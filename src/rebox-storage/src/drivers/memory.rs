@@ -1,6 +1,11 @@
-use std::collections::BTreeMap;
+use std::{collections::BTreeMap, io::Bytes};
+
+use anyhow::bail;
+use bytes::{Buf, BufMut, BytesMut};
 
 use rebox_types::ReboxResult;
+
+const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 1024 * 50; // 50 MBytes
 
 #[derive(Debug)]
 struct MaxSize(usize);
@@ -62,4 +67,17 @@ pub struct Column {
 pub struct ColumnName(String);
 
 #[derive(Debug, Default)]
-pub struct ColumnStorage(BTreeMap<u32, String>);
+pub struct ColumnStorage(BTreeMap<u32, ColumnContent>);
+
+#[derive(Debug, Default)]
+pub struct ColumnContent(BytesMut);
+
+impl ColumnContent {
+    pub fn store(mut self, payload: Box<dyn Buf>) -> ReboxResult<()> {
+        if self.0.capacity() >= COLUMN_MAX_CAPACITY {
+            bail!("Out ot space inside a column")
+        }
+        self.0.put(payload);
+        Ok(())
+    }
+}

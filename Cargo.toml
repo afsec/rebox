@@ -37,6 +37,7 @@ debug-assertions = true
 [workspace.dependencies]
 anyhow = "1.0.71"
 clap = { version = "4.3.5", features = ["derive"] }
+bytes = { version = "1.4.0" }
 # chrono = { version = "0.4.26", default-features = false, features = [
 #     "serde",
 #     "clock",
