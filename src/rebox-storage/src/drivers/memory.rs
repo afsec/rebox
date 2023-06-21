@@ -1,5 +1,6 @@
 use rebox_types::ReboxResult;
 
+#[derive(Debug, Default)]
 pub struct DriverMemory;
 
 impl DriverMemory {
