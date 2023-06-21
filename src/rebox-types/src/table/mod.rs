@@ -34,14 +34,14 @@ pub enum DatabaseState<D: Driver> {
 #[derive(Debug, Default)]
 pub struct DatabaseReady<D: Driver> {
     driver: D,
-    master_table: ReboxMaster,
+    master_table: ReboxSequence,
     tables: Vec<Table>,
 }
 
 ////////////////////
 
 #[derive(Debug, Default)]
-pub struct ReboxMaster {
+pub struct ReboxSequence {
     table_name: TableName,
     table_metadata_filename: TableFileName,
     tables: BTreeMap<TableName, CurrentRowId>,
