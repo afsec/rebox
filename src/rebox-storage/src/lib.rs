@@ -11,13 +11,22 @@ mod tests {
     fn run_against_memory_driver() -> ReboxResult<()> {
         let driver_name = "memory";
         let driver = Driver::from_str(driver_name)?;
-        driver.run()?;
+        assert!(driver.run().is_ok());
         Ok(())
     }
+    #[test]
     fn run_against_kv_driver() -> ReboxResult<()> {
         let driver_name = "kv";
         let driver = Driver::from_str(driver_name)?;
-        driver.run()?;
+
+        assert!(driver.run().is_ok());
+        Ok(())
+    }
+    #[test]
+    fn run_against_invalid_input_for_driver() -> ReboxResult<()> {
+        let driver_name = "";
+        let driver = Driver::from_str(driver_name);
+        assert!(driver.is_err());
         Ok(())
     }
 }

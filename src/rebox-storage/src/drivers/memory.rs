@@ -4,7 +4,8 @@ use rebox_types::ReboxResult;
 pub struct DriverMemory;
 
 impl DriverMemory {
-    pub fn run() -> ReboxResult<()> {
-        todo!();
+    pub fn run(self) -> ReboxResult<()> {
+        println!("Hello from: {} at line {}.", file!(), line!());
+        Ok(())
     }
 }

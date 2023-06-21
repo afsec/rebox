@@ -1,6 +1,3 @@
-#[derive(Debug, Default)]
-pub struct DriverRkv;
-
 use anyhow::format_err;
 use rebox_types::ReboxResult;
 use rkv::{
@@ -8,8 +5,12 @@ use rkv::{
     Manager, Rkv, SingleStore, StoreError, StoreOptions, Value,
 };
 use tempfile::Builder;
+
+#[derive(Debug, Default)]
+pub struct DriverRkv;
+
 impl DriverRkv {
-    pub fn run() -> ReboxResult<()> {
+    pub fn run(self) -> ReboxResult<()> {
         use std::{fs, str};
         let root = Builder::new().prefix("iterator").tempdir()?;
         fs::create_dir_all(root.path())?;
