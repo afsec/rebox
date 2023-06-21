@@ -1,0 +1,11 @@
+[package]
+edition = "2021"
+name = "rebox-core"
+version = "0.0.1"
+
+[dependencies]
+anyhow = { workspace = true }
+rebox-types = { path = "../rebox-types" }
+
+[dev-dependencies]
+clap = { workspace = true }

@@ -1,0 +1,46 @@
+[workspace]
+members = ["src/*", "xtask/", "fuzzer/"]
+
+[workspace.package]
+publish = false
+edition = "2021"
+rust-version = "1.70.0"
+authors = ["https://github.com/afsec"]
+license = "MIT"
+
+[profile.dev]
+opt-level = 0
+lto = false
+debug = true
+debug-assertions = true
+
+[profile.release]
+opt-level = 3
+lto = true
+debug = false
+debug-assertions = false
+strip = true
+
+[profile.bench]
+opt-level = 3
+lto = true
+debug = false
+debug-assertions = false
+
+[profile.test]
+opt-level = 0
+lto = false
+debug = true
+debug-assertions = true
+# [patch.'crates-io']
+
+[workspace.dependencies]
+anyhow = "1.0.71"
+clap = { version = "4.3.5", features = ["derive"] }
+# chrono = { version = "0.4.26", default-features = false, features = [
+#     "serde",
+#     "clock",
+# ] }
+serde = { version = "1.0.164", features = ["derive"] }
+# tokio = { version = "1.28.1", features = ["full", "tracing"] }
+# tracing = "0.1.37"

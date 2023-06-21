@@ -1,0 +1,7 @@
+[package]
+edition = "2021"
+name = "rebox-types"
+version = "0.0.1"
+
+[dependencies]
+anyhow = { workspace = true }
