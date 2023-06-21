@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use rebox_types::ReboxResult;
 
 #[derive(Debug)]
@@ -53,11 +55,11 @@ pub struct TableFileName(String);
 #[derive(Debug, Default)]
 pub struct Column {
     column_name: ColumnName,
-    column_filename: ColumnFileName,
+    column_storage: ColumnStorage,
 }
 
 #[derive(Debug, Default)]
 pub struct ColumnName(String);
 
 #[derive(Debug, Default)]
-pub struct ColumnFileName(String);
+pub struct ColumnStorage(BTreeMap<u32, String>);
