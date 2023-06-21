@@ -1,5 +1,6 @@
 pub type ReboxResult<T> = anyhow::Result<T>;
 
+pub mod table;
 // pub fn add(left: usize, right: usize) -> usize {
 //     left + right
 // }

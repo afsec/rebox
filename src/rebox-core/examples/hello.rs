@@ -2,7 +2,7 @@ use rebox_types::ReboxResult;
 
 fn main() -> ReboxResult<()> {
     use clap::Parser;
-    println!("Hello from: {} at line {}.", file!(), line!());
+
     let cli = cli::Args::parse();
 
     match cli.comamnd {
@@ -36,14 +36,12 @@ mod cli {
     pub struct Hello {
         /// No println-like messages
         #[arg(long, short)]
-        pub quiet: bool
-        
+        pub quiet: bool,
     }
     #[derive(Parser, Debug)]
     pub struct Todo {
         /// No println-like messages
         #[arg(long, short)]
-        pub quiet: bool
-        
+        pub quiet: bool,
     }
 }
