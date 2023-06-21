@@ -30,6 +30,7 @@
             ''
               rustup default stable
               rustup component add rust-analyzer
+              alias cx='cargo xtask'
             '';
         };
       });
