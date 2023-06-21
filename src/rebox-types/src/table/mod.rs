@@ -1,9 +1,9 @@
 use crate::ReboxResult;
 
 #[derive(Debug, Default)]
-pub struct Database<D>(DatabaseState<D>);
+pub struct Database<D: Driver>(DatabaseState<D>);
 
-impl<D> Database<D> {
+impl<D: Driver> Database<D> {
     pub fn run(self) -> ReboxResult<()> {
         println!("Hello from: {} at line {}.", file!(), line!());
         Ok(())
@@ -18,7 +18,7 @@ pub struct DatabaseOps<D: Driver> {
 }
 
 #[derive(Debug, Default)]
-pub enum DatabaseState<D> {
+pub enum DatabaseState<D: Driver> {
     #[default]
     NotStarted,
     Opening(D),
@@ -26,7 +26,7 @@ pub enum DatabaseState<D> {
 }
 
 #[derive(Debug, Default)]
-pub struct Ready<D> {
+pub struct Ready<D: Driver> {
     driver: D,
     master_table: MasterTable,
     tables: Vec<Table>,
