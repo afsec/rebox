@@ -19,7 +19,7 @@ impl Default for MaxSize {
 
 #[derive(Debug, Default)]
 pub struct DriverMemory {
-    master_table: MasterTable,
+    master_table: ReboxMaster,
     tables: Vec<Table>,
     max_size: MaxSize,
 }
@@ -37,12 +37,19 @@ impl DriverMemory {
 
 #[derive(Debug, Default)]
 pub struct Database {
-    master_table: MasterTable,
+    master_table: ReboxMaster,
     tables: Vec<Table>,
 }
 
 #[derive(Debug, Default)]
-pub struct MasterTable(Table);
+pub struct ReboxMaster {
+    table_name: TableName,
+    table_metadata_filename: TableFileName,
+    tables: BTreeMap<TableName, CurrentRowId>,
+}
+
+#[derive(Debug, Default)]
+pub struct CurrentRowId(u32);
 
 #[derive(Debug, Default)]
 pub struct Table {
