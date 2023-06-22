@@ -1,3 +1,5 @@
+use table::Driver;
+
 pub type ReboxResult<T> = anyhow::Result<T>;
 
 pub mod table;
@@ -5,13 +7,27 @@ pub mod table;
 //     left + right
 // }
 
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
+#[derive(Debug, Default)]
+struct KeyValue;
 
-//     #[test]
-//     fn it_works() {
-//         let result = add(2, 2);
-//         assert_eq!(result, 4);
-//     }
-// }
+#[derive(Debug, Default)]
+struct Memory;
+
+impl Driver for Memory {}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use table::Database;
+
+    #[test]
+    fn it_works() -> ReboxResult<()> {
+        let db = Database::new()
+            .set_driver(Memory)?
+            .set_session_name("remora-123123123")?
+            .connect()?;
+
+        // assert_eq!(result, 4);
+        Ok(())
+    }
+}

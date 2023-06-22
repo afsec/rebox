@@ -5,14 +5,23 @@ fn main() -> ReboxResult<()> {
 
     let cli = cli::Args::parse();
 
-    match cli.comamnd {
+    if let Some(command) = cli.command {
+        run(command)?;
+    } else {
+        run(cli::Command::default())?;
+    }
+    Ok(())
+}
+
+fn run(command: cli::Command) -> ReboxResult<()> {
+    match command {
         cli::Command::Hello(cmd) => {
             dbg!(cmd);
         }
         cli::Command::Todo(cmd) => {
             dbg!(cmd);
         }
-    };
+    }
     Ok(())
 }
 
@@ -23,7 +32,7 @@ mod cli {
     #[derive(Parser, Debug)]
     pub struct Args {
         #[command(subcommand)]
-        pub comamnd: Command,
+        pub command: Option<Command>,
     }
     #[derive(Parser, Debug)]
     pub enum Command {
@@ -32,7 +41,12 @@ mod cli {
         /// Simple Todo
         Todo(Todo),
     }
-    #[derive(Parser, Debug)]
+    impl Default for Command {
+        fn default() -> Self {
+            Self::Hello(Default::default())
+        }
+    }
+    #[derive(Parser, Debug, Default)]
     pub struct Hello {
         /// No println-like messages
         #[arg(long, short)]
