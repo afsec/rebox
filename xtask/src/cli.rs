@@ -10,6 +10,8 @@ pub struct Args {
 }
 #[derive(Parser, Debug)]
 pub enum Command {
+    /// Perform cargo check, build , build --release
+    Prep(Prepare),
     /// Compiles release version
     Build(Build),
     /// Run fuzzing tests
@@ -23,12 +25,24 @@ pub enum Command {
 }
 
 #[derive(Parser, Debug)]
+pub struct Prepare {
+    #[arg(long, short)]
+    /// Show cargo ouput
+    verbose: bool,
+}
+
+impl Prepare {
+    pub fn verbose(&self) -> bool {
+        self.verbose
+    }
+}
+
+#[derive(Parser, Debug)]
 pub struct Build {
     #[arg(long, short)]
     /// Enable release
-    release: bool    
+    release: bool,
 }
-
 
 #[derive(Parser, Debug)]
 pub struct FuzzTests;
