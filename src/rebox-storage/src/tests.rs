@@ -10,7 +10,7 @@ fn new_in_memory_database() -> ReboxResult<()> {
         .set_session_name("remora-123123123")?
         .connect()?;
 
-    // assert_eq!(result, 4);
+    assert_eq!(db.driver(), &InMemory);
     Ok(())
 }
 
@@ -22,6 +22,6 @@ fn new_kv_database() -> ReboxResult<()> {
         .set_session_name("remora-123123123")?
         .connect()?;
 
-    // assert_eq!(result, 4);
+    assert_eq!(db.driver(), &KeyValue);
     Ok(())
 }
