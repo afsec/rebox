@@ -48,13 +48,13 @@ mod cli {
     }
     #[derive(Parser, Debug, Default)]
     pub struct Hello {
-        /// No println-like messages
+        /// Disable println-like messagess
         #[arg(long, short)]
         pub quiet: bool,
     }
     #[derive(Parser, Debug)]
     pub struct Todo {
-        /// No println-like messages
+        /// Disable println-like messagess
         #[arg(long, short)]
         pub quiet: bool,
     }

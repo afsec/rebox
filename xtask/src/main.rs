@@ -26,7 +26,43 @@ fn main() -> XtaskResult<()> {
 
     sh.change_dir(project_root()?);
 
+    print!("\n{{ cargo xtask");
     match cli.comamnd {
+        cli::Command::Prep(args) => {
+            use humantime::format_duration;
+            use std::time::{Duration, Instant};
+            println!(" prepare:\n");
+            let now = Instant::now();
+            {
+                let cmd = cmd!(sh, "cargo check");
+                if args.verbose() {
+                    cmd.run()?;
+                } else {
+                    cmd.ignore_stdout().ignore_stderr().run()?;
+                }
+            }
+            {
+                let cmd = cmd!(sh, "cargo build");
+                if args.verbose() {
+                    cmd.run()?;
+                } else {
+                    cmd.ignore_stdout().ignore_stderr().run()?;
+                }
+            }
+            {
+                let cmd = cmd!(sh, "cargo build --release");
+                if args.verbose() {
+                    cmd.run()?;
+                } else {
+                    cmd.ignore_stdout().ignore_stderr().run()?;
+                }
+            }
+
+            println!(
+                "\n}}: Finished in {}",
+                format_duration(Duration::from_secs(now.elapsed().as_secs())).to_string()
+            );
+        }
         cli::Command::Build(cmd) => {
             dbg!(cmd);
             ()
@@ -48,7 +84,7 @@ fn main() -> XtaskResult<()> {
             ()
         }
     };
-    println!("Hello from: {} at line {}.", file!(), line!());
+    // println!("Hello from: {} at line {}.", file!(), line!());
     Ok(())
 }
 
