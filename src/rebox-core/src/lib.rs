@@ -1,9 +1,6 @@
-
 pub struct Rebox;
 
-impl Rebox {
-    
-}
+impl Rebox {}
 
 // pub fn add(left: usize, right: usize) -> usize {
 //     left + right

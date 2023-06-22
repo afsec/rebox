@@ -8,9 +8,17 @@ use tempfile::Builder;
 
 use super::{DataStorage, Driver};
 
-impl Driver for KeyValue {}
+const MAX_DB_SIZE: usize = 1024 * 1024 * 1024 * 20; // 20 GBytes
 
-impl DataStorage for KeyValueStorage {}
+impl Driver for KeyValue {
+    type Storage<DS> = KeyValueStorage;
+}
+
+impl DataStorage for KeyValueStorage {
+    fn max_dbsize(&self) -> usize {
+        MAX_DB_SIZE
+    }
+}
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct KeyValueStorage;
