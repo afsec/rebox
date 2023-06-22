@@ -19,6 +19,7 @@
           cargo-sort cargo-audit cargo-deny cargo-vet cargo-generate
           helix cocogitto difftastic watchexec
           hexyl
+          vscodium
           nixd
         ];
       in
