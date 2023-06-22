@@ -19,6 +19,10 @@ impl<D: Driver> Database<D> {
     pub fn new() -> DatabaseBuilder<D> {
         DatabaseBuilder(PhantomData)
     }
+
+    pub fn driver(&self) -> &D {
+        &self.driver
+    }
 }
 
 pub struct DatabaseBuilder<D: Driver>(PhantomData<D>);

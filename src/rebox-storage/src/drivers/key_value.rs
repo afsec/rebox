@@ -10,7 +10,7 @@ use super::Driver;
 
 impl Driver for KeyValue {}
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct KeyValue;
 
 impl KeyValue {

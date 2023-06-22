@@ -21,5 +21,5 @@ impl Default for MaxSize {
 
 impl Driver for InMemory {}
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq)]
 pub struct InMemory;
