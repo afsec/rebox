@@ -5,6 +5,8 @@ use bytes::{Buf, BufMut, BytesMut};
 
 use rebox_types::ReboxResult;
 
+use super::Driver;
+
 const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 1024 * 50; // 50 MBytes
 
 #[derive(Debug)]
@@ -17,77 +19,7 @@ impl Default for MaxSize {
     }
 }
 
-#[derive(Debug, Default)]
-pub struct DriverMemory {
-    master_table: ReboxSequence,
-    tables: Vec<Table>,
-    max_size: MaxSize,
-}
-
-impl DriverMemory {
-    pub fn current_size(&self) -> usize {
-        // TODO
-        std::mem::size_of::<Self>()
-    }
-    pub fn run(self) -> ReboxResult<()> {
-        println!("Hello from: {} at line {}.", file!(), line!());
-        Ok(())
-    }
-}
+impl Driver for InMemory {}
 
 #[derive(Debug, Default)]
-pub struct Database {
-    master_table: ReboxSequence,
-    tables: Vec<Table>,
-}
-
-#[derive(Debug, Default)]
-pub struct ReboxSequence {
-    table_name: TableName,
-    table_metadata_filename: TableFileName,
-    tables: BTreeMap<TableName, CurrentRowId>,
-}
-
-#[derive(Debug, Default)]
-pub struct CurrentRowId(u32);
-
-#[derive(Debug, Default)]
-pub struct Table {
-    table_name: TableName,
-    table_metadata_filename: TableFileName,
-    columns: Vec<Column>,
-}
-
-#[derive(Debug, Default)]
-pub struct TableName(String);
-
-#[derive(Debug, Default)]
-pub struct TableFileName(String);
-
-#[derive(Debug, Default)]
-pub struct Column {
-    column_name: ColumnName,
-    column_storage: ColumnStorage,
-}
-
-#[derive(Debug, Default)]
-pub struct ColumnName(String);
-
-#[derive(Debug, Default)]
-pub struct ColumnStorage {
-    current_row_id: CurrentRowId,
-    data: BTreeMap<u32, ColumnContent>,
-}
-
-#[derive(Debug, Default)]
-pub struct ColumnContent(BytesMut);
-
-impl ColumnContent {
-    pub fn store(mut self, payload: Box<dyn Buf>) -> ReboxResult<()> {
-        if self.0.capacity() >= COLUMN_MAX_CAPACITY {
-            bail!("Out ot space inside a column")
-        }
-        self.0.put(payload);
-        Ok(())
-    }
-}
+pub struct InMemory;
