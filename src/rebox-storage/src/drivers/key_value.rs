@@ -6,9 +6,14 @@ use rkv::{
 };
 use tempfile::Builder;
 
-use super::Driver;
+use super::{DataStorage, Driver};
 
 impl Driver for KeyValue {}
+
+impl DataStorage for KeyValueStorage {}
+
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct KeyValueStorage;
 
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct KeyValue;
