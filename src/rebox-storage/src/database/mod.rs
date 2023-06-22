@@ -7,6 +7,9 @@ use rebox_types::{
 };
 use std::{fmt::Debug, marker::PhantomData};
 
+#[cfg(test)]
+mod tests;
+
 #[derive(Debug)]
 pub struct Database<D: Driver> {
     driver: D,
@@ -23,11 +26,15 @@ impl<D: Driver> Database<D> {
     pub fn driver(&self) -> &D {
         &self.driver
     }
+    pub fn connect(&mut self) -> ReboxResult<()> {
+        // TODO
+        Ok(())
+    }
 }
 
 pub struct DatabaseBuilder<D: Driver>(PhantomData<D>);
 impl<D: Driver> DatabaseBuilder<D> {
-    pub fn set_driver(&mut self, driver: D) -> ReboxResult<DatabaseWithDriver<D>> {
+    pub fn set_driver(self, driver: D) -> ReboxResult<DatabaseWithDriver<D>> {
         Ok(DatabaseWithDriver { driver })
     }
 }
@@ -57,7 +64,7 @@ pub struct DatabaseWithParams<D: Driver> {
     database_name: String,
 }
 impl<D: Driver> DatabaseWithParams<D> {
-    pub fn connect(self) -> ReboxResult<Database<D>> {
+    pub fn build(self) -> ReboxResult<Database<D>> {
         let Self {
             driver,
             database_name,
