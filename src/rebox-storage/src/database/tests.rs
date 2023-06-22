@@ -3,24 +3,27 @@ use rebox_types::ReboxResult;
 use crate::drivers::{InMemory, KeyValue};
 
 #[test]
-fn new_in_memory_database() -> ReboxResult<()> {
+fn new_in_memory() -> ReboxResult<()> {
     use crate::database::Database;
-    let db = Database::new()
+    let mut db = Database::new()
         .set_driver(InMemory)?
         .set_session_name("remora-123123123")?
-        .connect()?;
+        .build()?;
+    db.connect()?;
 
     assert_eq!(db.driver(), &InMemory);
     Ok(())
 }
 
 #[test]
-fn new_kv_database() -> ReboxResult<()> {
+fn new_kv() -> ReboxResult<()> {
     use crate::database::Database;
-    let db = Database::new()
+    let mut db = Database::new()
         .set_driver(KeyValue)?
         .set_session_name("remora-123123123")?
-        .connect()?;
+        .build()?;
+
+    db.connect()?;
 
     assert_eq!(db.driver(), &KeyValue);
     Ok(())
