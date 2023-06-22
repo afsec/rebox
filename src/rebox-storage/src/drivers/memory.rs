@@ -5,7 +5,9 @@ use bytes::{Buf, BufMut, BytesMut};
 
 use rebox_types::ReboxResult;
 
-use super::Driver;
+use crate::table::ColumnContent;
+
+use super::{DataStorage, Driver};
 
 const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 1024 * 50; // 50 MBytes
 
@@ -19,7 +21,12 @@ impl Default for MaxSize {
     }
 }
 
-impl Driver for InMemory {}
+impl Driver for InMemoryDriver {}
 
 #[derive(Debug, Default, PartialEq, Eq)]
-pub struct InMemory;
+pub struct InMemoryDriver;
+
+impl DataStorage for InMemoryStorage {}
+
+#[derive(Debug, Default)]
+pub struct InMemoryStorage(BTreeMap<u32, ColumnContent>);

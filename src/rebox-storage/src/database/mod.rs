@@ -1,26 +1,29 @@
-use crate::drivers::Driver;
+use crate::{
+    drivers::{DataStorage, Driver},
+    table::{ReboxSequence, Table},
+};
 use anyhow::bail;
 use bytes::{Buf, BufMut, BytesMut};
-use rebox_types::{
-    table::{ReboxSequence, Table, TableFileName, TableName},
-    ReboxResult,
-};
+use rebox_types::ReboxResult;
 use std::{fmt::Debug, marker::PhantomData};
 
 #[cfg(test)]
 mod tests;
 
 #[derive(Debug)]
-pub struct Database<D: Driver> {
+pub struct Database<D: Driver, DS: DataStorage> {
     driver: D,
     database_name: String,
     rebox_sequence: ReboxSequence,
-    tables: Vec<Table>,
+    tables: Vec<Table<DS>>,
 }
 
-impl<D: Driver> Database<D> {
-    pub fn new() -> DatabaseBuilder<D> {
-        DatabaseBuilder(PhantomData)
+impl<D: Driver, DS: DataStorage> Database<D, DS> {
+    pub fn new() -> DatabaseBuilder<D, DS> {
+        DatabaseBuilder {
+            driver: PhantomData,
+            storage: PhantomData,
+        }
     }
 
     pub fn driver(&self) -> &D {
@@ -32,42 +35,49 @@ impl<D: Driver> Database<D> {
     }
 }
 
-pub struct DatabaseBuilder<D: Driver>(PhantomData<D>);
-impl<D: Driver> DatabaseBuilder<D> {
-    pub fn set_driver(self, driver: D) -> ReboxResult<DatabaseWithDriver<D>> {
-        Ok(DatabaseWithDriver { driver })
+pub struct DatabaseBuilder<D: Driver, DS: DataStorage> {
+    driver: PhantomData<D>,
+    storage: PhantomData<DS>,
+}
+impl<D: Driver, DS: DataStorage> DatabaseBuilder<D, DS> {
+    pub fn set_driver(self, driver: D, storage: DS) -> ReboxResult<DatabaseWithDriver<D, DS>> {
+        Ok(DatabaseWithDriver { driver, storage })
     }
 }
 
 #[derive(Debug, Default)]
-pub struct DatabaseWithDriver<D: Driver> {
+pub struct DatabaseWithDriver<D: Driver, DS: DataStorage> {
     driver: D,
+    storage: DS,
 }
 
-impl<D: Driver> DatabaseWithDriver<D> {
+impl<D: Driver, DS: DataStorage> DatabaseWithDriver<D, DS> {
     pub fn set_session_name<S: AsRef<str>>(
         self,
         session_name: S,
-    ) -> ReboxResult<DatabaseWithParams<D>> {
-        let Self { driver } = self;
+    ) -> ReboxResult<DatabaseWithParams<D, DS>> {
+        let Self { driver, storage } = self;
         // TODO
         Ok(DatabaseWithParams {
             driver,
             database_name: session_name.as_ref().to_string(),
+            storage,
         })
     }
 }
 
 #[derive(Debug, Default)]
-pub struct DatabaseWithParams<D: Driver> {
+pub struct DatabaseWithParams<D: Driver, DS: DataStorage> {
     driver: D,
+    storage: DS,
     database_name: String,
 }
-impl<D: Driver> DatabaseWithParams<D> {
-    pub fn build(self) -> ReboxResult<Database<D>> {
+impl<D: Driver, DS: DataStorage> DatabaseWithParams<D, DS> {
+    pub fn build(self) -> ReboxResult<Database<D, DS>> {
         let Self {
             driver,
             database_name,
+            storage,
         } = self;
         // TODO
         Ok(Database {

@@ -1,8 +1,10 @@
-use crate::ReboxResult;
 use anyhow::bail;
 use bytes::{Buf, BufMut, BytesMut};
+use rebox_types::ReboxResult;
 use std::collections::BTreeMap;
 use std::fmt::Debug;
+
+use crate::drivers::DataStorage;
 
 const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 1024 * 50; // 50 MBytes
 
@@ -27,10 +29,10 @@ impl Default for ReboxSequence {
 pub struct CurrentRowId(u32);
 
 #[derive(Debug, Default)]
-pub struct Table {
+pub struct Table<DS: DataStorage> {
     table_name: TableName,
     table_metadata_filename: TableFileName,
-    columns: Vec<Column>,
+    columns: Vec<Column<DS>>,
 }
 
 #[derive(Debug, Default)]
@@ -51,16 +53,13 @@ impl TableFileName {
 }
 
 #[derive(Debug, Default)]
-pub struct Column {
+pub struct Column<DS: DataStorage> {
     column_name: ColumnName,
-    column_storage: ColumnStorage,
+    column_storage: DS,
 }
 
 #[derive(Debug, Default)]
 pub struct ColumnName(String);
-
-#[derive(Debug, Default)]
-pub struct ColumnStorage(BTreeMap<u32, ColumnContent>);
 
 #[derive(Debug, Default)]
 pub struct ColumnContent(BytesMut);
