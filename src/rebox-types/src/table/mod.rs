@@ -1,88 +1,28 @@
-use std::{collections::BTreeMap, io::Bytes, marker::PhantomData, vec};
-
+use crate::ReboxResult;
 use anyhow::bail;
 use bytes::{Buf, BufMut, BytesMut};
-
-const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 1024 * 50; // 50 MBytes
-use crate::{Memory, ReboxResult};
+use std::collections::BTreeMap;
 use std::fmt::Debug;
 
-pub trait Driver {}
-
-#[derive(Debug)]
-pub struct Database<D: Driver> {
-    driver: D,
-    database_name: String,
-    rebox_sequence: ReboxSequence,
-    tables: Vec<Table>,
-}
-
-impl<D: Driver> Database<D> {
-    pub fn new() -> DatabaseBuilder<D> {
-        DatabaseBuilder(PhantomData)
-    }
-}
-
-pub struct DatabaseBuilder<D: Driver>(PhantomData<D>);
-impl<D: Driver> DatabaseBuilder<D> {
-    pub fn set_driver(&mut self, driver: D) -> ReboxResult<DatabaseWithDriver<D>> {
-        Ok(DatabaseWithDriver { driver })
-    }
-}
-
-#[derive(Debug, Default)]
-pub struct DatabaseWithDriver<D: Driver> {
-    driver: D,
-}
-
-impl<D: Driver> DatabaseWithDriver<D> {
-    pub fn set_session_name<S: AsRef<str>>(
-        self,
-        session_name: S,
-    ) -> ReboxResult<DatabaseWithParams<D>> {
-        let Self { driver } = self;
-        // TODO
-        Ok(DatabaseWithParams {
-            driver,
-            database_name: session_name.as_ref().to_string(),
-        })
-    }
-}
-
-#[derive(Debug, Default)]
-pub struct DatabaseWithParams<D: Driver> {
-    driver: D,
-    database_name: String,
-}
-impl<D: Driver> DatabaseWithParams<D> {
-    pub fn connect(self) -> ReboxResult<Database<D>> {
-        let Self {
-            driver,
-            database_name,
-        } = self;
-        // TODO
-        Ok(Database {
-            driver,
-            database_name,
-            rebox_sequence: ReboxSequence {
-                table_name: TableName::new("rebox_sequence"),
-                table_filename: TableFileName::new("rebox_sequence"),
-                inner_data: Default::default(),
-            },
-            tables: vec![],
-        })
-    }
-}
+const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 1024 * 50; // 50 MBytes
 
 ////////////////////
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct ReboxSequence {
     table_name: TableName,
     table_filename: TableFileName,
     inner_data: BTreeMap<TableName, CurrentRowId>,
 }
-
+impl Default for ReboxSequence {
+    fn default() -> Self {
+        Self {
+            table_name: TableName::new("rebox_sequence"),
+            table_filename: TableFileName::new("rebox_sequence"),
+            inner_data: Default::default(),
+        }
+    }
+}
 #[derive(Debug, Default)]
 pub struct CurrentRowId(u32);
 

@@ -6,10 +6,14 @@ use rkv::{
 };
 use tempfile::Builder;
 
-#[derive(Debug, Default)]
-pub struct DriverRkv;
+use super::Driver;
 
-impl DriverRkv {
+impl Driver for KeyValue {}
+
+#[derive(Debug, Default)]
+pub struct KeyValue;
+
+impl KeyValue {
     pub fn run(self) -> ReboxResult<()> {
         use std::{fs, str};
         let root = Builder::new().prefix("iterator").tempdir()?;
