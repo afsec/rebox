@@ -3,23 +3,37 @@ use bytes::{Buf, BufMut, BytesMut};
 
 use rebox_types::ReboxResult;
 
-use crate::drivers::DataStorage;
-
 const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 50; // 50 MBytes
 
-#[derive(Debug, Default)]
-pub struct Column<DS: DataStorage> {
+#[derive(Debug)]
+pub struct ColumnDesc {
     column_name: ColumnName,
-    column_storage: DS,
+    column_type: ColumnType,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, PartialEq, Eq)]
+pub struct Column {
+    column_name: ColumnName,
+    column_type: ColumnType,
+    columen_value: ColumnValue,
+}
+
+#[derive(Debug, PartialEq, Eq)]
 pub struct ColumnName(String);
 
-#[derive(Debug, Default)]
-pub struct ColumnContent(BytesMut);
+#[derive(Debug, PartialEq, Eq)]
+pub enum ColumnType {
+    Null,
+    Bool(bool),
+    Integer(u32),
+    Float((u16, u16)),
+    Text(String),
+}
 
-impl ColumnContent {
+#[derive(Debug, PartialEq, Eq)]
+pub struct ColumnValue(BytesMut);
+
+impl ColumnValue {
     pub fn store(mut self, payload: Box<dyn Buf>) -> ReboxResult<()> {
         if self.0.capacity() >= COLUMN_MAX_CAPACITY {
             bail!("Out ot space inside a column")
