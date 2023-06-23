@@ -6,9 +6,7 @@ use std::fmt::Debug;
 
 use crate::drivers::DataStorage;
 
-const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 1024 * 50; // 50 MBytes
-
-////////////////////
+const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 50; // 50 MBytes
 
 #[derive(Debug)]
 pub struct ReboxSequence {
