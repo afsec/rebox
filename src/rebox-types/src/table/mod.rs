@@ -3,10 +3,8 @@ use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::vec;
 
+use crate::ReboxResult;
 use anyhow::bail;
-use rebox_types::ReboxResult;
-
-use crate::drivers::DataStorage;
 
 pub use self::columns::Column;
 use self::columns::ColumnDesc;
@@ -42,9 +40,7 @@ impl CurrentRowId {
 
 #[derive(Debug, Default)]
 pub struct TableRow(BTreeSet<Column>);
-impl TableRow {
-
-}
+impl TableRow {}
 
 #[derive(Debug, Default)]
 pub struct Table {
