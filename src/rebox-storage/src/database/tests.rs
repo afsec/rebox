@@ -9,7 +9,7 @@ fn new_in_memory() -> ReboxResult<()> {
         .set_driver(InMemoryDriver, InMemoryStorage::default())?
         .set_session_name("remora-123123123")?
         .build()?;
-    db.connect()?;
+    // db.connect()?;
 
     assert_eq!(db.driver(), &InMemoryDriver);
     Ok(())
@@ -23,7 +23,7 @@ fn new_kv() -> ReboxResult<()> {
         .set_session_name("remora-123123123")?
         .build()?;
 
-    db.connect()?;
+    // db.connect()?;
 
     assert_eq!(db.driver(), &KeyValue);
     Ok(())

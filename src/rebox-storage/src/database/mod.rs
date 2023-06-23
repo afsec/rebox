@@ -1,11 +1,14 @@
 use crate::{
     drivers::{DataStorage, Driver},
-    table::{ReboxSequence, Table},
+    table::TableName,
 };
-use anyhow::bail;
-use bytes::{Buf, BufMut, BytesMut};
+
 use rebox_types::ReboxResult;
 use std::{fmt::Debug, marker::PhantomData};
+
+use self::tables::{DatabaseTables, ReboxSequence};
+
+mod tables;
 
 #[cfg(test)]
 mod tests;
@@ -15,7 +18,7 @@ pub struct Database<D: Driver, DS: DataStorage> {
     driver: D,
     database_name: String,
     rebox_sequence: ReboxSequence,
-    tables: Vec<Table<DS>>,
+    tables: DatabaseTables<DS>,
 }
 
 impl<D: Driver, DS: DataStorage> Database<D, DS> {
@@ -29,9 +32,13 @@ impl<D: Driver, DS: DataStorage> Database<D, DS> {
     pub fn driver(&self) -> &D {
         &self.driver
     }
-    pub fn connect(&mut self) -> ReboxResult<()> {
-        // TODO
-        Ok(())
+    // pub fn connect(&mut self) -> ReboxResult<Arc<RwLock<&D>>> {
+    //     // TODO
+    //     Ok(Arc::new(RwLock::new(&self.driver)))
+    // }
+
+    pub fn get_table_list(&self) -> Vec<&TableName> {
+        self.tables.list()
     }
 }
 
