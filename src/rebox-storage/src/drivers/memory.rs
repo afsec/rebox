@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use crate::table::ColumnContent;
+use crate::table::Column;
 
 use super::{DataStorage, Driver};
 
@@ -19,4 +19,4 @@ impl DataStorage for InMemoryStorage {
 }
 
 #[derive(Debug, Default)]
-pub struct InMemoryStorage(BTreeMap<u32, ColumnContent>);
+pub struct InMemoryStorage(BTreeMap<u32, Column>);

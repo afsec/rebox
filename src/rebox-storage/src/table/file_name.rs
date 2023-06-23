@@ -5,3 +5,9 @@ impl TableFileName {
         Self(name.as_ref().to_string())
     }
 }
+
+impl From<String> for TableFileName {
+    fn from(value: String) -> Self {
+        Self(value)
+    }
+}
