@@ -1,7 +1,7 @@
 use anyhow::bail;
 use bytes::{Buf, BufMut, BytesMut};
 
-use rebox_types::ReboxResult;
+use crate::ReboxResult;
 
 const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 50; // 50 MBytes
 
@@ -25,8 +25,8 @@ pub struct ColumnName(String);
 pub enum ColumnType {
     Null,
     Bool(bool),
-    Integer(u32),
-    Float((u16, u16)),
+    Integer(i32),
+    Natural(u32),
     Text(String),
 }
 

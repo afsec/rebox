@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
+use crate::ReboxResult;
 use anyhow::bail;
-use rebox_types::ReboxResult;
 
 use crate::table::{CurrentRowId, Table, TableName, TableRow};
 

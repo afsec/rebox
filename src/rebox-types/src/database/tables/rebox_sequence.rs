@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
+use crate::ReboxResult;
 use anyhow::bail;
-use rebox_types::ReboxResult;
 
 use crate::table::{CurrentRowId, TableFileName, TableName};
 
@@ -32,7 +32,6 @@ impl ReboxSequence {
         }
         Ok(())
     }
-    
 }
 impl Default for ReboxSequence {
     fn default() -> Self {
