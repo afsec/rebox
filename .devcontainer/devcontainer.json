@@ -1,12 +1,8 @@
 {
-	"name": "composable",
-	"hostRequirements": {
-		"memory": "20gb",
-		"cpus": 8
-	},
+	"name": "rebox",
 	"build": {
 		"dockerfile": "Dockerfile",
-		"context": "."
+		"context": "../"
 	},
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
@@ -38,38 +34,6 @@
 				"zxh404.vscode-proto3",
 				"mkhl.direnv"
 			]
-		}
-	},
-	"portsAttributes": {
-		"9988": {
-			"label": "Picasso",
-			"onAutoForward": "notify",
-			"protocol": "http"
-		},
-		"29988": {
-			"label": "Composable",
-			"onAutoForward": "notify",
-			"protocol": "http"
-		},
-		"9944": {
-			"label": "Kusama",
-			"onAutoForward": "notify",
-			"protocol": "http"
-		},
-		"29944": {
-			"label": "Polkadot",
-			"onAutoForward": "notify",
-			"protocol": "http"
-		},
-		"26657": {
-			"label": "Juno",
-			"onAutoForward": "notify",
-			"protocol": "http"
-		},
-		"8080": {
-			"label": "Hasura",
-			"onAutoForward": "notify",
-			"protocol": "http"
 		}
 	},
 	"settings": {
