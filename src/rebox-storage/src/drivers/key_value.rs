@@ -8,15 +8,14 @@ use tempfile::Builder;
 
 use super::{DataStorage, Driver};
 
-const MAX_DB_SIZE: usize = 1024 * 1024 * 1024 * 20; // 20 GBytes
-
 impl Driver for KeyValue {
     type Storage<DS> = KeyValueStorage;
 }
 
 impl DataStorage for KeyValueStorage {
+    const MAX_SIZE_DB: usize = 1024 * 1024 * 1024 * 20; // 20 GBytes
     fn max_dbsize(&self) -> usize {
-        MAX_DB_SIZE
+        Self::MAX_SIZE_DB
     }
 }
 
