@@ -1,19 +1,20 @@
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
-use crate::ReboxResult;
+use crate::{
+    schema::{column::TableColumn, name::TableName, schema::TableSchema},
+    ReboxResult,
+};
 use anyhow::bail;
 
-use crate::table::{CurrentRowId, Table, TableName, TableRow};
+use crate::schema::{CurrentRowId, Table, TableRow};
 
-pub use self::rebox_sequence::ReboxSequence;
 
-mod rebox_sequence;
-#[cfg(test)]
-mod tests;
+
+
 
 // TODO
 #[derive(Debug)]
-pub struct DatabaseTables(BTreeMap<TableName, Table>);
+pub struct DatabaseTables(BTreeMap<TableName, TableSchema>);
 impl Default for DatabaseTables {
     fn default() -> Self {
         Self(Default::default())
@@ -25,13 +26,13 @@ impl DatabaseTables {
         outcome
     }
     pub fn create_table(&mut self, table: Table) -> ReboxResult<TableName> {
-        let table_name = table.name().to_owned();
-        if self.0.contains_key(&table_name) {
-            bail!("Table {} is already in Database", table.name());
+        let (name, schema) = table.take();
+        if self.0.contains_key(&name) {
+            bail!("Table {} is already in Database", name);
         }
-        self.0.insert(table_name.clone(), table);
+        self.0.insert(name.clone(), schema);
 
-        Ok(table_name)
+        Ok(name)
     }
     pub fn insert_into_table(
         &mut self,

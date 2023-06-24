@@ -1,19 +1,32 @@
 use crate::{database::Database, ReboxResult};
 
-const DB_NAME: &str = "rebox-123123123";
-
 #[test]
 fn ok_on_new_database_with_valid_name() -> ReboxResult<()> {
-    let res = Database::new().database_name(DB_NAME);
+    let res = Database::new().set_name("rebox-123123123");
 
     assert!(res.is_ok());
+
+    let res = res?.build();
+
+    assert!(res.is_ok());
+
     Ok(())
 }
 
 #[test]
-fn erro_on_new_database_with_invalid_name() -> ReboxResult<()> {
-    let res = Database::new().database_name(DB_NAME);
+fn error_on_new_database_with_invalid_name() -> ReboxResult<()> {
+    let res = Database::new().set_name("rebox_123123123");
 
     assert!(res.is_err());
+
+    Ok(())
+}
+
+#[test]
+fn ok_on_new_database_with_columns() -> ReboxResult<()> {
+    let res = Database::new().set_name("rebox-123123123")?.build();
+
+    assert!(res.is_ok());
+
     Ok(())
 }
