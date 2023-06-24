@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use rebox_types::{database::Database, table::TableName, ReboxResult};
+use rebox_types::{database::{Database, DatabaseName}, helpers::check_valid_name, ReboxResult};
 
 use crate::drivers::Driver;
 
@@ -45,15 +45,16 @@ pub struct BuilderWithDriver<D: Driver> {
 }
 
 impl<D: Driver> BuilderWithDriver<D> {
-    pub fn database_name<S: AsRef<str>>(
+    pub fn set_name<S: AsRef<str>>(
         self,
-        session_name: S,
+        name: S,
     ) -> ReboxResult<BuilderWithParams<D>> {
+        check_valid_name(&name)?;
         let Self { driver } = self;
         // TODO
         Ok(BuilderWithParams {
             driver,
-            database_name: session_name.as_ref().to_string(),
+            database_name: DatabaseName::new(name),
         })
     }
 }
@@ -61,7 +62,7 @@ impl<D: Driver> BuilderWithDriver<D> {
 #[derive(Debug, Default)]
 pub struct BuilderWithParams<D: Driver> {
     driver: D,
-    database_name: String,
+    database_name: DatabaseName,
 }
 impl<D: Driver> BuilderWithParams<D> {
     pub fn build(self) -> ReboxResult<Manager<D>> {
@@ -72,7 +73,7 @@ impl<D: Driver> BuilderWithParams<D> {
         // TODO
         Ok(Manager {
             driver,
-            database: Database::new().database_name(database_name)?.build()?,
+            database: Database::new().set_name(database_name)?.build()?,
         })
     }
 }
