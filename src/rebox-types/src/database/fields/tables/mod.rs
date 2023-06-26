@@ -9,6 +9,9 @@ use anyhow::bail;
 
 use crate::schema::{CurrentRowId, Table};
 
+#[cfg(test)]
+mod tests;
+
 // TODO
 #[derive(Debug)]
 pub struct DatabaseTables(BTreeMap<TableName, TableSchema>);

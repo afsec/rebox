@@ -2,7 +2,7 @@ use std::marker::PhantomData;
 
 use rebox_types::{
     database::{Database, DatabaseName},
-    helpers::check_valid_name,
+    helpers::check_valid_entity_name,
     ReboxResult,
 };
 
@@ -50,7 +50,7 @@ pub struct BuilderWithDriver<D: Driver> {
 
 impl<D: Driver> BuilderWithDriver<D> {
     pub fn set_name<S: AsRef<str>>(self, name: S) -> ReboxResult<BuilderWithParams<D>> {
-        check_valid_name(&name)?;
+        check_valid_entity_name(&name)?;
         let Self { driver } = self;
         // TODO
         Ok(BuilderWithParams {

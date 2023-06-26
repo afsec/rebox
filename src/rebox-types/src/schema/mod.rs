@@ -1,7 +1,7 @@
 use anyhow::bail;
 use std::fmt::Debug;
 
-use crate::{helpers::check_valid_name, ReboxResult};
+use crate::{helpers::check_valid_entity_name, ReboxResult};
 
 use self::{column::TableColumn, name::TableName, schema::TableSchema};
 
@@ -59,7 +59,7 @@ pub struct TableBuilder;
 
 impl TableBuilder {
     pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<TableBuilderWtbName> {
-        check_valid_name(&name)?;
+        check_valid_entity_name(&name)?;
         Ok(TableBuilderWtbName {
             name: TableName::new(name),
             schema: Default::default(),
@@ -73,9 +73,12 @@ pub struct TableBuilderWtbName {
 }
 
 impl TableBuilderWtbName {
-    pub fn set_column(self, column: TableColumn) -> ReboxResult<Self> {
+    pub fn set_schema(self, columns: Vec<TableColumn>) -> ReboxResult<Self> {
         let Self { name, mut schema } = self;
-        schema.add_column(column)?;
+        columns
+            .into_iter()
+            .map(|column| schema.add_column(column))
+            .collect::<ReboxResult<()>>()?;
 
         Ok(Self { name, schema })
     }
