@@ -1,5 +1,5 @@
 use anyhow::bail;
-use std::{collections::BTreeSet, fmt::Debug};
+use std::fmt::Debug;
 
 use crate::{helpers::check_valid_name, ReboxResult};
 
@@ -88,7 +88,3 @@ impl TableBuilderWtbName {
         }
     }
 }
-
-#[derive(Debug, Default)]
-pub struct TableRow(TableSchema);
-impl TableRow {}
