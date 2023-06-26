@@ -1,22 +1,22 @@
-use std::collections::{ BTreeMap};
+use std::collections::BTreeMap;
 
 use anyhow::bail;
 
 use crate::ReboxResult;
 
-use super::{column::{TableColumn, ColumnName}};
+use super::column::{ColumnName, SchemaColumn};
 
-#[derive(Debug, Default)]
-pub struct TableSchema(BTreeMap<ColumnName,TableColumn>);
+#[derive(Debug, Default, Clone)]
+pub struct TableSchema(BTreeMap<ColumnName, SchemaColumn>);
 
 impl TableSchema {
-    pub fn add_column(&mut self, column: TableColumn) -> ReboxResult<()> {
+    pub fn add_column(&mut self, column: SchemaColumn) -> ReboxResult<()> {
         let column_name = column.name();
         if self.0.contains_key(column_name) {
             bail!("Column already defined");
         }
 
-        self.0.insert(column_name.to_owned(),column);
+        self.0.insert(column_name.to_owned(), column);
 
         Ok(())
     }

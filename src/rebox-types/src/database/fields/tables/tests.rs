@@ -1,6 +1,6 @@
 use crate::{
     schema::{
-        column::{ColumnKind, TableColumn},
+        column::{ColumnKind, SchemaColumn},
         Table,
     },
     test_helpers::ResultScenario,
@@ -20,14 +20,14 @@ fn create_table(column_names: &[&str], result_scenario: ResultScenario) -> Rebox
     let schema = column_names
         .iter()
         .map(|name| {
-            let outcome = TableColumn::new()
+            let outcome = SchemaColumn::new()
                 .set_name(name)?
                 .set_kind(ColumnKind::Text)
                 .is_nullable(false)
                 .build();
             Ok(outcome)
         })
-        .collect::<ReboxResult<Vec<TableColumn>>>()?;
+        .collect::<ReboxResult<Vec<SchemaColumn>>>()?;
 
     assert_eq!(schema.len(), column_names.len());
 

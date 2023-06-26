@@ -16,7 +16,7 @@ pub fn check_valid_entity_name<T: AsRef<str>>(name: T) -> ReboxResult<()> {
             if ch.is_ascii_alphanumeric() || ch == '-' {
                 Ok(())
             } else {
-                bail!("Entity name has invalid chars")
+                bail!("Entity name has invalid char [`{ch}`]")
             }
         })
         .collect::<ReboxResult<()>>()?;
