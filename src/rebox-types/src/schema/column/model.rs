@@ -5,7 +5,7 @@ use crate::ReboxResult;
 
 const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 50; // 50 MBytes
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ColumnName(String);
 
 impl<T: AsRef<str>> From<T> for ColumnName {
