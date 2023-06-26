@@ -4,7 +4,7 @@ use test_case::test_case;
 
 #[test_case(&["db-name-1","db-name1"],ResultScenario::Success ; "when name is valid")]
 #[test_case(&["db-name_1","db_name1"],ResultScenario::Error  ; "when name is invalid")]
-fn create_databse(database_names: &[&str], result_scenario: ResultScenario) -> ReboxResult<()> {
+fn create_database(database_names: &[&str], result_scenario: ResultScenario) -> ReboxResult<()> {
     let res = database_names
         .iter()
         .map(|name| Database::new().set_name(name)?.build())

@@ -15,6 +15,10 @@ impl TableColumn {
     pub fn new() -> TableColumnBuilder {
         TableColumnBuilder
     }
+
+    pub fn name(&self) -> &ColumnName {
+        &self.name
+    }
 }
 
 pub struct TableColumnBuilder;
