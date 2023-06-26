@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use rebox_types::database::TableRow;
+use rebox_types::database::row::TableRow;
 
 use super::{DataStorage, Driver};
 

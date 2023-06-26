@@ -1,6 +1,13 @@
 use std::vec;
 
-use crate::{database::Database, test_helpers::ResultScenario, ReboxResult};
+use crate::{
+    database::{
+        row::{ColumnValue, TableColumn},
+        Database,
+    },
+    test_helpers::ResultScenario,
+    ReboxResult,
+};
 
 use test_case::test_case;
 
@@ -27,8 +34,12 @@ fn create_database(database_names: &[&str], result_scenario: ResultScenario) -> 
 /////
 #[test_case(vec!["db-name1","db-name2"] ; "when creating one table for earch of them")]
 fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
-        use crate::{database::{TableRow, TableColumn}, schema::{column::ColumnKind, Table}};
-        use crate::schema::column::SchemaColumn;
+    use crate::schema::column::SchemaColumn;
+    use crate::{
+        database::TableRow,
+        schema::{column::ColumnKind, Table},
+    };
+
     let request_tbl_schema = vec![
         SchemaColumn::new()
             .set_name("request-id")?
@@ -96,7 +107,14 @@ fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
     });
 
     // TABLE CRUD - CREATE ROW (INSERT)
-    let columns = vec![];
+    let c1 = TableColumn::new()
+        .set_name("request-id")?
+        .set_kind(ColumnKind::Text)
+        .is_nullable(false)
+        .set_value(ColumnValue::Text("B46D427F2".to_owned()))?
+        .build()?;
+
+    let columns = vec![c1];
     let table_row = TableRow::new(columns)?;
     databases
         .iter_mut()

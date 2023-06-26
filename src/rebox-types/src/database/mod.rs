@@ -11,12 +11,12 @@ use crate::{
 
 use std::{collections::BTreeMap, fmt::Debug};
 
-use self::builder::DatabaseBuilder;
 pub use self::fields::{name::DatabaseName, rebox_sequence::ReboxSequence, tables::DatabaseTables};
+use self::{builder::DatabaseBuilder, row::TableRow};
 
 pub mod builder;
 mod fields;
-
+pub mod row;
 #[cfg(test)]
 mod tests;
 
@@ -55,69 +55,4 @@ impl Database {
     pub fn name(&self) -> &str {
         self.name.as_ref()
     }
-}
-
-#[derive(Debug, Default, Clone)]
-pub struct TableRow(BTreeMap<ColumnName, TableColumn>);
-
-impl TableRow {
-    pub fn new(columns: Vec<TableColumn>) -> ReboxResult<Self> {
-        let mut row = BTreeMap::new();
-
-        columns
-            .into_iter()
-            .map(|column| {
-                if row.contains_key(column.name()) {
-                    bail!("Column already defined");
-                } else {
-                    row.insert(column.name().to_owned(), column);
-                }
-
-                Ok(())
-            })
-            .collect::<ReboxResult<Vec<()>>>()?;
-
-        Ok(Self(row))
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct TableColumn {
-    name: ColumnName,
-    kind: ColumnKind,
-    is_nullable: bool,
-    value: Option<ColumnValue>,
-}
-
-impl From<SchemaColumn> for TableColumn {
-    fn from(value: SchemaColumn) -> Self {
-        let (name, kind, is_nullable) = value.take();
-        Self {
-            name,
-            kind,
-            is_nullable,
-            value: None,
-        }
-    }
-}
-
-/*
-SchemaColumn
- */
-impl TableColumn {
-    pub fn name(&self) -> &ColumnName {
-        &self.name
-    }
-
-    pub fn set_value(&mut self, value: ColumnValue) {
-        self.value = Some(value);
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ColumnValue {
-    Bool(bool),
-    Integer(i32),
-    Natural(u32),
-    Text(String),
 }

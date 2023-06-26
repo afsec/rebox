@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use anyhow::bail;
 use bytes::{Buf, BufMut, BytesMut};
 
@@ -11,6 +13,12 @@ pub struct ColumnName(String);
 impl<T: AsRef<str>> From<T> for ColumnName {
     fn from(value: T) -> Self {
         ColumnName(value.as_ref().to_owned())
+    }
+}
+
+impl Display for ColumnName {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 
