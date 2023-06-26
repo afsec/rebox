@@ -1,4 +1,4 @@
-use crate::{helpers::check_valid_name, ReboxResult};
+use crate::{helpers::check_valid_entity_name, ReboxResult};
 
 pub use self::model::{ColumnData, ColumnKind, ColumnName};
 
@@ -20,7 +20,7 @@ impl TableColumn {
 pub struct TableColumnBuilder;
 impl TableColumnBuilder {
     pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<TableColumnBuilderS1> {
-        check_valid_name(&name)?;
+        check_valid_entity_name(&name)?;
         Ok(TableColumnBuilderS1 { name: name.into() })
     }
 }

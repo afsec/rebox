@@ -7,3 +7,6 @@ version = "0.0.1"
 anyhow = { workspace = true }
 bytes = { workspace = true }
 
+[dev-dependencies]
+test-case = "3.1.0"
+

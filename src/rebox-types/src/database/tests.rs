@@ -1,32 +1,23 @@
-use crate::{database::Database, ReboxResult};
+use crate::{database::Database, test_helpers::ResultScenario, ReboxResult};
 
-#[test]
-fn ok_on_new_database_with_valid_name() -> ReboxResult<()> {
-    let res = Database::new().set_name("rebox-123123123");
+use test_case::test_case;
 
-    assert!(res.is_ok());
+#[test_case(&["db-name-1","db-name1"],ResultScenario::Success ; "when name is valid")]
+#[test_case(&["db-name_1","db_name1"],ResultScenario::Error  ; "when name is invalid")]
+fn create_databse(database_names: &[&str], result_scenario: ResultScenario) -> ReboxResult<()> {
+    let res = database_names
+        .iter()
+        .map(|name| Database::new().set_name(name)?.build())
+        .collect::<ReboxResult<Vec<Database>>>();
 
-    let res = res?.build();
+    let current_scenario = ResultScenario::from(&res);
 
-    assert!(res.is_ok());
+    assert_eq!(current_scenario, result_scenario);
 
-    Ok(())
-}
-
-#[test]
-fn error_on_new_database_with_invalid_name() -> ReboxResult<()> {
-    let res = Database::new().set_name("rebox_123123123");
-
-    assert!(res.is_err());
-
-    Ok(())
-}
-
-#[test]
-fn ok_on_new_database_with_columns() -> ReboxResult<()> {
-    let res = Database::new().set_name("rebox-123123123")?.build();
-
-    assert!(res.is_ok());
+    if current_scenario == ResultScenario::Success {
+        assert!(res.is_ok());
+        assert_eq!(res?.len(), database_names.len());
+    }
 
     Ok(())
 }

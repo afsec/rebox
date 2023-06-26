@@ -1,4 +1,4 @@
-use crate::{helpers::check_valid_name, ReboxResult};
+use crate::{helpers::check_valid_entity_name, ReboxResult};
 
 use super::{Database, DatabaseName, ReboxSequence};
 
@@ -6,7 +6,7 @@ pub struct DatabaseBuilder;
 
 impl DatabaseBuilder {
     pub fn set_name<S: AsRef<str>>(self, name: S) -> ReboxResult<DatabaseBuilderS1> {
-        check_valid_name(&name)?;
+        check_valid_entity_name(&name)?;
 
         Ok(DatabaseBuilderS1 {
             name: DatabaseName::new(name),
