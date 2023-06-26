@@ -3,9 +3,9 @@ use std::fmt::Debug;
 
 use crate::{helpers::check_valid_entity_name, ReboxResult};
 
-use self::{column::TableColumn, name::TableName, schema::TableSchema};
+use self::{column::SchemaColumn, name::TableName, schema::TableSchema};
 
-// pub use self::{column::TableColumn, name::TableName};
+// pub use self::{column::SchemaColumn, name::TableName};
 
 pub mod column;
 pub mod name;
@@ -34,7 +34,7 @@ impl CurrentRowId {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct Table {
     name: TableName,
     schema: TableSchema,
@@ -73,7 +73,7 @@ pub struct TableBuilderWtbName {
 }
 
 impl TableBuilderWtbName {
-    pub fn set_schema(self, columns: Vec<TableColumn>) -> ReboxResult<Self> {
+    pub fn set_schema(self, columns: Vec<SchemaColumn>) -> ReboxResult<Self> {
         let Self { name, mut schema } = self;
         columns
             .into_iter()

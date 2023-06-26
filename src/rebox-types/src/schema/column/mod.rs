@@ -4,49 +4,57 @@ pub use self::model::{ColumnData, ColumnKind, ColumnName};
 
 mod model;
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub struct TableColumn {
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct SchemaColumn {
     name: ColumnName,
     kind: ColumnKind,
     is_nullable: bool,
 }
 
-impl TableColumn {
-    pub fn new() -> TableColumnBuilder {
-        TableColumnBuilder
+impl SchemaColumn {
+    pub fn new() -> SchemaColumnBuilder {
+        SchemaColumnBuilder
     }
 
     pub fn name(&self) -> &ColumnName {
         &self.name
     }
-}
-
-pub struct TableColumnBuilder;
-impl TableColumnBuilder {
-    pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<TableColumnBuilderS1> {
-        check_valid_entity_name(&name)?;
-        Ok(TableColumnBuilderS1 { name: name.into() })
+    pub fn take(self) -> (ColumnName, ColumnKind, bool) {
+        let Self {
+            name,
+            kind,
+            is_nullable,
+        } = self;
+        (name, kind, is_nullable)
     }
 }
 
-pub struct TableColumnBuilderS1 {
+pub struct SchemaColumnBuilder;
+impl SchemaColumnBuilder {
+    pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<SchemaColumnBuilderS1> {
+        check_valid_entity_name(&name)?;
+        Ok(SchemaColumnBuilderS1 { name: name.into() })
+    }
+}
+
+pub struct SchemaColumnBuilderS1 {
     name: ColumnName,
 }
-impl TableColumnBuilderS1 {
-    pub fn set_kind(self, kind: ColumnKind) -> TableColumnBuilderS2 {
+impl SchemaColumnBuilderS1 {
+    pub fn set_kind(self, kind: ColumnKind) -> SchemaColumnBuilderS2 {
         let Self { name } = self;
-        TableColumnBuilderS2 { name, kind }
+        SchemaColumnBuilderS2 { name, kind }
     }
 }
-pub struct TableColumnBuilderS2 {
+pub struct SchemaColumnBuilderS2 {
     name: ColumnName,
     kind: ColumnKind,
 }
 
-impl TableColumnBuilderS2 {
-    pub fn is_nullable(self, is_nullable: bool) -> TableColumnBuilderS3 {
+impl SchemaColumnBuilderS2 {
+    pub fn is_nullable(self, is_nullable: bool) -> SchemaColumnBuilderS3 {
         let Self { name, kind } = self;
-        TableColumnBuilderS3 {
+        SchemaColumnBuilderS3 {
             name,
             kind,
             is_nullable,
@@ -54,20 +62,20 @@ impl TableColumnBuilderS2 {
     }
 }
 
-pub struct TableColumnBuilderS3 {
+pub struct SchemaColumnBuilderS3 {
     name: ColumnName,
     kind: ColumnKind,
     is_nullable: bool,
 }
 
-impl TableColumnBuilderS3 {
-    pub fn build(self) -> TableColumn {
+impl SchemaColumnBuilderS3 {
+    pub fn build(self) -> SchemaColumn {
         let Self {
             name,
             kind,
             is_nullable,
         } = self;
-        TableColumn {
+        SchemaColumn {
             name,
             kind,
             is_nullable,

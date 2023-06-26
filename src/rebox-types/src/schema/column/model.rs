@@ -14,7 +14,7 @@ impl<T: AsRef<str>> From<T> for ColumnName {
     }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ColumnKind {
     Bool,
     Integer,
