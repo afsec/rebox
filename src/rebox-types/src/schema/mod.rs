@@ -62,30 +62,40 @@ impl Table {
 pub struct TableBuilder;
 
 impl TableBuilder {
-    pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<TableBuilderWtbName> {
+    pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<TableBuilderS1> {
         check_valid_entity_name(&name)?;
-        Ok(TableBuilderWtbName {
+        Ok(TableBuilderS1 {
             name: TableName::new(name),
-            schema: Default::default(),
         })
     }
 }
 
-pub struct TableBuilderWtbName {
+pub struct TableBuilderS1 {
     name: TableName,
-    schema: TableSchema,
 }
 
-impl TableBuilderWtbName {
-    pub fn set_schema(self, columns: Vec<SchemaColumn>) -> ReboxResult<Self> {
-        let Self { name, mut schema } = self;
+impl TableBuilderS1 {
+    pub fn set_schema(self, columns: Vec<SchemaColumn>) -> ReboxResult<TableBuilderS2> {
+        if columns.len() < 1 {
+            bail!("Sorry, you must to define at least one SchemaColumn")
+        }
+        let mut schema = TableSchema::default();
+        let Self { name } = self;
         columns
             .into_iter()
             .map(|column| schema.add_column(column))
             .collect::<ReboxResult<()>>()?;
 
-        Ok(Self { name, schema })
+        Ok(TableBuilderS2 { name, schema })
     }
+}
+
+pub struct TableBuilderS2 {
+    name: TableName,
+    schema: TableSchema,
+}
+
+impl TableBuilderS2 {
     pub fn build(self) -> ReboxResult<Table> {
         let Self { name, schema } = self;
         if schema.count_columns() > 0 {
