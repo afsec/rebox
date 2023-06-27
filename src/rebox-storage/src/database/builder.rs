@@ -1,6 +1,6 @@
-use crate::{helpers::check_valid_entity_name, ReboxResult};
+use rebox_types::{helpers::check_valid_entity_name, ReboxResult};
 
-use super::{Database, DatabaseName, ReboxSequence};
+use super::{Database, fields::{DatabaseName, ReboxSequence, ReboxMaster, ReboxSchema}};
 
 pub struct DatabaseBuilder;
 
@@ -26,6 +26,8 @@ impl DatabaseBuilderS1 {
             name,
             rebox_sequence: ReboxSequence::default(),
             tables: Default::default(),
+            rebox_schema: ReboxSchema::default(),
+            rebox_master: ReboxMaster::default(),
         })
     }
 }

@@ -1,8 +1,5 @@
-use crate::{
-    schema::{
-        column::{ColumnKind, SchemaColumn},
-        Table,
-    },
+use rebox_types::{
+    schema::{SchemaColumn, Table, ColumnKind},
     test_helpers::ResultScenario,
     ReboxResult,
 };

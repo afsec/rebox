@@ -6,6 +6,8 @@ version = "0.0.1"
 [dependencies]
 anyhow = { workspace = true }
 rebox-types = { path = "../rebox-types" }
+rebox-storage = { path = "../rebox-storage" }
 
 [dev-dependencies]
 clap = { workspace = true }
+test-case = { workspace = true }

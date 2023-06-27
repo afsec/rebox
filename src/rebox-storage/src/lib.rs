@@ -1,2 +1,4 @@
+mod database;
 mod drivers;
-mod manager;
+pub use self::database::{Database, DatabaseName, DatabaseTables};
+pub use self::drivers::{Driver, KeyValueDriver, KeyValueStorage};

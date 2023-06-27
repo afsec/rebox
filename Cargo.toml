@@ -39,6 +39,8 @@ anyhow = "1.0.71"
 clap = { version = "4.3.5", features = ["derive"] }
 bytes = "1.4.0"
 humantime = "2.1.0"
+
+test-case = "3.1.0"
 # serde = { version = "1.0.164", features = ["derive"] }
 # chrono = { version = "0.4.26", default-features = false, features = [
 #     "serde",
@@ -46,3 +48,5 @@ humantime = "2.1.0"
 # ] }
 # tokio = { version = "1.28.1", features = ["full", "tracing"] }
 # tracing = "0.1.37"
+
+

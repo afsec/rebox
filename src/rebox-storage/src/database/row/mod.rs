@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use anyhow::bail;
 
-use crate::{schema::column::ColumnName, ReboxResult};
+use rebox_types::{schema::ColumnName, ReboxResult};
 
 pub use self::column::{ColumnValue, TableColumn};
 

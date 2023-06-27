@@ -6,26 +6,9 @@ use rkv::{
 };
 use tempfile::Builder;
 
-use super::{DataStorage, Driver};
+use super::KeyValueDriver;
 
-impl Driver for KeyValue {
-    type Storage<DS> = KeyValueStorage;
-}
-
-impl DataStorage for KeyValueStorage {
-    const MAX_SIZE_DB: usize = 1024 * 1024 * 1024 * 20; // 20 GBytes
-    fn max_dbsize(&self) -> usize {
-        Self::MAX_SIZE_DB
-    }
-}
-
-#[derive(Debug, Default, PartialEq, Eq)]
-pub struct KeyValueStorage;
-
-#[derive(Debug, Default, PartialEq, Eq)]
-pub struct KeyValue;
-
-impl KeyValue {
+impl KeyValueDriver {
     pub fn run(self) -> ReboxResult<()> {
         use std::{fs, str};
         let root = Builder::new().prefix("iterator").tempdir()?;

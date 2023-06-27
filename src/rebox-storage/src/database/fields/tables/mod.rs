@@ -1,13 +1,12 @@
 use std::collections::BTreeMap;
 
-use crate::{
-    database::TableRow,
-    schema::{name::TableName, schema::TableSchema},
+use anyhow::bail;
+use rebox_types::{
+    schema::{CurrentRowId, Table, TableName, TableSchema},
     ReboxResult,
 };
-use anyhow::bail;
 
-use crate::schema::{CurrentRowId, Table};
+use crate::database::row::TableRow;
 
 #[cfg(test)]
 mod tests;

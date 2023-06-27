@@ -1,9 +1,10 @@
 use anyhow::bail;
 use std::collections::BTreeMap;
 
-use crate::schema::name::TableName;
-use crate::schema::CurrentRowId;
-use crate::ReboxResult;
+use rebox_types::{
+    schema::{CurrentRowId, TableName},
+    ReboxResult,
+};
 
 #[derive(Debug)]
 pub struct ReboxSequence {
