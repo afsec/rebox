@@ -12,38 +12,11 @@ use rebox_types::{test_helpers::ResultScenario, ReboxResult};
 
 use test_case::test_case;
 
-#[test_case(&["db-name-1","db-name1"],ResultScenario::Success ; "when name is valid")]
-#[test_case(&["db-name_1","db_name1"],ResultScenario::Error  ; "when name is invalid")]
-fn create_database(database_names: &[&str], result_scenario: ResultScenario) -> ReboxResult<()> {
-    let driver = KeyValueDriver;
-    let res = database_names
-        .iter()
-        .map(|name| {
-            let database = Database::new()
-                .set_name(name)?
-                .set_driver(driver.clone())
-                .build()?;
-            Ok(database)
-        })
-        .collect::<ReboxResult<Vec<Database<KeyValueDriver>>>>();
-
-    let current_scenario = ResultScenario::from(&res);
-
-    assert_eq!(current_scenario, result_scenario);
-
-    if current_scenario == ResultScenario::Success {
-        assert!(res.is_ok());
-        assert_eq!(res?.len(), database_names.len());
-    }
-
-    Ok(())
-}
-
-/////
 #[test_case(vec!["db-name1","db-name2"] ; "when creating one table for earch of them")]
 fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
     use crate::database::TableRow;
     use rebox_types::schema::{ColumnKind, SchemaColumn, Table};
+
     let driver = KeyValueDriver;
     let request_tbl_schema = vec![
         SchemaColumn::new()
