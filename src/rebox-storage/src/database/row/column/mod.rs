@@ -1,8 +1,8 @@
 use anyhow::bail;
 
-use crate::{
+use rebox_types::{
     helpers::check_valid_entity_name,
-    schema::column::{ColumnKind, ColumnName},
+    schema::{ColumnKind, ColumnName},
     ReboxResult,
 };
 

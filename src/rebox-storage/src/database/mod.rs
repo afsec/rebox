@@ -1,18 +1,17 @@
-use anyhow::bail;
-
-use crate::{
-    schema::{
-        column::{ColumnKind, ColumnName, SchemaColumn},
-        name::TableName,
-        CurrentRowId, Table,
-    },
+use rebox_types::{
+    schema::{CurrentRowId, Table, TableName},
     ReboxResult,
 };
 
-use std::{collections::BTreeMap, fmt::Debug};
+use std::fmt::Debug;
 
-pub use self::fields::{name::DatabaseName, rebox_sequence::ReboxSequence, tables::DatabaseTables};
-use self::{builder::DatabaseBuilder, row::TableRow};
+pub use self::fields::{DatabaseName, DatabaseTables};
+
+use self::{
+    builder::DatabaseBuilder,
+    fields::{ReboxMaster, ReboxSchema, ReboxSequence},
+    row::TableRow,
+};
 
 pub mod builder;
 mod fields;
@@ -24,6 +23,8 @@ mod tests;
 pub struct Database {
     name: DatabaseName,
     rebox_sequence: ReboxSequence,
+    rebox_schema: ReboxSchema,
+    rebox_master: ReboxMaster,
     tables: DatabaseTables,
 }
 

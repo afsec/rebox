@@ -3,13 +3,17 @@ use std::fmt::Debug;
 
 use crate::{helpers::check_valid_entity_name, ReboxResult};
 
-use self::{column::SchemaColumn, name::TableName, schema::TableSchema};
+pub use self::{
+    column::{ColumnKind, ColumnName, SchemaColumn},
+    name::TableName,
+    table::TableSchema,
+};
 
 // pub use self::{column::SchemaColumn, name::TableName};
 
-pub mod column;
-pub mod name;
-pub mod schema;
+mod column;
+mod name;
+mod table;
 
 #[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CurrentRowId(u32);

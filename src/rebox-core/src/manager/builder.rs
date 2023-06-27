@@ -1,36 +1,19 @@
 use std::marker::PhantomData;
 
+use rebox_storage::Driver;
 use rebox_types::{
     database::{Database, DatabaseName},
     helpers::check_valid_entity_name,
     ReboxResult,
 };
 
-use crate::drivers::Driver;
-
-#[derive(Debug)]
-pub struct Manager<D: Driver> {
-    driver: D,
-    database: Database,
-}
+use super::Manager;
 
 impl<D: Driver> Manager<D> {
     pub fn new() -> ManagerBuilder<D> {
         ManagerBuilder {
             driver: PhantomData,
         }
-    }
-
-    pub fn driver(&self) -> &D {
-        &self.driver
-    }
-    // pub fn connect(&mut self) -> ReboxResult<Arc<RwLock<&D>>> {
-    //     // TODO
-    //     Ok(Arc::new(RwLock::new(&self.driver)))
-    // }
-
-    pub fn database(&self) -> &Database {
-        &self.database
     }
 }
 
@@ -49,7 +32,7 @@ pub struct BuilderWithDriver<D: Driver> {
 }
 
 impl<D: Driver> BuilderWithDriver<D> {
-    pub fn set_name<S: AsRef<str>>(self, name: S) -> ReboxResult<BuilderWithParams<D>> {
+    pub fn set_database_name<S: AsRef<str>>(self, name: S) -> ReboxResult<BuilderWithParams<D>> {
         check_valid_entity_name(&name)?;
         let Self { driver } = self;
         // TODO

@@ -1,13 +1,11 @@
 use std::vec;
 
-use crate::{
-    database::{
-        row::{ColumnValue, TableColumn},
-        Database,
-    },
-    test_helpers::ResultScenario,
-    ReboxResult,
+use crate::database::{
+    row::{ColumnValue, TableColumn},
+    Database,
 };
+
+use rebox_types::{test_helpers::ResultScenario, ReboxResult};
 
 use test_case::test_case;
 
@@ -34,11 +32,8 @@ fn create_database(database_names: &[&str], result_scenario: ResultScenario) -> 
 /////
 #[test_case(vec!["db-name1","db-name2"] ; "when creating one table for earch of them")]
 fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
-    use crate::schema::column::SchemaColumn;
-    use crate::{
-        database::TableRow,
-        schema::{column::ColumnKind, Table},
-    };
+    use crate::database::TableRow;
+    use rebox_types::schema::{ColumnKind, SchemaColumn, Table};
 
     let request_tbl_schema = vec![
         SchemaColumn::new()
