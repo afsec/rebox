@@ -17,7 +17,7 @@ pub struct DatabaseConnection<D: Driver> {
 
 // impl<D: Driver> DatabaseConnection<D> {
 //     pub fn new(driver: D) -> Self {
-//         Self { driver }
+//         Self { driver }  'q12e4r5t6y7890-
 //     }
 
 //     pub fn list_tables(&self) -> Vec<&TableName> {

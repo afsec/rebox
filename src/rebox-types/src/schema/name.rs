@@ -3,6 +3,12 @@ use std::fmt::Display;
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TableName(String);
 
+impl From<TableName> for String {
+    fn from(value: TableName) -> Self {
+        value.0
+    }
+}
+
 impl TableName {
     pub fn new<T: AsRef<str>>(name: T) -> Self {
         Self(name.as_ref().to_string())

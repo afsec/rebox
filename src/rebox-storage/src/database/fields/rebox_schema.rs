@@ -32,11 +32,15 @@ impl ReboxSchema {
         }
         Ok(())
     }
+
+    pub fn table_name(&self) -> &TableName {
+        &self.table_name
+    }
 }
 impl Default for ReboxSchema {
     fn default() -> Self {
         Self {
-            table_name: TableName::new("rebox_sequence"),
+            table_name: TableName::new("schema"),
             inner_data: Default::default(),
         }
     }

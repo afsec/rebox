@@ -1,4 +1,6 @@
-use anyhow::bail;
+use std::path::{Path, PathBuf};
+
+use anyhow::{bail, format_err};
 
 use crate::ReboxResult;
 
@@ -21,4 +23,17 @@ pub fn check_valid_entity_name<T: AsRef<str>>(name: T) -> ReboxResult<()> {
         })
         .collect::<ReboxResult<()>>()?;
     Ok(())
+}
+
+pub fn project_root() -> ReboxResult<PathBuf> {
+    use std::env;
+    let project_root = Path::new(
+        &env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| env!("CARGO_MANIFEST_DIR").to_owned()),
+    )
+    .ancestors()
+    .nth(2)
+    .ok_or(format_err!("Error on getting project root path"))?
+    .to_path_buf();
+    dbg!(&project_root);
+    Ok(project_root)
 }
