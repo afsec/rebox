@@ -1,11 +1,7 @@
 use std::marker::PhantomData;
 
-use rebox_storage::Driver;
-use rebox_types::{
-    database::{Database, DatabaseName},
-    helpers::check_valid_entity_name,
-    ReboxResult,
-};
+use rebox_storage::{Database, DatabaseName, Driver};
+use rebox_types::{helpers::check_valid_entity_name, ReboxResult};
 
 use super::Manager;
 

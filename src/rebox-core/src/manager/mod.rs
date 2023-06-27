@@ -1,5 +1,4 @@
-use rebox_storage::Driver;
-use rebox_types::database::Database;
+use rebox_storage::{Database, Driver};
 
 mod builder;
 
