@@ -1,14 +1,10 @@
-use anyhow::{bail, format_err};
-use std::{collections::BTreeMap, path::PathBuf, str::FromStr};
+use anyhow::bail;
+use std::collections::BTreeMap;
 
 use rebox_types::{
-    helpers::project_root,
     schema::{CurrentRowId, TableName},
     ReboxResult,
 };
-
-#[cfg(test)]
-mod tests;
 
 #[derive(Debug)]
 pub struct ReboxSequence {
@@ -36,7 +32,6 @@ impl ReboxSequence {
         }
         Ok(())
     }
-    
 
     pub fn table_name(&self) -> &TableName {
         &self.table_name

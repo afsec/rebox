@@ -32,16 +32,18 @@ impl<'a> KeyValueStorage {
         // * Bootstrap DIRECTORY
 
         let mut root = project_root()?;
+
+        let table_name = table.into().to_string();
+
         root.push("rebox_data/");
         root.push("metadata/");
+        root.push(format!("{}/", table_name));
         if root.is_dir().not() {
             dbg!(&root);
             fs::create_dir_all(&root)?;
         }
 
         dbg!(&root);
-
-        let table_name = table.into().to_string();
 
         let mut manager = Manager::<SafeModeEnvironment>::singleton()
             .write()
@@ -86,10 +88,29 @@ impl<'a> KeyValueStorage {
             .get_or_create(root.as_path(), |p| Rkv::new::<SafeMode>(p))
             .unwrap();
         let k = created_arc.read().unwrap();
-        let store = k.open_single(table_name.as_str(), StoreOptions::create())?;
-        let mut writer = k.write()?;
-        // store.put(&mut writer, "some_key", &Value::Str("some_value"))?;
-        writer.commit().map_err(|err| format_err!("{err}"))
+        {
+            let store = k.open_single("master", StoreOptions::create())?;
+            let mut writer = k.write()?;
+            // TODO: Define schema
+            // store.put(&mut writer, "some_key", &Value::Str("some_value"))?;
+            writer.commit().map_err(|err| format_err!("{err}"))?;
+        }
+        {
+            let store = k.open_single("schema", StoreOptions::create())?;
+            let mut writer = k.write()?;
+            // TODO: Define schema
+            // store.put(&mut writer, "some_key", &Value::Str("some_value"))?;
+            writer.commit().map_err(|err| format_err!("{err}"))?;
+        }
+
+        {
+            let store = k.open_single("sequence", StoreOptions::create())?;
+            let mut writer = k.write()?;
+            // TODO: Define schema
+            // store.put(&mut writer, "some_key", &Value::Str("some_value"))?;
+            writer.commit().map_err(|err| format_err!("{err}"))?;
+        }
+        Ok(())
     }
 }
 
