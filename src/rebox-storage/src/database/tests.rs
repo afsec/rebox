@@ -1,8 +1,11 @@
 use std::vec;
 
-use crate::database::{
-    row::{ColumnValue, TableColumn},
-    Database,
+use crate::{
+    database::{
+        row::{ColumnValue, TableColumn},
+        Database,
+    },
+    KeyValueDriver,
 };
 
 use rebox_types::{test_helpers::ResultScenario, ReboxResult};
@@ -12,10 +15,17 @@ use test_case::test_case;
 #[test_case(&["db-name-1","db-name1"],ResultScenario::Success ; "when name is valid")]
 #[test_case(&["db-name_1","db_name1"],ResultScenario::Error  ; "when name is invalid")]
 fn create_database(database_names: &[&str], result_scenario: ResultScenario) -> ReboxResult<()> {
+    let driver = KeyValueDriver;
     let res = database_names
         .iter()
-        .map(|name| Database::new().set_name(name)?.build())
-        .collect::<ReboxResult<Vec<Database>>>();
+        .map(|name| {
+            let database = Database::new()
+                .set_name(name)?
+                .set_driver(driver.clone())
+                .build()?;
+            Ok(database)
+        })
+        .collect::<ReboxResult<Vec<Database<KeyValueDriver>>>>();
 
     let current_scenario = ResultScenario::from(&res);
 
@@ -34,7 +44,7 @@ fn create_database(database_names: &[&str], result_scenario: ResultScenario) -> 
 fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
     use crate::database::TableRow;
     use rebox_types::schema::{ColumnKind, SchemaColumn, Table};
-
+    let driver = KeyValueDriver;
     let request_tbl_schema = vec![
         SchemaColumn::new()
             .set_name("request-id")?
@@ -83,13 +93,18 @@ fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
 
     let mut databases = database_names
         .iter()
-        .map(|name| Database::new().set_name(name)?.build())
-        .collect::<ReboxResult<Vec<Database>>>()?;
+        .map(|name| {
+            Database::new()
+                .set_name(name)?
+                .set_driver(driver.clone())
+                .build()
+        })
+        .collect::<ReboxResult<Vec<Database<KeyValueDriver>>>>()?;
 
     // DATABASE CRUD - CREATE TABLE
     databases
         .iter_mut()
-        .map(|database: &mut Database| {
+        .map(|database: &mut Database<KeyValueDriver>| {
             database.create_table(requests_tbl.clone())?;
             database.create_table(responses_tbl.clone())?;
             Ok(())
@@ -113,7 +128,7 @@ fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
     let table_row = TableRow::new(columns)?;
     databases
         .iter_mut()
-        .map(|database: &mut Database| {
+        .map(|database: &mut Database<KeyValueDriver>| {
             database.insert_into_table("requests", table_row.clone())?;
             database.insert_into_table("responses", table_row.clone())?;
 

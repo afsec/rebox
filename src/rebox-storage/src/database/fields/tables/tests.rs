@@ -1,10 +1,12 @@
 use rebox_types::{
-    schema::{SchemaColumn, Table, ColumnKind},
+    schema::{ColumnKind, SchemaColumn, Table},
     test_helpers::ResultScenario,
     ReboxResult,
 };
 
 use test_case::test_case;
+
+use crate::KeyValueDriver;
 
 const DEFAULT_DB_NAME: &str = "rebox-123123123";
 
@@ -12,7 +14,11 @@ const DEFAULT_DB_NAME: &str = "rebox-123123123";
 #[test_case(&["c1","c2"], ResultScenario::Success ; "when two column has different name")]
 fn create_table(column_names: &[&str], result_scenario: ResultScenario) -> ReboxResult<()> {
     use crate::database::Database;
-    let mut db = Database::new().set_name(DEFAULT_DB_NAME)?.build()?;
+    let driver = KeyValueDriver;
+    let mut db = Database::new()
+        .set_name(DEFAULT_DB_NAME)?
+        .set_driver(driver)
+        .build()?;
 
     let schema = column_names
         .iter()
