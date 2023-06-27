@@ -1,4 +1,4 @@
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct DatabaseName(String);
 impl AsRef<str> for DatabaseName {
     fn as_ref(&self) -> &str {

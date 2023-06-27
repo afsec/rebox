@@ -49,13 +49,11 @@ impl<D: Driver> DatabaseBuilderS2<D> {
     pub fn build(self) -> ReboxResult<Database<D>> {
         let Self { name, driver } = self;
         // TODO
-        Ok(Database {
-            name,
-            connection: DatabaseConnection::new(driver),
-            rebox_master: ReboxMaster::default(),
-            rebox_sequence: ReboxSequence::default(),
-            rebox_schema: ReboxSchema::default(),
-            tables: Default::default(),
-        })
+        let connection = DatabaseConnection::new()
+            .set_driver(driver)
+            .set_name(name.clone())?
+            .build()
+            .connect()?;
+        Ok(Database { name, connection })
     }
 }
