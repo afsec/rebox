@@ -34,6 +34,6 @@ pub fn project_root() -> ReboxResult<PathBuf> {
     .nth(2)
     .ok_or(format_err!("Error on getting project root path"))?
     .to_path_buf();
-    dbg!(&project_root);
+
     Ok(project_root)
 }

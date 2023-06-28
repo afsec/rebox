@@ -1,8 +1,3 @@
-use rebox_types::{
-    schema::{CurrentRowId, Table, TableName},
-    ReboxResult,
-};
-
 use std::fmt::Debug;
 
 use crate::Driver;
@@ -12,7 +7,7 @@ pub use self::{
     row::TableRow,
 };
 
-use self::fields::{ReboxMaster, ReboxSchema, ReboxSequence};
+pub use self::fields::{ReboxMaster, ReboxSchema, ReboxSequence};
 
 pub use connection::DatabaseConnection;
 
