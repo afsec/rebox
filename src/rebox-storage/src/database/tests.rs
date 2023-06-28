@@ -2,23 +2,16 @@ use std::vec;
 
 use crate::{
     database::{
-        row::{ColumnValue, TableColumn},
+        row::column::{ColumnValue, TableColumn},
         Database,
     },
-    KeyValueDriver,
+    drivers::{KeyValueDriver, KeyValueStorage},
 };
 
 use rebox_types::{
     schema::{ColumnKind, SchemaColumn, Table},
     ReboxResult,
 };
-
-use crate::{
-    database::fields::{ReboxMaster, ReboxSchema},
-    KeyValueStorage,
-};
-
-use super::ReboxSequence;
 
 use rebox_types::test_helpers::ResultScenario;
 

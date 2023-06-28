@@ -9,7 +9,7 @@ use crate::database::row::TableRow;
 // }
 
 #[derive(Debug, Default, PartialEq, Eq)]
-pub struct InMemoryDriver;
+pub(crate) struct InMemoryDriver;
 
 // impl DataStorage for InMemoryStorage {
 //     const MAX_SIZE_DB: usize = u32::MAX as usize; // 4 GBytes
@@ -19,4 +19,4 @@ pub struct InMemoryDriver;
 // }
 
 #[derive(Debug, Default)]
-pub struct InMemoryStorage(BTreeMap<u32, TableRow>);
+pub(crate) struct InMemoryStorage(BTreeMap<u32, TableRow>);

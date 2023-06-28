@@ -27,17 +27,17 @@ impl Driver for KeyValueDriver {}
 // }
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
-pub struct KeyValueDriver;
+pub(crate) struct KeyValueDriver;
 
 #[derive(Debug, Default, PartialEq, Eq)]
-pub struct KeyValueStorage {
+pub(crate) struct KeyValueStorage {
     base_path: PathBuf,
 }
 impl<'a> KeyValueStorage {
-    pub fn new() -> KeyValueStorageBuilder {
+    pub(crate) fn new() -> KeyValueStorageBuilder {
         KeyValueStorageBuilder::default()
     }
-    pub fn open_table(&self, table: &Table, create_mode: bool) -> ReboxResult<()> {
+    pub(crate) fn open_table(&self, table: &Table, create_mode: bool) -> ReboxResult<()> {
         use rkv::{
             backend::{SafeMode, SafeModeDatabase, SafeModeEnvironment},
             Manager, Rkv, SingleStore, StoreError, StoreOptions, Value,

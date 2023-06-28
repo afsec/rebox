@@ -7,15 +7,9 @@
 mod cli;
 mod helpers;
 
-// use anyhow::bail;
-use helpers::XtaskResult;
-use std::{
-    env,
-    path::{Path, PathBuf},
-};
 use xshell::{cmd, Shell};
 
-use crate::helpers::project_root;
+use crate::helpers::{project_root, XtaskResult};
 
 fn main() -> XtaskResult<()> {
     use clap::Parser;

@@ -6,7 +6,7 @@ use rebox_types::{
 
 use test_case::test_case;
 
-use crate::KeyValueDriver;
+use crate::drivers::KeyValueDriver;
 
 const DEFAULT_DB_NAME: &str = "rebox-123123123";
 

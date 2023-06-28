@@ -2,10 +2,10 @@ use std::vec;
 
 use crate::{
     database::{
-        row::{ColumnValue, TableColumn},
+        row::column::{ColumnValue, TableColumn},
         Database,
     },
-    KeyValueDriver,
+    drivers::KeyValueDriver,
 };
 
 use rebox_types::{test_helpers::ResultScenario, ReboxResult};

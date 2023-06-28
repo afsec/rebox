@@ -4,15 +4,15 @@ use anyhow::bail;
 
 use rebox_types::{schema::ColumnName, ReboxResult};
 
-pub use self::column::{ColumnValue, TableColumn};
+use self::column::TableColumn;
 
-mod column;
+pub(crate) mod column;
 
 #[derive(Debug, Default, Clone)]
-pub struct TableRow(BTreeMap<ColumnName, TableColumn>);
+pub(crate) struct TableRow(BTreeMap<ColumnName, TableColumn>);
 
 impl TableRow {
-    pub fn new(columns: Vec<TableColumn>) -> ReboxResult<Self> {
+    pub(crate) fn new(columns: Vec<TableColumn>) -> ReboxResult<Self> {
         if columns.len() < 1 {
             bail!("Can't build a table row without column")
         }

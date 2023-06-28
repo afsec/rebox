@@ -1,7 +1,7 @@
 mod key_value;
 mod memory;
 
-pub trait Driver {}
+pub(crate) trait Driver {}
 
 // pub trait Driver {
 //     type Storage<DS>: DataStorage;
@@ -12,5 +12,5 @@ pub trait Driver {}
 //     fn max_dbsize(&self) -> usize;
 // }
 
-pub use key_value::{KeyValueDriver, KeyValueStorage};
+pub(crate) use key_value::{KeyValueDriver, KeyValueStorage};
 // pub use memory::{InMemoryDriver, InMemoryStorage};
