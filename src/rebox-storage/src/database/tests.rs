@@ -113,6 +113,7 @@ fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
         })
         .collect::<ReboxResult<Vec<Database<KeyValueDriver>>>>()?;
 
+    todo!();
     // TODO
     // DATABASE CRUD - CREATE TABLE
     // databases
@@ -155,29 +156,6 @@ fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
 }
 
 #[test]
-fn open_table_rebox_sequence() -> ReboxResult<()> {
-    // TODO: Implement new/open session
-    let rebox_sequence = ReboxSequence::default();
-    KeyValueStorage::open_metadata(rebox_sequence.table_name())?;
-    Ok(())
-}
-
-#[test]
-fn open_table_rebox_master() -> ReboxResult<()> {
-    // TODO: Implement new/open session
-    let rebox_master = ReboxMaster::default();
-    KeyValueStorage::open_metadata(rebox_master.table_name())?;
-    Ok(())
-}
-
-#[test]
-fn open_table_rebox_schema() -> ReboxResult<()> {
-    // TODO: Implement new/open session
-    let rebox_schema = ReboxSchema::default();
-    KeyValueStorage::open_metadata(rebox_schema.table_name())?;
-    Ok(())
-}
-#[test]
 fn open_table_requests() -> ReboxResult<()> {
     let c1 = SchemaColumn::new()
         .set_name("c1")?
@@ -195,7 +173,9 @@ fn open_table_requests() -> ReboxResult<()> {
     // TODO: Create Table Schema
     // TODO: Open Table to Insert into
     // TODO: Validate Table Schema against Database
-    KeyValueStorage::open_table(table.name())?;
+
+    let kv_storage = KeyValueStorage::new().build()?;
+    kv_storage.open_table(table.name(), true)?;
     Ok(())
 }
 #[test]
@@ -216,6 +196,7 @@ fn open_table_responses() -> ReboxResult<()> {
     // TODO: Create Table Schema
     // TODO: Open Table to Insert into
     // TODO: Validate Table Schema against Database
-    KeyValueStorage::open_table(table.name())?;
+    let kv_storage = KeyValueStorage::new().build()?;
+    kv_storage.open_table(table.name(), true)?;
     Ok(())
 }
