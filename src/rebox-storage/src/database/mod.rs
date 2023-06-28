@@ -1,32 +1,31 @@
 use std::fmt::Debug;
 
-use crate::Driver;
+use crate::drivers::Driver;
 
-pub use self::{
-    fields::{DatabaseName, DatabaseTables},
-    row::TableRow,
+pub(crate) use self::row::TableRow;
+
+pub(crate) use self::fields::{
+    DatabaseName, DatabaseTables, ReboxMaster, ReboxSchema, ReboxSequence,
 };
 
-pub use self::fields::{ReboxMaster, ReboxSchema, ReboxSequence};
+pub(crate) use connection::DatabaseConnection;
 
-pub use connection::DatabaseConnection;
-
-pub mod builder;
+pub(crate) mod builder;
 mod connection;
 mod fields;
-pub mod row;
+pub(crate) mod row;
 
 #[cfg(test)]
 mod tests;
 
 #[derive(Debug)]
-pub struct Database<D: Driver> {
+pub(crate) struct Database<D: Driver> {
     name: DatabaseName,
     connection: DatabaseConnection<D>,
 }
 
 impl<D: Driver> Database<D> {
-    pub fn name(&self) -> &str {
+    pub(crate) fn name(&self) -> &str {
         self.name.as_ref()
     }
 }

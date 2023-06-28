@@ -1,5 +1,5 @@
 use clap::Parser;
-use std::{path::PathBuf, str::FromStr};
+use std::path::PathBuf;
 
 /// cargo xtask
 #[derive(Parser, Debug)]

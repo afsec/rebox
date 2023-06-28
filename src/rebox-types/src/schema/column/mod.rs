@@ -1,6 +1,8 @@
 use crate::{helpers::check_valid_entity_name, ReboxResult};
 
-pub use self::model::{ColumnData, ColumnKind, ColumnName};
+pub use self::model::{ColumnKind, ColumnName};
+
+// pub(crate) use self::model::ColumnData;
 
 mod model;
 
@@ -29,6 +31,7 @@ impl SchemaColumn {
     }
 }
 
+#[derive(Debug)]
 pub struct SchemaColumnBuilder;
 impl SchemaColumnBuilder {
     pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<SchemaColumnBuilderS1> {
@@ -37,6 +40,7 @@ impl SchemaColumnBuilder {
     }
 }
 
+#[derive(Debug)]
 pub struct SchemaColumnBuilderS1 {
     name: ColumnName,
 }
@@ -46,6 +50,8 @@ impl SchemaColumnBuilderS1 {
         SchemaColumnBuilderS2 { name, kind }
     }
 }
+
+#[derive(Debug)]
 pub struct SchemaColumnBuilderS2 {
     name: ColumnName,
     kind: ColumnKind,
@@ -62,6 +68,7 @@ impl SchemaColumnBuilderS2 {
     }
 }
 
+#[derive(Debug)]
 pub struct SchemaColumnBuilderS3 {
     name: ColumnName,
     kind: ColumnKind,

@@ -12,16 +12,13 @@ pub fn check_valid_entity_name<T: AsRef<str>>(name: T) -> ReboxResult<()> {
         bail!("Entity name can't be larger than {ENTITY_NAME_MAX_CHARS} characters.");
     }
 
-    input_str
-        .chars()
-        .map(|ch| {
-            if ch.is_ascii_alphanumeric() || ch == '-' {
-                Ok(())
-            } else {
-                bail!("Entity name has invalid char [`{ch}`]")
-            }
-        })
-        .collect::<ReboxResult<()>>()?;
+    input_str.chars().try_for_each(|ch| {
+        if ch.is_ascii_alphanumeric() || ch == '-' {
+            Ok(())
+        } else {
+            bail!("Entity name has invalid char [`{ch}`]")
+        }
+    })?;
     Ok(())
 }
 

@@ -7,7 +7,7 @@ use rebox_types::{
 };
 
 #[derive(Debug, Clone)]
-pub struct TableColumn {
+pub(crate) struct TableColumn {
     name: ColumnName,
     kind: ColumnKind,
     is_nullable: bool,
@@ -15,7 +15,7 @@ pub struct TableColumn {
 }
 
 impl TableColumn {
-    pub fn new() -> TableColumnBuilder {
+    pub(crate) fn new() -> TableColumnBuilder {
         TableColumnBuilder
     }
 }
@@ -24,51 +24,51 @@ impl TableColumn {
 TableColumn
  */
 impl TableColumn {
-    pub fn name(&self) -> &ColumnName {
+    pub(crate) fn name(&self) -> &ColumnName {
         &self.name
     }
 
-    pub fn set_value(mut self, value: ColumnValue) -> Self {
+    pub(crate) fn set_value(mut self, value: ColumnValue) -> Self {
         self.value = Some(value);
         self
     }
-    pub fn build(self) -> Self {
+    pub(crate) fn build(self) -> Self {
         self
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ColumnValue {
+pub(crate) enum ColumnValue {
     Bool(bool),
     Integer(i32),
     Natural(u32),
     Text(String),
 }
 
-pub struct TableColumnBuilder;
+pub(crate) struct TableColumnBuilder;
 impl TableColumnBuilder {
-    pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<TableColumnBuilderS1> {
+    pub(crate) fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<TableColumnBuilderS1> {
         check_valid_entity_name(&name)?;
         Ok(TableColumnBuilderS1 { name: name.into() })
     }
 }
 
-pub struct TableColumnBuilderS1 {
+pub(crate) struct TableColumnBuilderS1 {
     name: ColumnName,
 }
 impl TableColumnBuilderS1 {
-    pub fn set_kind(self, kind: ColumnKind) -> TableColumnBuilderS2 {
+    pub(crate) fn set_kind(self, kind: ColumnKind) -> TableColumnBuilderS2 {
         let Self { name } = self;
         TableColumnBuilderS2 { name, kind }
     }
 }
-pub struct TableColumnBuilderS2 {
+pub(crate) struct TableColumnBuilderS2 {
     name: ColumnName,
     kind: ColumnKind,
 }
 
 impl TableColumnBuilderS2 {
-    pub fn is_nullable(self, is_nullable: bool) -> TableColumnBuilderS3 {
+    pub(crate) fn is_nullable(self, is_nullable: bool) -> TableColumnBuilderS3 {
         let Self { name, kind } = self;
         TableColumnBuilderS3 {
             name,
@@ -79,7 +79,7 @@ impl TableColumnBuilderS2 {
     }
 }
 
-pub struct TableColumnBuilderS3 {
+pub(crate) struct TableColumnBuilderS3 {
     name: ColumnName,
     kind: ColumnKind,
     is_nullable: bool,
@@ -87,7 +87,7 @@ pub struct TableColumnBuilderS3 {
 }
 
 impl TableColumnBuilderS3 {
-    pub fn set_value(self, column_value: ColumnValue) -> ReboxResult<Self> {
+    pub(crate) fn set_value(self, column_value: ColumnValue) -> ReboxResult<Self> {
         let Self {
             name,
             kind,
@@ -105,7 +105,7 @@ impl TableColumnBuilderS3 {
             value: Some(column_value),
         })
     }
-    pub fn build(self) -> ReboxResult<TableColumn> {
+    pub(crate) fn build(self) -> ReboxResult<TableColumn> {
         use std::ops::Not;
         let Self {
             name,

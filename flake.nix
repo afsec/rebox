@@ -54,6 +54,7 @@
             ''
               rustup default stable
               rustup component add rust-analyzer
+              rustup component add clippy
               alias cx='cargo xtask'
             '';
         };

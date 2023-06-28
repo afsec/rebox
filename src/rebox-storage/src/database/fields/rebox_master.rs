@@ -7,13 +7,13 @@ use rebox_types::{
 };
 
 #[derive(Debug)]
-pub struct ReboxMaster {
+pub(crate) struct ReboxMaster {
     table_name: TableName,
     inner_data: BTreeMap<TableName, CurrentRowId>,
 }
 
 impl ReboxMaster {
-    pub fn bump_table_cur_rowid(&mut self, table_name: &TableName) -> ReboxResult<()> {
+    pub(crate) fn bump_table_cur_rowid(&mut self, table_name: &TableName) -> ReboxResult<()> {
         self.check_can_inc_rowid(table_name)?;
         let cur_row_id = self
             .inner_data
@@ -24,7 +24,7 @@ impl ReboxMaster {
 
         Ok(())
     }
-    pub fn check_can_inc_rowid(&self, table_name: &TableName) -> ReboxResult<()> {
+    pub(crate) fn check_can_inc_rowid(&self, table_name: &TableName) -> ReboxResult<()> {
         if let Some(cur_row_id) = self.inner_data.get(table_name) {
             if cur_row_id.is_full() {
                 bail!("Table [{table_name}] reached max row id");
@@ -33,7 +33,7 @@ impl ReboxMaster {
         Ok(())
     }
 
-    pub fn table_name(&self) -> &TableName {
+    pub(crate) fn table_name(&self) -> &TableName {
         &self.table_name
     }
 }

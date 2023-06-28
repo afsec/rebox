@@ -1,12 +1,14 @@
-use crate::{Driver, DatabaseTables, DatabaseName};
+use crate::drivers::Driver;
 
-use super::fields::{ReboxSequence, ReboxMaster, ReboxSchema};
+use super::{
+    fields::{ReboxMaster, ReboxSchema, ReboxSequence},
+    DatabaseName, DatabaseTables,
+};
 
 mod builder;
 
-
 #[derive(Debug)]
-pub struct DatabaseConnection<D: Driver> {
+pub(crate) struct DatabaseConnection<D: Driver> {
     driver: D,
     name: DatabaseName,
     rebox_sequence: ReboxSequence,
@@ -16,19 +18,19 @@ pub struct DatabaseConnection<D: Driver> {
 }
 
 // impl<D: Driver> DatabaseConnection<D> {
-//     pub fn new(driver: D) -> Self {
+//     pub (crate) fn new(driver: D) -> Self {
 //         Self { driver }  'q12e4r5t6y7890-
 //     }
 
-//     pub fn list_tables(&self) -> Vec<&TableName> {
+//     pub (crate) fn list_tables(&self) -> Vec<&TableName> {
 //         self.tables.list_tables()
 //     }
-//     pub fn create_table(&mut self, table: Table) -> ReboxResult<TableName> {
+//     pub (crate) fn create_table(&mut self, table: Table) -> ReboxResult<TableName> {
 //         let table_name = self.tables.create_table(table)?;
 
 //         Ok(table_name)
 //     }
-//     pub fn insert_into_table<T: AsRef<str>>(
+//     pub (crate) fn insert_into_table<T: AsRef<str>>(
 //         &mut self,
 //         table: T,
 //         row: TableRow,
@@ -40,7 +42,7 @@ pub struct DatabaseConnection<D: Driver> {
 //         Ok(cur_row_id)
 //     }
 
-//     pub fn name(&self) -> &str {
+//     pub (crate) fn name(&self) -> &str {
 //         self.name.as_ref()
 //     }
 // }

@@ -59,6 +59,7 @@ impl Table {
         TableBuilder
     }
 }
+#[derive(Debug)]
 pub struct TableBuilder;
 
 impl TableBuilder {
@@ -70,6 +71,7 @@ impl TableBuilder {
     }
 }
 
+#[derive(Debug)]
 pub struct TableBuilderS1 {
     name: TableName,
 }
@@ -90,6 +92,7 @@ impl TableBuilderS1 {
     }
 }
 
+#[derive(Debug)]
 pub struct TableBuilderS2 {
     name: TableName,
     schema: TableSchema,

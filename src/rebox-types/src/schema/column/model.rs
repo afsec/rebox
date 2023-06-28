@@ -1,11 +1,8 @@
 use std::fmt::Display;
 
-use anyhow::bail;
-use bytes::{Buf, BufMut, BytesMut};
+use bytes::BytesMut;
 
-use crate::ReboxResult;
-
-const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 50; // 50 MBytes
+// const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 50; // 50 MBytes
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ColumnName(String);
@@ -31,14 +28,14 @@ pub enum ColumnKind {
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub struct ColumnData(BytesMut);
+pub(crate) struct ColumnData(BytesMut);
 
-impl ColumnData {
-    pub fn store(mut self, payload: Box<dyn Buf>) -> ReboxResult<()> {
-        if self.0.capacity() >= COLUMN_MAX_CAPACITY {
-            bail!("Out ot space inside a column")
-        }
-        self.0.put(payload);
-        Ok(())
-    }
-}
+// impl ColumnData {
+//     pub(crate) fn store(mut self, payload: Box<dyn Buf>) -> ReboxResult<()> {
+//         if self.0.capacity() >= COLUMN_MAX_CAPACITY {
+//             bail!("Out ot space inside a column")
+//         }
+//         self.0.put(payload);
+//         Ok(())
+//     }
+// }

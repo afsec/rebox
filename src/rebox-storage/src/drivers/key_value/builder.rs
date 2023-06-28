@@ -6,20 +6,21 @@ use rebox_types::helpers::project_root;
 use rebox_types::{schema::TableName, ReboxResult};
 
 use crate::database::{ReboxMaster, ReboxSchema, ReboxSequence};
-use crate::KeyValueStorage;
+
+use super::KeyValueStorage;
 
 #[derive(Debug, Default)]
-pub struct KeyValueStorageBuilder {
+pub(crate) struct KeyValueStorageBuilder {
     maybe_path_str: Option<String>,
 }
 
 impl KeyValueStorageBuilder {
-    pub fn set_path<T: AsRef<str>>(self, path: T) -> ReboxResult<Self> {
+    pub(crate) fn set_path<T: AsRef<str>>(self, path: T) -> ReboxResult<Self> {
         Ok(KeyValueStorageBuilder {
             maybe_path_str: Some(path.as_ref().to_string()),
         })
     }
-    pub fn build(self) -> ReboxResult<KeyValueStorage> {
+    pub(crate) fn build(self) -> ReboxResult<KeyValueStorage> {
         let Self { maybe_path_str } = self;
         let mut base_path = match maybe_path_str {
             Some(path_str) => PathBuf::from_str(&path_str)?,
