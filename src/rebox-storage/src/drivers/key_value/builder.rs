@@ -13,10 +13,8 @@ pub struct KeyValueStorageBuilder {
     maybe_path_str: Option<String>,
 }
 
-impl<'a> KeyValueStorageBuilder {
+impl KeyValueStorageBuilder {
     pub fn set_path<T: AsRef<str>>(self, path: T) -> ReboxResult<Self> {
-        // * Bootstrap DIRECTORY
-
         Ok(KeyValueStorageBuilder {
             maybe_path_str: Some(path.as_ref().to_string()),
         })
@@ -35,21 +33,18 @@ impl<'a> KeyValueStorageBuilder {
         };
         base_path.push("rebox_data/");
 
-        Self::create_metadata_tables(&base_path)?;
+        Self::bootstrap_metadata(&base_path)?;
 
         Ok(KeyValueStorage { base_path })
     }
-    fn create_metadata_tables(base_path: &PathBuf) -> ReboxResult<()> {
+    fn bootstrap_metadata(base_path: &PathBuf) -> ReboxResult<()> {
         // TODO: Implement new/open session
-        let rebox_sequence = ReboxSequence::default();
-        Self::create_metatable(&base_path, rebox_sequence.table_name())?;
-        let rebox_master = ReboxMaster::default();
-        Self::create_metatable(&base_path, rebox_master.table_name())?;
-        let rebox_schema = ReboxSchema::default();
-        Self::create_metatable(&base_path, rebox_schema.table_name())?;
+        Self::create_metadata_table(&base_path, ReboxSequence::default().table_name())?;
+        Self::create_metadata_table(&base_path, ReboxMaster::default().table_name())?;
+        Self::create_metadata_table(&base_path, ReboxSchema::default().table_name())?;
         Ok(())
     }
-    fn create_metatable(base_path: &PathBuf, table_name: &TableName) -> ReboxResult<()> {
+    fn create_metadata_table(base_path: &PathBuf, table_name: &TableName) -> ReboxResult<()> {
         use rkv::{
             backend::{SafeMode, SafeModeDatabase, SafeModeEnvironment},
             Manager, Rkv, SingleStore, StoreError, StoreOptions, Value,
@@ -71,9 +66,9 @@ impl<'a> KeyValueStorageBuilder {
         dbg!(&root);
 
         let mut path_dbfile = PathBuf::from(&root);
-        
+
         path_dbfile.push("data.safe.bin");
-        
+
         if path_dbfile.exists().not() {
             let mut manager = Manager::<SafeModeEnvironment>::singleton()
                 .write()

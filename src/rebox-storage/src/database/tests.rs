@@ -175,7 +175,7 @@ fn open_table_requests() -> ReboxResult<()> {
     // TODO: Validate Table Schema against Database
 
     let kv_storage = KeyValueStorage::new().build()?;
-    kv_storage.open_table(table.name(), true)?;
+    kv_storage.open_table(&table, true)?;
     Ok(())
 }
 #[test]
@@ -197,6 +197,6 @@ fn open_table_responses() -> ReboxResult<()> {
     // TODO: Open Table to Insert into
     // TODO: Validate Table Schema against Database
     let kv_storage = KeyValueStorage::new().build()?;
-    kv_storage.open_table(table.name(), true)?;
+    kv_storage.open_table(&table, true)?;
     Ok(())
 }
