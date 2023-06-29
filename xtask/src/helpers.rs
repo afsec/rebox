@@ -1,10 +1,11 @@
 use anyhow::format_err;
 use std::env;
 use std::path::{Path, PathBuf};
+use xshell::Shell;
 
-pub type XtaskResult<T> = anyhow::Result<T>;
+pub(crate) type XtaskResult<T> = anyhow::Result<T>;
 
-pub fn project_root() -> XtaskResult<PathBuf> {
+pub(crate) fn project_root() -> XtaskResult<PathBuf> {
     let project_root = Path::new(
         &env::var("CARGO_MANIFEST_DIR").unwrap_or_else(|_| env!("CARGO_MANIFEST_DIR").to_owned()),
     )
@@ -14,4 +15,8 @@ pub fn project_root() -> XtaskResult<PathBuf> {
     .to_path_buf();
 
     Ok(project_root)
+}
+
+pub(crate) trait Runner {
+    fn run(&self, sh: &Shell) -> XtaskResult<()>;
 }
