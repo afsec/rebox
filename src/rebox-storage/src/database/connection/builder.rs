@@ -50,6 +50,7 @@ impl<D: Driver> DatabaseConnectionToConnect<D> {
     pub fn connect(self) -> ReboxResult<DatabaseConnection<D>> {
         let Self { driver, name } = self;
         // TODO: Start storage controller
+        todo!();
         Ok(DatabaseConnection {
             driver,
             name,

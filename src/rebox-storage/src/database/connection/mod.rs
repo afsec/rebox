@@ -36,6 +36,7 @@ impl<D: Driver> DatabaseConnection<D> {
         Ok(vec![])
     }
     pub(crate) fn create_table(&mut self, table: Table) -> ReboxResult<TableName> {
+        
         todo!();
         Ok(TableName::default())
     }

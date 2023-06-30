@@ -6,22 +6,27 @@ use std::path::PathBuf;
 use anyhow::format_err;
 use rebox_types::{schema::Table, ReboxResult};
 
+use self::builder::KeyValueStorageBuilder;
+use crate::database::fields::name::DatabaseName;
 use crate::drivers::Driver;
 
-use self::builder::KeyValueStorageBuilder;
+use super::DataStorage;
 
-impl Driver for KeyValueDriver {}
+impl Driver for KeyValueDriver {
+    type Storage = KeyValueStorage;
 
-// impl Driver for KeyValueDriver {
-//     type Storage<DS> = KeyValueStorage;
-// }
+    fn connect(&mut self, db_name: &DatabaseName) -> ReboxResult<Self::Storage> {
+        todo!();
+        KeyValueStorage::new().set_name(db_name)?.build()
+    }
+}
 
-// impl DataStorage for KeyValueStorage {
-//     const MAX_SIZE_DB: usize = 1024 * 1024 * 1024 * 20; // 20 GBytes
-//     fn max_dbsize(&self) -> usize {
-//         Self::MAX_SIZE_DB
-//     }
-// }
+impl DataStorage for KeyValueStorage {
+    const MAX_SIZE_DB: usize = 1024 * 1024 * 1024 * 20; // 20 GBytes
+    fn max_dbsize(&self) -> usize {
+        Self::MAX_SIZE_DB
+    }
+}
 
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
 pub struct KeyValueDriver;
