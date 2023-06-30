@@ -44,11 +44,11 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![cfg_attr(test, allow(clippy::float_cmp))]
 
-mod database;
-mod drivers;
+pub mod database;
+pub mod drivers;
 
 #[cfg(test)]
 mod tests;
 
-// pub(crate) use self::database::{Database, DatabaseName, DatabaseTables};
+// pub use self::database::{Database, DatabaseName, DatabaseTables};
 // pub use self::drivers::{Driver, KeyValueDriver, KeyValueStorage};

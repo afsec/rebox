@@ -6,13 +6,13 @@ use rebox_types::{schema::column::model::ColumnName, ReboxResult};
 
 use self::column::TableColumn;
 
-pub(crate) mod column;
+pub mod column;
 
 #[derive(Debug, Default, Clone)]
-pub(crate) struct TableRow(BTreeMap<ColumnName, TableColumn>);
+pub struct TableRow(BTreeMap<ColumnName, TableColumn>);
 
 impl TableRow {
-    pub(crate) fn new(columns: Vec<TableColumn>) -> ReboxResult<Self> {
+    pub fn new(columns: Vec<TableColumn>) -> ReboxResult<Self> {
         if columns.is_empty() {
             bail!("Can't build a table row without column")
         }
