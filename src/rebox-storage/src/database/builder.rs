@@ -12,6 +12,7 @@ impl<D: Driver> Database<D> {
     }
 }
 
+#[derive(Debug)]
 pub struct DatabaseBuilder<D: Driver>(PhantomData<D>);
 
 impl<D: Driver> DatabaseBuilder<D> {

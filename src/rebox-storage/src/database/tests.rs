@@ -168,7 +168,7 @@ fn open_table_requests() -> ReboxResult<()> {
     // TODO: Open Table to Insert into
     // TODO: Validate Table Schema against Database
 
-    let kv_storage = KeyValueStorage::new().build()?;
+    let kv_storage = KeyValueStorage::new().set_name("some-database-name")?.build()?;
     kv_storage.open_table(&table, true)?;
     Ok(())
 }
@@ -190,7 +190,7 @@ fn open_table_responses() -> ReboxResult<()> {
     // TODO: Create Table Schema
     // TODO: Open Table to Insert into
     // TODO: Validate Table Schema against Database
-    let kv_storage = KeyValueStorage::new().build()?;
+    let kv_storage = KeyValueStorage::new().set_name("some-database-name")?.build()?;
     kv_storage.open_table(&table, true)?;
     Ok(())
 }

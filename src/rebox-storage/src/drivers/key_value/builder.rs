@@ -3,6 +3,7 @@ use std::{path::PathBuf, str::FromStr};
 
 use anyhow::format_err;
 
+use rebox_types::helpers::check_valid_entity_name;
 use rebox_types::{helpers::project_root, schema::name::TableName, ReboxResult};
 
 use crate::database::fields::rebox_master::ReboxMaster;
@@ -12,18 +13,37 @@ use crate::database::fields::rebox_sequence::ReboxSequence;
 use super::KeyValueStorage;
 
 #[derive(Debug, Default)]
-pub struct KeyValueStorageBuilder {
-    maybe_path_str: Option<String>,
-}
+pub struct KeyValueStorageBuilder;
 
 impl KeyValueStorageBuilder {
+    pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<KeyValueStorageBuilderS1> {
+        let database_name = name.as_ref().to_owned();
+        check_valid_entity_name(&database_name)?;
+        Ok(KeyValueStorageBuilderS1 {
+            database_name,
+            ..Default::default()
+        })
+    }
+}
+
+#[derive(Debug, Default)]
+pub struct KeyValueStorageBuilderS1 {
+    database_name: String,
+    maybe_path_str: Option<String>,
+}
+impl KeyValueStorageBuilderS1 {
     pub fn set_path<T: AsRef<str>>(self, path: T) -> ReboxResult<Self> {
-        Ok(KeyValueStorageBuilder {
+        let Self { database_name, .. } = self;
+        Ok(Self {
+            database_name,
             maybe_path_str: Some(path.as_ref().to_owned()),
         })
     }
     pub fn build(self) -> ReboxResult<KeyValueStorage> {
-        let Self { maybe_path_str } = self;
+        let Self {
+            database_name,
+            maybe_path_str,
+        } = self;
         let mut base_path = match maybe_path_str {
             Some(path_str) => PathBuf::from_str(&path_str)?,
             None => {
@@ -35,6 +55,7 @@ impl KeyValueStorageBuilder {
             }
         };
         base_path.push("rebox_data/");
+        base_path.push(format!("{database_name}/"));
 
         Self::bootstrap_metadata(&base_path)?;
 
