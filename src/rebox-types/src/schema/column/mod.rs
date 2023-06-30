@@ -1,10 +1,8 @@
 use crate::{helpers::check_valid_entity_name, ReboxResult};
 
-pub use self::model::{ColumnKind, ColumnName};
+use self::model::{ColumnKind, ColumnName};
 
-// pub(crate) use self::model::ColumnData;
-
-mod model;
+pub mod model;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct SchemaColumn {
@@ -58,7 +56,7 @@ pub struct SchemaColumnBuilderS2 {
 }
 
 impl SchemaColumnBuilderS2 {
-    pub fn is_nullable(self, is_nullable: bool) -> SchemaColumnBuilderS3 {
+    pub fn set_nullable(self, is_nullable: bool) -> SchemaColumnBuilderS3 {
         let Self { name, kind } = self;
         SchemaColumnBuilderS3 {
             name,

@@ -4,10 +4,7 @@ mod moz_rkv;
 use std::path::PathBuf;
 
 use anyhow::format_err;
-use rebox_types::{
-    schema::{Table, TableName},
-    ReboxResult,
-};
+use rebox_types::{schema::Table, ReboxResult};
 
 use crate::drivers::Driver;
 
@@ -39,8 +36,8 @@ impl<'a> KeyValueStorage {
     }
     pub(crate) fn open_table(&self, table: &Table, create_mode: bool) -> ReboxResult<()> {
         use rkv::{
-            backend::{SafeMode, SafeModeDatabase, SafeModeEnvironment},
-            Manager, Rkv, SingleStore, StoreError, StoreOptions, Value,
+            backend::{SafeMode, SafeModeEnvironment},
+            Manager, Rkv, StoreOptions,
         };
         use std::fs;
         use std::ops::Not;

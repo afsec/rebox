@@ -11,7 +11,7 @@ impl From<TableName> for String {
 
 impl TableName {
     pub fn new<T: AsRef<str>>(name: T) -> Self {
-        Self(name.as_ref().to_string())
+        Self(name.as_ref().to_owned())
     }
 }
 

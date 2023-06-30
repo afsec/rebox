@@ -3,17 +3,13 @@ use std::fmt::Debug;
 
 use crate::{helpers::check_valid_entity_name, ReboxResult};
 
-pub use self::{
-    column::{ColumnKind, ColumnName, SchemaColumn},
-    name::TableName,
-    table::TableSchema,
-};
+use self::{column::SchemaColumn, name::TableName, table::TableSchema};
 
 // pub use self::{column::SchemaColumn, name::TableName};
 
-mod column;
-mod name;
-mod table;
+pub mod column;
+pub mod name;
+pub mod table;
 
 #[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CurrentRowId(u32);
@@ -34,7 +30,7 @@ impl CurrentRowId {
         }
     }
     pub fn is_full(&self) -> bool {
-        self.0 >= u32::MAX
+        self.0 == u32::MAX
     }
 }
 
@@ -78,15 +74,14 @@ pub struct TableBuilderS1 {
 
 impl TableBuilderS1 {
     pub fn set_schema(self, columns: Vec<SchemaColumn>) -> ReboxResult<TableBuilderS2> {
-        if columns.len() < 1 {
+        if columns.is_empty() {
             bail!("Sorry, you must to define at least one SchemaColumn")
         }
         let mut schema = TableSchema::default();
         let Self { name } = self;
         columns
             .into_iter()
-            .map(|column| schema.add_column(column))
-            .collect::<ReboxResult<()>>()?;
+            .try_for_each(|column| schema.add_column(column))?;
 
         Ok(TableBuilderS2 { name, schema })
     }

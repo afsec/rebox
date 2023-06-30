@@ -4,7 +4,7 @@ use anyhow::bail;
 
 use crate::ReboxResult;
 
-use super::column::{ColumnName, SchemaColumn};
+use super::column::{model::ColumnName, SchemaColumn};
 
 #[derive(Debug, Default, Clone)]
 pub struct TableSchema(BTreeMap<ColumnName, SchemaColumn>);

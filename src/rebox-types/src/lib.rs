@@ -2,6 +2,7 @@
 #![warn(
     clippy::all,
     clippy::dbg_macro,
+    clippy::type_complexity,
     clippy::todo,
     clippy::empty_enum,
     clippy::enum_glob_use,
@@ -35,7 +36,11 @@
     // missing_docs
 )]
 #![deny(unreachable_pub, private_in_public)]
-#![allow(elided_lifetimes_in_paths, clippy::type_complexity)]
+#![allow(
+    elided_lifetimes_in_paths,
+    clippy::new_ret_no_self,
+    clippy::unused_self
+)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![cfg_attr(test, allow(clippy::float_cmp))]
 

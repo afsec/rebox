@@ -4,10 +4,7 @@ use rebox_types::{helpers::check_valid_entity_name, ReboxResult};
 
 use crate::drivers::Driver;
 
-use super::{
-    fields::{DatabaseName, ReboxMaster, ReboxSchema, ReboxSequence},
-    Database, DatabaseConnection,
-};
+use super::{fields::name::DatabaseName, Database, DatabaseConnection};
 
 impl<D: Driver> Database<D> {
     pub(crate) fn new() -> DatabaseBuilder<D> {

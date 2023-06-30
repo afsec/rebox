@@ -28,7 +28,7 @@ pub enum ColumnKind {
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub(crate) struct ColumnData(BytesMut);
+pub struct ColumnData(BytesMut);
 
 // impl ColumnData {
 //     pub(crate) fn store(mut self, payload: Box<dyn Buf>) -> ReboxResult<()> {
