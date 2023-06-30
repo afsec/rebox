@@ -1,15 +1,17 @@
 use clap::Parser;
-use std::path::PathBuf;
+
+use crate::{tasks::{Build, Dist, FuzzTests, Metrics, Prepare, PublishReleaseNotes}, helpers::Runner};
 
 /// cargo xtask
 #[derive(Parser, Debug)]
 #[command(author, version, about)]
-pub struct Args {
+pub(crate) struct Args {
     #[command(subcommand)]
-    pub comamnd: Command,
+    pub(crate) command: Command,
 }
+
 #[derive(Parser, Debug)]
-pub enum Command {
+pub(crate) enum Command {
     /// Perform cargo check, build , build --release
     Prep(Prepare),
     /// Compiles release version
@@ -23,38 +25,16 @@ pub enum Command {
     /// Generate metrics
     Metrics(Metrics),
 }
-
-#[derive(Parser, Debug)]
-pub struct Prepare {
-    #[arg(long, short)]
-    /// Show cargo ouput
-    verbose: bool,
-}
-
-impl Prepare {
-    pub fn verbose(&self) -> bool {
-        self.verbose
+impl Runner for Command {
+    fn run(&self, sh: &xshell::Shell) -> crate::helpers::XtaskResult<()> {
+        match &self {
+            Self::Prep(cmd) => cmd.run(sh)?,
+            Self::Build(cmd) => cmd.run(sh)?,
+            Self::FuzzTests(cmd) => cmd.run(sh)?,
+            Self::Dist(cmd) => cmd.run(sh)?,
+            Self::PublishReleaseNotes(cmd) => cmd.run(sh)?,
+            Self::Metrics(cmd) => cmd.run(sh)?,
+        };
+        Ok(())
     }
 }
-
-#[derive(Parser, Debug)]
-pub struct Build {
-    #[arg(long, short)]
-    /// Enable release
-    release: bool,
-}
-
-#[derive(Parser, Debug)]
-pub struct FuzzTests;
-
-#[derive(Parser, Debug)]
-pub struct Dist {
-    /// Path to the dist folder
-    pub path: PathBuf,
-}
-
-#[derive(Parser, Debug)]
-pub struct PublishReleaseNotes;
-
-#[derive(Parser, Debug)]
-pub struct Metrics;
