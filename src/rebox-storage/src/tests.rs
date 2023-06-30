@@ -2,37 +2,43 @@ use std::vec;
 
 use crate::{
     database::{
-        row::column::{ColumnValue, TableColumn},
+        row::{
+            column::{ColumnValue, TableColumn},
+            TableRow,
+        },
         Database,
     },
-    drivers::KeyValueDriver,
+    drivers::key_value::KeyValueDriver,
 };
 
-use rebox_types::{test_helpers::ResultScenario, ReboxResult};
+use rebox_types::{
+    schema::{
+        column::{model::ColumnKind, SchemaColumn},
+        Table,
+    },
+    ReboxResult,
+};
 
 use test_case::test_case;
 
 #[test_case(vec!["db-name1","db-name2"] ; "when creating one table for earch of them")]
 fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
-    use crate::database::TableRow;
-    use rebox_types::schema::{ColumnKind, SchemaColumn, Table};
-
     let driver = KeyValueDriver;
     let request_tbl_schema = vec![
         SchemaColumn::new()
             .set_name("request-id")?
             .set_kind(ColumnKind::Text)
-            .is_nullable(false)
+            .set_nullable(false)
             .build(),
         SchemaColumn::new()
             .set_name("method")?
             .set_kind(ColumnKind::Text)
-            .is_nullable(false)
+            .set_nullable(false)
             .build(),
         SchemaColumn::new()
             .set_name("url")?
             .set_kind(ColumnKind::Text)
-            .is_nullable(false)
+            .set_nullable(false)
             .build(),
     ];
 
@@ -40,17 +46,17 @@ fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
         SchemaColumn::new()
             .set_name("request-id")?
             .set_kind(ColumnKind::Text)
-            .is_nullable(false)
+            .set_nullable(false)
             .build(),
         SchemaColumn::new()
             .set_name("status")?
             .set_kind(ColumnKind::Natural)
-            .is_nullable(false)
+            .set_nullable(false)
             .build(),
         SchemaColumn::new()
             .set_name("url")?
             .set_kind(ColumnKind::Text)
-            .is_nullable(false)
+            .set_nullable(false)
             .build(),
     ];
 
@@ -95,7 +101,7 @@ fn digging_database(database_names: Vec<&str>) -> ReboxResult<()> {
     let c1 = TableColumn::new()
         .set_name("request-id")?
         .set_kind(ColumnKind::Text)
-        .is_nullable(false)
+        .set_nullable(false)
         .set_value(ColumnValue::Text("B46D427F2".to_owned()))?
         .build()?;
 

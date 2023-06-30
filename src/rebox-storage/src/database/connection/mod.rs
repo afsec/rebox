@@ -1,11 +1,15 @@
 use crate::drivers::Driver;
 
-use super::{
-    fields::{ReboxMaster, ReboxSchema, ReboxSequence},
-    DatabaseName, DatabaseTables,
+use super::fields::{
+    name::DatabaseName, rebox_master::ReboxMaster, rebox_schema::ReboxSchema,
+    rebox_sequence::ReboxSequence, tables::DatabaseTables,
 };
 
 mod builder;
+
+// pub(crate) use builder::{
+//     DatabaseConnectionBuilder, DatabaseConnectionBuilderS1, DatabaseConnectionBuilderS2,
+// };
 
 #[derive(Debug)]
 pub(crate) struct DatabaseConnection<D: Driver> {

@@ -2,10 +2,12 @@ use std::env;
 use std::{path::PathBuf, str::FromStr};
 
 use anyhow::format_err;
-use rebox_types::helpers::project_root;
-use rebox_types::{schema::TableName, ReboxResult};
 
-use crate::database::{ReboxMaster, ReboxSchema, ReboxSequence};
+use rebox_types::{helpers::project_root, schema::name::TableName, ReboxResult};
+
+use crate::database::fields::rebox_master::ReboxMaster;
+use crate::database::fields::rebox_schema::ReboxSchema;
+use crate::database::fields::rebox_sequence::ReboxSequence;
 
 use super::KeyValueStorage;
 
@@ -17,7 +19,7 @@ pub(crate) struct KeyValueStorageBuilder {
 impl KeyValueStorageBuilder {
     pub(crate) fn set_path<T: AsRef<str>>(self, path: T) -> ReboxResult<Self> {
         Ok(KeyValueStorageBuilder {
-            maybe_path_str: Some(path.as_ref().to_string()),
+            maybe_path_str: Some(path.as_ref().to_owned()),
         })
     }
     pub(crate) fn build(self) -> ReboxResult<KeyValueStorage> {
@@ -40,15 +42,15 @@ impl KeyValueStorageBuilder {
     }
     fn bootstrap_metadata(base_path: &PathBuf) -> ReboxResult<()> {
         // TODO: Implement new/open session
-        Self::create_metadata_table(&base_path, ReboxSequence::default().table_name())?;
-        Self::create_metadata_table(&base_path, ReboxMaster::default().table_name())?;
-        Self::create_metadata_table(&base_path, ReboxSchema::default().table_name())?;
+        Self::create_metadata_table(base_path, ReboxSequence::default().table_name())?;
+        Self::create_metadata_table(base_path, ReboxMaster::default().table_name())?;
+        Self::create_metadata_table(base_path, ReboxSchema::default().table_name())?;
         Ok(())
     }
     fn create_metadata_table(base_path: &PathBuf, table_name: &TableName) -> ReboxResult<()> {
         use rkv::{
-            backend::{SafeMode, SafeModeDatabase, SafeModeEnvironment},
-            Manager, Rkv, SingleStore, StoreError, StoreOptions, Value,
+            backend::{SafeMode, SafeModeEnvironment},
+            Manager, Rkv, StoreOptions,
         };
         use std::fs;
         use std::ops::Not;

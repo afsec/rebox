@@ -30,12 +30,12 @@ mod cli {
 
     /// A tool to help with publishing crates
     #[derive(Parser, Debug)]
-    pub struct Args {
+    pub(crate) struct Args {
         #[command(subcommand)]
         pub command: Option<Command>,
     }
     #[derive(Parser, Debug)]
-    pub enum Command {
+    pub(crate) enum Command {
         /// Simple Hello
         Hello(Hello),
         /// Simple Todo
@@ -47,13 +47,13 @@ mod cli {
         }
     }
     #[derive(Parser, Debug, Default)]
-    pub struct Hello {
+    pub(crate) struct Hello {
         /// Disable println-like messagess
         #[arg(long, short)]
         pub quiet: bool,
     }
     #[derive(Parser, Debug)]
-    pub struct Todo {
+    pub(crate) struct Todo {
         /// Disable println-like messagess
         #[arg(long, short)]
         pub quiet: bool,

@@ -2,7 +2,7 @@ use anyhow::bail;
 use std::collections::BTreeMap;
 
 use rebox_types::{
-    schema::{CurrentRowId, TableName},
+    schema::{name::TableName, CurrentRowId},
     ReboxResult,
 };
 

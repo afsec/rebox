@@ -2,7 +2,7 @@ use anyhow::bail;
 
 use rebox_types::{
     helpers::check_valid_entity_name,
-    schema::{ColumnKind, ColumnName},
+    schema::column::model::{ColumnKind, ColumnName},
     ReboxResult,
 };
 
@@ -68,7 +68,7 @@ pub(crate) struct TableColumnBuilderS2 {
 }
 
 impl TableColumnBuilderS2 {
-    pub(crate) fn is_nullable(self, is_nullable: bool) -> TableColumnBuilderS3 {
+    pub(crate) fn set_nullable(self, is_nullable: bool) -> TableColumnBuilderS3 {
         let Self { name, kind } = self;
         TableColumnBuilderS3 {
             name,

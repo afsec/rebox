@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use anyhow::bail;
 use rebox_types::{
-    schema::{CurrentRowId, Table, TableName, TableSchema},
+    schema::{name::TableName, table::TableSchema, CurrentRowId, Table},
     ReboxResult,
 };
 
@@ -12,16 +12,12 @@ use crate::database::row::TableRow;
 mod tests;
 
 // TODO
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub(crate) struct DatabaseTables(BTreeMap<TableName, TableSchema>);
-impl Default for DatabaseTables {
-    fn default() -> Self {
-        Self(Default::default())
-    }
-}
+
 impl DatabaseTables {
     pub(crate) fn list_tables(&self) -> Vec<&TableName> {
-        let outcome: Vec<&TableName> = self.0.iter().map(|(table, _)| table).collect();
+        let outcome: Vec<&TableName> = self.0.keys().collect();
         outcome
     }
     pub(crate) fn create_table(&mut self, table: Table) -> ReboxResult<TableName> {
@@ -38,8 +34,6 @@ impl DatabaseTables {
         table_name: TableName,
         table_row: TableRow,
     ) -> ReboxResult<CurrentRowId> {
-        let x = table_row;
-
         // TODO
         todo!();
         Ok(0.into())

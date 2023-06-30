@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use anyhow::bail;
 
-use rebox_types::{schema::ColumnName, ReboxResult};
+use rebox_types::{schema::column::model::ColumnName, ReboxResult};
 
 use self::column::TableColumn;
 
@@ -13,7 +13,7 @@ pub(crate) struct TableRow(BTreeMap<ColumnName, TableColumn>);
 
 impl TableRow {
     pub(crate) fn new(columns: Vec<TableColumn>) -> ReboxResult<Self> {
-        if columns.len() < 1 {
+        if columns.is_empty() {
             bail!("Can't build a table row without column")
         }
 

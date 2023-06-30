@@ -2,17 +2,13 @@ use std::fmt::Debug;
 
 use crate::drivers::Driver;
 
-pub(crate) use self::row::TableRow;
+use connection::DatabaseConnection;
 
-pub(crate) use self::fields::{
-    DatabaseName, DatabaseTables, ReboxMaster, ReboxSchema, ReboxSequence,
-};
-
-pub(crate) use connection::DatabaseConnection;
+use self::fields::name::DatabaseName;
 
 pub(crate) mod builder;
-mod connection;
-mod fields;
+pub(crate) mod connection;
+pub(crate) mod fields;
 pub(crate) mod row;
 
 #[cfg(test)]

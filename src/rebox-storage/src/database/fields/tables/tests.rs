@@ -1,12 +1,15 @@
 use rebox_types::{
-    schema::{ColumnKind, SchemaColumn, Table},
+    schema::{
+        column::{model::ColumnKind, SchemaColumn},
+        Table,
+    },
     test_helpers::ResultScenario,
     ReboxResult,
 };
 
 use test_case::test_case;
 
-use crate::drivers::KeyValueDriver;
+use crate::drivers::key_value::KeyValueDriver;
 
 const DEFAULT_DB_NAME: &str = "rebox-123123123";
 
@@ -26,7 +29,7 @@ fn create_table(column_names: &[&str], result_scenario: ResultScenario) -> Rebox
             let outcome = SchemaColumn::new()
                 .set_name(name)?
                 .set_kind(ColumnKind::Text)
-                .is_nullable(false)
+                .set_nullable(false)
                 .build();
             Ok(outcome)
         })
