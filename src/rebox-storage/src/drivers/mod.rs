@@ -1,7 +1,7 @@
-pub(crate) mod key_value;
-pub(crate) mod memory;
+pub mod key_value;
+pub mod memory;
 
-pub(crate) trait Driver {}
+pub trait Driver {}
 
 // pub trait Driver {
 //     type Storage<DS>: DataStorage;

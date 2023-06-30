@@ -31,7 +31,7 @@ pub enum ColumnKind {
 pub struct ColumnData(BytesMut);
 
 // impl ColumnData {
-//     pub(crate) fn store(mut self, payload: Box<dyn Buf>) -> ReboxResult<()> {
+//     pub fn store(mut self, payload: Box<dyn Buf>) -> ReboxResult<()> {
 //         if self.0.capacity() >= COLUMN_MAX_CAPACITY {
 //             bail!("Out ot space inside a column")
 //         }

@@ -12,17 +12,17 @@ use crate::database::fields::rebox_sequence::ReboxSequence;
 use super::KeyValueStorage;
 
 #[derive(Debug, Default)]
-pub(crate) struct KeyValueStorageBuilder {
+pub struct KeyValueStorageBuilder {
     maybe_path_str: Option<String>,
 }
 
 impl KeyValueStorageBuilder {
-    pub(crate) fn set_path<T: AsRef<str>>(self, path: T) -> ReboxResult<Self> {
+    pub fn set_path<T: AsRef<str>>(self, path: T) -> ReboxResult<Self> {
         Ok(KeyValueStorageBuilder {
             maybe_path_str: Some(path.as_ref().to_owned()),
         })
     }
-    pub(crate) fn build(self) -> ReboxResult<KeyValueStorage> {
+    pub fn build(self) -> ReboxResult<KeyValueStorage> {
         let Self { maybe_path_str } = self;
         let mut base_path = match maybe_path_str {
             Some(path_str) => PathBuf::from_str(&path_str)?,

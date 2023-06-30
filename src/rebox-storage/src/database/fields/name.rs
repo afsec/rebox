@@ -1,5 +1,5 @@
 #[derive(Debug, Default, Clone)]
-pub(crate) struct DatabaseName(String);
+pub struct DatabaseName(String);
 impl AsRef<str> for DatabaseName {
     fn as_ref(&self) -> &str {
         self.0.as_ref()
@@ -7,7 +7,7 @@ impl AsRef<str> for DatabaseName {
 }
 
 impl DatabaseName {
-    pub(crate) fn new<T: AsRef<str>>(name: T) -> Self {
+    pub fn new<T: AsRef<str>>(name: T) -> Self {
         Self(name.as_ref().to_owned())
     }
 }

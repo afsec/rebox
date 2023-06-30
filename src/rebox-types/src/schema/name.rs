@@ -15,6 +15,12 @@ impl TableName {
     }
 }
 
+impl AsRef<str> for TableName {
+    fn as_ref(&self) -> &str {
+        &self.0
+    }
+}
+
 impl Display for TableName {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
