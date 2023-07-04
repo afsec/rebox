@@ -6,44 +6,66 @@ use anyhow::format_err;
 use rebox_types::helpers::check_valid_entity_name;
 use rebox_types::{helpers::project_root, schema::name::TableName, ReboxResult};
 
+use crate::database::fields::name::DatabaseName;
 use crate::database::fields::rebox_master::ReboxMaster;
 use crate::database::fields::rebox_schema::ReboxSchema;
 use crate::database::fields::rebox_sequence::ReboxSequence;
 
-use super::KeyValueStorage;
+use super::{KeyValueDriver, KvConnection};
+
+// use super::KeyValueDriver;
 
 #[derive(Debug, Default)]
-pub struct KeyValueStorageBuilder;
+pub struct KeyValueDriverBuilder;
 
-impl KeyValueStorageBuilder {
-    pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<KeyValueStorageBuilderS1> {
-        let database_name = name.as_ref().to_owned();
-        check_valid_entity_name(&database_name)?;
-        Ok(KeyValueStorageBuilderS1 {
-            database_name,
+impl KeyValueDriverBuilder {
+    pub fn set_name(self, db_name: DatabaseName) -> ReboxResult<KeyValueDriverBuilderS1> {
+        Ok(KeyValueDriverBuilderS1 {
+            db_name,
             ..Default::default()
         })
     }
 }
 
 #[derive(Debug, Default)]
-pub struct KeyValueStorageBuilderS1 {
-    database_name: String,
+pub struct KeyValueDriverBuilderS1 {
+    db_name: DatabaseName,
     maybe_path_str: Option<String>,
+    create_mode: bool,
 }
-impl KeyValueStorageBuilderS1 {
-    pub fn set_path<T: AsRef<str>>(self, path: T) -> ReboxResult<Self> {
-        let Self { database_name, .. } = self;
-        Ok(Self {
-            database_name,
-            maybe_path_str: Some(path.as_ref().to_owned()),
-        })
-    }
-    pub fn build(self) -> ReboxResult<KeyValueStorage> {
+
+impl KeyValueDriverBuilderS1 {
+    pub fn set_path<T: AsRef<str>>(self, path: T) -> Self {
         let Self {
-            database_name,
+            db_name,
             maybe_path_str,
+            create_mode,
         } = self;
+        Self {
+            db_name,
+            maybe_path_str: Some(path.as_ref().to_owned()),
+            create_mode,
+        }
+    }
+    pub fn create_mode(self, create_mode: bool) -> Self {
+        let Self {
+            db_name,
+            maybe_path_str,
+            create_mode,
+        } = self;
+        Self {
+            db_name,
+            maybe_path_str,
+            create_mode,
+        }
+    }
+    pub fn build(self) -> ReboxResult<KeyValueDriverBuilderS2> {
+        let Self {
+            db_name,
+            maybe_path_str,
+            create_mode,
+        } = self;
+
         let mut base_path = match maybe_path_str {
             Some(path_str) => PathBuf::from_str(&path_str)?,
             None => {
@@ -54,58 +76,66 @@ impl KeyValueStorageBuilderS1 {
                 }
             }
         };
+
         base_path.push("rebox_data/");
-        base_path.push(format!("{database_name}/"));
+        base_path.push(format!("{}/", &*db_name));
 
-        Self::bootstrap_metadata(&base_path)?;
-
-        Ok(KeyValueStorage { base_path })
+        Ok(KeyValueDriverBuilderS2 {
+            db_name,
+            base_path,
+            create_mode,
+        })
     }
-    fn bootstrap_metadata(base_path: &PathBuf) -> ReboxResult<()> {
-        // TODO: Implement new/open session
-        Self::create_metadata_table(base_path, ReboxSequence::default().table_name())?;
-        Self::create_metadata_table(base_path, ReboxMaster::default().table_name())?;
-        Self::create_metadata_table(base_path, ReboxSchema::default().table_name())?;
-        Ok(())
-    }
-    fn create_metadata_table(base_path: &PathBuf, table_name: &TableName) -> ReboxResult<()> {
+}
+pub struct KeyValueDriverBuilderS2 {
+    db_name: DatabaseName,
+    base_path: PathBuf,
+    create_mode: bool,
+}
+impl KeyValueDriverBuilderS2 {
+    pub fn connect(self) -> ReboxResult<KeyValueDriver> {
         use rkv::{
             backend::{SafeMode, SafeModeEnvironment},
-            Manager, Rkv, StoreOptions,
+            Manager, Rkv,
         };
-        use std::fs;
-        use std::ops::Not;
+        use std::{fs, ops::Not};
 
-        // * Bootstrap DIRECTORY
+        let mut root = self.base_path.clone();
+        root.push(format!("{}/", &*self.db_name));
 
-        let mut root = PathBuf::from(base_path);
-
-        root.push("metadata/");
-        root.push(format!("{}/", table_name));
         if root.is_dir().not() {
             dbg!(&root);
             fs::create_dir_all(&root)?;
         }
 
         dbg!(&root);
-
         let mut path_dbfile = PathBuf::from(&root);
 
         path_dbfile.push("data.safe.bin");
 
-        if path_dbfile.exists().not() {
-            let mut manager = Manager::<SafeModeEnvironment>::singleton()
-                .write()
-                .map_err(|err| format_err!("{err}"))?;
-            let created_arc = manager
-                .get_or_create(root.as_path(), |p| Rkv::new::<SafeMode>(p))
-                .unwrap();
-            let k = created_arc.read().unwrap();
-            let store = k.open_single(table_name.to_string().as_str(), StoreOptions::create())?;
-            let mut writer = k.write()?;
-            // store.put(&mut writer, "some_key", &Value::Str("some_value"))?;
-            writer.commit().map_err(|err| format_err!("{err}"))?;
+        let mut manager = Manager::<SafeModeEnvironment>::singleton()
+            .write()
+            .map_err(|err| format_err!("{err}"))?;
+
+        let connection = match (path_dbfile.exists(), self.create_mode) {
+            (false, true) => {
+                Some(manager.get_or_create(root.as_path(), |p| Rkv::new::<SafeMode>(p))?)
+            }
+            (true, _) => manager.get(root.as_path())?,
+            (false, false) => None,
         }
-        Ok(())
+        .ok_or(format_err!("Error on open connection for Rkv database"))?;
+
+        let Self {
+            db_name,
+            base_path,
+            create_mode,
+        } = self;
+        Ok(KeyValueDriver {
+            db_name,
+            base_path,
+            create_mode,
+            connection,
+        })
     }
 }
