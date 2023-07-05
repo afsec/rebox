@@ -1,5 +1,4 @@
 pub(super) mod builder;
-mod moz_rkv;
 
 use std::path::PathBuf;
 use std::sync::Arc;

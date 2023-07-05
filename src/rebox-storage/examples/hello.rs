@@ -29,11 +29,14 @@ fn main() -> ReboxResult<()> {
 
     let db = Database::new().set_name(db_name)?.build()?;
 
-    dbg!(&db);
+    // dbg!(&db);
 
     let table_name = db.create_table(table)?;
 
     dbg!(&table_name);
 
+    let tables = db.list_tables()?;
+
+    dbg!(&tables);
     Ok(())
 }

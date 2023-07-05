@@ -62,10 +62,17 @@ impl Database {
         let table_name = metadata_table.table_name();
         let created_arc = self.driver.connection();
         let k = created_arc.read().unwrap();
-        let store = k.open_single(table_name.to_string().as_str(), StoreOptions::create())?;
-        let mut writer = k.write()?;
-        // store.put(&mut writer, "some_key", &Value::Str("some_value"))?;
-        writer.commit().map_err(|err| format_err!("{err}"))?;
+
+        if k.open_single(table_name.to_string().as_str(), StoreOptions::default())
+            .is_err()
+        {
+            let created_store =
+                k.open_single(table_name.to_string().as_str(), StoreOptions::create());
+
+            let mut writer = k.write()?;
+            // created_store?.put(&mut writer, "some_key", &Value::Str("some_value"))?;
+            writer.commit().map_err(|err| format_err!("{err}"))?;
+        }
 
         Ok(())
     }
