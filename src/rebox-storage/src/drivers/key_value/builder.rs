@@ -38,8 +38,8 @@ impl KeyValueDriverBuilderS1 {
     pub fn set_path<T: AsRef<str>>(self, path: T) -> Self {
         let Self {
             db_name,
-            maybe_path_str,
             create_mode,
+            ..
         } = self;
         Self {
             db_name,
@@ -47,16 +47,16 @@ impl KeyValueDriverBuilderS1 {
             create_mode,
         }
     }
-    pub fn create_mode(self, create_mode: bool) -> Self {
+    pub fn create_mode(self, yes: bool) -> Self {
         let Self {
             db_name,
             maybe_path_str,
-            create_mode,
+            ..
         } = self;
         Self {
             db_name,
             maybe_path_str,
-            create_mode,
+            create_mode: yes,
         }
     }
     pub fn build(self) -> ReboxResult<KeyValueDriverBuilderS2> {
@@ -100,42 +100,51 @@ impl KeyValueDriverBuilderS2 {
         };
         use std::{fs, ops::Not};
 
-        let mut root = self.base_path.clone();
-        root.push(format!("{}/", &*self.db_name));
+        let root = self.base_path.clone();
 
         if root.is_dir().not() {
             dbg!(&root);
             fs::create_dir_all(&root)?;
         }
 
-        dbg!(&root);
-        let mut path_dbfile = PathBuf::from(&root);
+        let mut path_dbfile = self.base_path.clone();
 
         path_dbfile.push("data.safe.bin");
 
-        let mut manager = Manager::<SafeModeEnvironment>::singleton()
-            .write()
-            .map_err(|err| format_err!("{err}"))?;
+        dbg!(&root.as_path());
+        dbg!(&path_dbfile.as_path());
 
-        let connection = match (path_dbfile.exists(), self.create_mode) {
+        let manager = Manager::<SafeModeEnvironment>::singleton();
+
+        // let mut reader = manager.read().map_err(|err| format_err!("{err}"))?;
+
+        let mut writer = manager
+            .write()
+            .map_err(|err| format_err!("Writer Error: {err}"))?;
+        dbg!();
+        let connection = match (path_dbfile.is_file(), self.create_mode) {
             (false, true) => {
-                Some(manager.get_or_create(root.as_path(), |p| Rkv::new::<SafeMode>(p))?)
+                Some(writer.get_or_create(root.as_path(), |p| Rkv::new::<SafeMode>(p))?)
             }
-            (true, _) => manager.get(root.as_path())?,
-            (false, false) => None,
+            (true, false) => writer.get(root.as_path())?,
+            _ => None,
         }
-        .ok_or(format_err!("Error on open connection for Rkv database"))?;
+        .ok_or(format_err!(
+            "Error on open connection for Rkv database, try create mode"
+        ))?;
 
         let Self {
             db_name,
             base_path,
             create_mode,
         } = self;
-        Ok(KeyValueDriver {
+        let kv_driver = KeyValueDriver {
             db_name,
             base_path,
             create_mode,
             connection,
-        })
+        };
+        kv_driver.bootstrap_metadata()?;
+        Ok(kv_driver)
     }
 }

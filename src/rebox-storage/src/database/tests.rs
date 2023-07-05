@@ -195,8 +195,11 @@ fn open_table_responses() -> ReboxResult<()> {
 
     let db_name = DatabaseName::new("some-database-name")?;
 
-    let mut kv_driver = KeyValueDriver::new().set_name(db_name)?.build()?.connect()?;
-    
+    let mut kv_driver = KeyValueDriver::new()
+        .set_name(db_name)?
+        .build()?
+        .connect()?;
+
     // kv_driver.open_table(&table, true)?;
     Ok(())
 }

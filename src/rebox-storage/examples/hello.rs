@@ -34,11 +34,12 @@ fn main() -> ReboxResult<()> {
 
     let kv_driver = KeyValueDriver::new()
         .set_name(DatabaseName::new(db_name)?)?
+        .create_mode(true)
         .build()?
         .connect()?;
 
     dbg!(&kv_driver);
-    
+
     // kv_driver.create_table(table)?;
     Ok(())
 }
