@@ -1,10 +1,8 @@
-use std::marker::PhantomData;
-
 use rebox_types::{helpers::check_valid_entity_name, ReboxResult};
 
-use crate::{database::DatabaseMetadata, drivers::Driver};
+use crate::database::DatabaseMetadata;
 
-use super::{fields::name::DatabaseName, Database};
+use super::{name::DatabaseName, Database};
 
 impl Database {
     pub fn new() -> DatabaseBuilder {
@@ -31,7 +29,7 @@ pub struct DatabaseBuilderS1 {
 }
 impl DatabaseBuilderS1 {
     pub fn build(self) -> ReboxResult<Database> {
-        use crate::drivers::key_value::KeyValueDriver;
+        use super::driver::key_value::KeyValueDriver;
         let driver = KeyValueDriver::new()
             .set_name(self.name.to_owned())?
             .create_mode(true)

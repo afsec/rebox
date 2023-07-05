@@ -6,7 +6,7 @@ use rebox_types::{schema::column::model::ColumnName, ReboxResult};
 
 use self::column::TableColumn;
 
-pub mod column;
+pub(super) mod column;
 
 #[derive(Debug, Default, Clone)]
 pub struct TableRow(BTreeMap<ColumnName, TableColumn>);

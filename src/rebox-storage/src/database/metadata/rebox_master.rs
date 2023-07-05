@@ -9,19 +9,19 @@ use rebox_types::{
 use crate::database::MetadataTable;
 
 #[derive(Debug)]
-pub struct ReboxSchema {
+pub(crate) struct ReboxMaster {
     table_name: TableName,
     inner_data: BTreeMap<TableName, CurrentRowId>,
 }
 
-impl MetadataTable for ReboxSchema {
+impl MetadataTable for ReboxMaster {
     fn table_name(&self) -> &TableName {
         &self.table_name
     }
 }
 
-impl ReboxSchema {
-    pub fn bump_table_cur_rowid(&mut self, table_name: &TableName) -> ReboxResult<()> {
+impl ReboxMaster {
+    pub(crate) fn bump_table_cur_rowid(&mut self, table_name: &TableName) -> ReboxResult<()> {
         self.check_can_inc_rowid(table_name)?;
         let cur_row_id = self
             .inner_data
@@ -32,7 +32,7 @@ impl ReboxSchema {
 
         Ok(())
     }
-    pub fn check_can_inc_rowid(&self, table_name: &TableName) -> ReboxResult<()> {
+    pub(crate) fn check_can_inc_rowid(&self, table_name: &TableName) -> ReboxResult<()> {
         if let Some(cur_row_id) = self.inner_data.get(table_name) {
             if cur_row_id.is_full() {
                 bail!("Table [{table_name}] reached max row id");
@@ -41,14 +41,14 @@ impl ReboxSchema {
         Ok(())
     }
 
-    pub fn table_name(&self) -> &TableName {
+    pub(crate) fn table_name(&self) -> &TableName {
         &self.table_name
     }
 }
-impl Default for ReboxSchema {
+impl Default for ReboxMaster {
     fn default() -> Self {
         Self {
-            table_name: TableName::new("schema"),
+            table_name: TableName::new("master"),
             inner_data: Default::default(),
         }
     }

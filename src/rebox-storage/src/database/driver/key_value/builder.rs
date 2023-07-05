@@ -1,25 +1,18 @@
-use std::env;
-use std::{path::PathBuf, str::FromStr};
+use std::{env, path::PathBuf, str::FromStr};
 
 use anyhow::format_err;
 
-use rebox_types::helpers::check_valid_entity_name;
-use rebox_types::{helpers::project_root, schema::name::TableName, ReboxResult};
+use rebox_types::{helpers::project_root, ReboxResult};
 
-use crate::database::fields::name::DatabaseName;
-use crate::database::fields::rebox_master::ReboxMaster;
-use crate::database::fields::rebox_schema::ReboxSchema;
-use crate::database::fields::rebox_sequence::ReboxSequence;
+use crate::database::name::DatabaseName;
 
-use super::{KeyValueDriver, KvConnection};
-
-// use super::KeyValueDriver;
+use super::KeyValueDriver;
 
 #[derive(Debug, Default)]
-pub struct KeyValueDriverBuilder;
+pub(crate) struct KeyValueDriverBuilder;
 
 impl KeyValueDriverBuilder {
-    pub fn set_name(self, db_name: DatabaseName) -> ReboxResult<KeyValueDriverBuilderS1> {
+    pub(crate) fn set_name(self, db_name: DatabaseName) -> ReboxResult<KeyValueDriverBuilderS1> {
         Ok(KeyValueDriverBuilderS1 {
             db_name,
             ..Default::default()
@@ -28,14 +21,14 @@ impl KeyValueDriverBuilder {
 }
 
 #[derive(Debug, Default)]
-pub struct KeyValueDriverBuilderS1 {
+pub(crate) struct KeyValueDriverBuilderS1 {
     db_name: DatabaseName,
     maybe_path_str: Option<String>,
     create_mode: bool,
 }
 
 impl KeyValueDriverBuilderS1 {
-    pub fn set_path<T: AsRef<str>>(self, path: T) -> Self {
+    pub(crate) fn set_path<T: AsRef<str>>(self, path: T) -> Self {
         let Self {
             db_name,
             create_mode,
@@ -47,7 +40,7 @@ impl KeyValueDriverBuilderS1 {
             create_mode,
         }
     }
-    pub fn create_mode(self, yes: bool) -> Self {
+    pub(crate) fn create_mode(self, yes: bool) -> Self {
         let Self {
             db_name,
             maybe_path_str,
@@ -59,7 +52,7 @@ impl KeyValueDriverBuilderS1 {
             create_mode: yes,
         }
     }
-    pub fn build(self) -> ReboxResult<KeyValueDriverBuilderS2> {
+    pub(crate) fn build(self) -> ReboxResult<KeyValueDriverBuilderS2> {
         let Self {
             db_name,
             maybe_path_str,
@@ -87,13 +80,13 @@ impl KeyValueDriverBuilderS1 {
         })
     }
 }
-pub struct KeyValueDriverBuilderS2 {
+pub(crate) struct KeyValueDriverBuilderS2 {
     db_name: DatabaseName,
     base_path: PathBuf,
     create_mode: bool,
 }
 impl KeyValueDriverBuilderS2 {
-    pub fn connect(self) -> ReboxResult<KeyValueDriver> {
+    pub(crate) fn connect(self) -> ReboxResult<KeyValueDriver> {
         use rkv::{
             backend::{SafeMode, SafeModeEnvironment},
             Manager, Rkv,

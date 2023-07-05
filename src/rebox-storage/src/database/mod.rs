@@ -1,7 +1,8 @@
-pub mod builder;
-pub mod fields;
-pub mod row;
-
+pub(crate) mod builder;
+mod driver;
+mod metadata;
+mod name;
+mod row;
 use std::fmt::Debug;
 
 use anyhow::format_err;
@@ -11,15 +12,11 @@ use rebox_types::{
     ReboxResult,
 };
 
-use crate::drivers::key_value::KeyValueDriver;
-
-use self::{
-    fields::{
-        name::DatabaseName, rebox_master::ReboxMaster, rebox_schema::ReboxSchema,
-        rebox_sequence::ReboxSequence,
-    },
-    row::TableRow,
+use self::metadata::{
+    rebox_master::ReboxMaster, rebox_schema::ReboxSchema, rebox_sequence::ReboxSequence,
 };
+use self::name::DatabaseName;
+use self::{driver::key_value::KeyValueDriver, row::TableRow};
 
 #[cfg(test)]
 mod tests;
@@ -75,12 +72,12 @@ impl Database {
 }
 
 #[derive(Debug, Default)]
-pub struct DatabaseMetadata {
+pub(super) struct DatabaseMetadata {
     rebox_sequence: ReboxSequence,
     rebox_schema: ReboxSchema,
     rebox_master: ReboxMaster,
 }
 
-pub trait MetadataTable {
+pub(super) trait MetadataTable {
     fn table_name(&self) -> &TableName;
 }
