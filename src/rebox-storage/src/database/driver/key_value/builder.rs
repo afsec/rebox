@@ -87,6 +87,7 @@ pub(crate) struct KeyValueDriverBuilderS2 {
 }
 impl KeyValueDriverBuilderS2 {
     pub(crate) fn connect(self) -> ReboxResult<KeyValueDriver> {
+        use rkv::StoreOptions;
         use rkv::{
             backend::{SafeMode, SafeModeEnvironment},
             Manager, Rkv,
@@ -96,7 +97,6 @@ impl KeyValueDriverBuilderS2 {
         let root = self.base_path.clone();
 
         if root.is_dir().not() {
-            dbg!(&root);
             fs::create_dir_all(&root)?;
         }
 
@@ -104,27 +104,13 @@ impl KeyValueDriverBuilderS2 {
 
         path_dbfile.push("data.safe.bin");
 
-        dbg!(&root.as_path());
-        dbg!(&path_dbfile.as_path());
-
-        let manager = Manager::<SafeModeEnvironment>::singleton();
-
-        // let mut reader = manager.read().map_err(|err| format_err!("{err}"))?;
-
-        let mut writer = manager
+        let mut manager = Manager::<SafeModeEnvironment>::singleton()
             .write()
-            .map_err(|err| format_err!("Writer Error: {err}"))?;
-        dbg!();
-        let connection = match (path_dbfile.is_file(), self.create_mode) {
-            (false, true) => {
-                Some(writer.get_or_create(root.as_path(), |p| Rkv::new::<SafeMode>(p))?)
-            }
-            (true, false) => writer.get(root.as_path())?,
-            _ => None,
-        }
-        .ok_or(format_err!(
-            "Error on open connection for Rkv database, try create mode"
-        ))?;
+            .map_err(|err| format_err!("Manager error: {err}"))?;
+
+        let connection = manager
+            .get_or_create(root.as_path(), Rkv::new::<SafeMode>)
+            .map_err(|err| format_err!("Create Arc error: {err}"))?;
 
         let Self {
             db_name,
