@@ -1,6 +1,9 @@
 use clap::Parser;
 
-use crate::{tasks::{Build, Dist, FuzzTests, Metrics, Prepare, PublishReleaseNotes}, helpers::Runner};
+use crate::{
+    helpers::Runner,
+    tasks::{Build, Dist, FuzzTests, Metrics, Prepare, PublishReleaseNotes},
+};
 
 /// cargo xtask
 #[derive(Parser, Debug)]

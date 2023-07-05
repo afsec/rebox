@@ -32,8 +32,11 @@ pub struct DatabaseBuilderS1 {
 impl DatabaseBuilderS1 {
     pub fn build(self) -> ReboxResult<Database> {
         use crate::drivers::key_value::KeyValueDriver;
-        let mut driver = KeyValueDriver::new().set_name(self.name.to_owned())?.build()?.connect()?;
-        
+        let mut driver = KeyValueDriver::new()
+            .set_name(self.name.to_owned())?
+            .build()?
+            .connect()?;
+
         let Self { name, .. } = self;
         Ok(Database {
             name,
