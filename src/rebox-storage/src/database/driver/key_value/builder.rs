@@ -62,6 +62,7 @@ impl KeyValueDriverBuilderS1 {
         let mut base_path = match maybe_path_str {
             Some(path_str) => PathBuf::from_str(&path_str)?,
             None => {
+                // TODO: Dev environment
                 if cfg!(debug_assertions) {
                     project_root()?
                 } else {

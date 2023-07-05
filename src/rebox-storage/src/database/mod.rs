@@ -64,7 +64,9 @@ impl Database {
     ) -> ReboxResult<()> {
         use rkv::{StoreOptions, Value};
         let created_arc = self.driver.connection();
-        let k = created_arc.read().unwrap();
+        let k = created_arc
+            .read()
+            .map_err(|err| format_err!("Read error: {err}"))?;
         let store_name = format!("{}-{}", self.metadata.prefix, metadata_table.table_name());
 
         if k.open_single(&*store_name, StoreOptions::default())
