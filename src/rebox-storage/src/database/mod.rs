@@ -1,10 +1,17 @@
+pub mod builder;
+pub mod fields;
+pub mod row;
+
 use std::fmt::Debug;
 
-use crate::drivers::key_value::KeyValueDriver;
+use anyhow::format_err;
+
 use rebox_types::{
     schema::{name::TableName, CurrentRowId, Table},
     ReboxResult,
 };
+
+use crate::drivers::key_value::KeyValueDriver;
 
 use self::{
     fields::{
@@ -13,10 +20,6 @@ use self::{
     },
     row::TableRow,
 };
-
-pub mod builder;
-pub mod fields;
-pub mod row;
 
 #[cfg(test)]
 mod tests;
@@ -37,18 +40,37 @@ impl Database {
         todo!();
         Ok(vec![])
     }
-    pub fn create_table(&mut self, table: Table) -> ReboxResult<TableName> {
+    pub fn create_table(&self, table: Table) -> ReboxResult<TableName> {
         // self.driver.open_table(&table, true)?;
         todo!();
         Ok(table.name().to_owned())
     }
     pub fn insert_into_table(
-        &mut self,
+        &self,
         table_name: TableName,
         table_row: TableRow,
     ) -> ReboxResult<CurrentRowId> {
         todo!();
         Ok(CurrentRowId::default())
+    }
+    fn bootstrap_metadata(&self) -> ReboxResult<()> {
+        // TODO: Implement new/open session
+        self.create_metadata_table(&self.metadata.rebox_schema)?;
+        self.create_metadata_table(&self.metadata.rebox_master)?;
+        self.create_metadata_table(&self.metadata.rebox_sequence)?;
+        Ok(())
+    }
+    fn create_metadata_table<T: MetadataTable>(&self, metadata_table: &T) -> ReboxResult<()> {
+        use rkv::{StoreOptions, Value};
+        let table_name = metadata_table.table_name();
+        let created_arc = self.driver.connection();
+        let k = created_arc.read().unwrap();
+        let store = k.open_single(table_name.to_string().as_str(), StoreOptions::create())?;
+        let mut writer = k.write()?;
+        // store.put(&mut writer, "some_key", &Value::Str("some_value"))?;
+        writer.commit().map_err(|err| format_err!("{err}"))?;
+
+        Ok(())
     }
 }
 
@@ -57,4 +79,8 @@ pub struct DatabaseMetadata {
     rebox_sequence: ReboxSequence,
     rebox_schema: ReboxSchema,
     rebox_master: ReboxMaster,
+}
+
+pub trait MetadataTable {
+    fn table_name(&self) -> &TableName;
 }

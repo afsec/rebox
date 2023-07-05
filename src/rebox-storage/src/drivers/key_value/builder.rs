@@ -144,7 +144,7 @@ impl KeyValueDriverBuilderS2 {
             create_mode,
             connection,
         };
-        kv_driver.bootstrap_metadata()?;
+
         Ok(kv_driver)
     }
 }

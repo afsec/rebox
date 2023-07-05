@@ -6,10 +6,18 @@ use rebox_types::{
     ReboxResult,
 };
 
+use crate::database::MetadataTable;
+
 #[derive(Debug)]
 pub struct ReboxMaster {
     table_name: TableName,
     inner_data: BTreeMap<TableName, CurrentRowId>,
+}
+
+impl MetadataTable for ReboxMaster {
+    fn table_name(&self) -> &TableName {
+        &self.table_name
+    }
 }
 
 impl ReboxMaster {
