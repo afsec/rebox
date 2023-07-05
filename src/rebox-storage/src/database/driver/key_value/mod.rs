@@ -1,12 +1,12 @@
 pub(super) mod builder;
 
-use std::path::PathBuf;
+// use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::RwLock;
 
 use rkv::{backend::SafeModeEnvironment, Rkv};
 
-use crate::database::name::DatabaseName;
+// use crate::database::name::DatabaseName;
 
 use self::builder::KeyValueDriverBuilder;
 
@@ -17,9 +17,9 @@ pub(crate) type KvConnection = Arc<RwLock<Rkv<SafeModeEnvironment>>>;
 
 #[derive(Debug)]
 pub(crate) struct KeyValueDriver {
-    db_name: DatabaseName,
-    base_path: PathBuf,
-    create_mode: bool,
+    // db_name: DatabaseName,
+    // base_path: PathBuf,
+    // create_mode: bool,
     connection: KvConnection,
 }
 impl KeyValueDriver {

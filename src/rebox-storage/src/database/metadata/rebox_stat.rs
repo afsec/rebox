@@ -9,18 +9,18 @@ use rebox_types::{
 use crate::database::MetadataTable;
 
 #[derive(Debug)]
-pub(crate) struct ReboxMaster {
+pub(crate) struct ReboxStat {
     table_name: TableName,
     inner_data: BTreeMap<TableName, CurrentRowId>,
 }
 
-impl MetadataTable for ReboxMaster {
+impl MetadataTable for ReboxStat {
     fn table_name(&self) -> &TableName {
         &self.table_name
     }
 }
 
-impl ReboxMaster {
+impl ReboxStat {
     pub(crate) fn bump_table_cur_rowid(&mut self, table_name: &TableName) -> ReboxResult<()> {
         self.check_can_inc_rowid(table_name)?;
         let cur_row_id = self
@@ -45,7 +45,7 @@ impl ReboxMaster {
         &self.table_name
     }
 }
-impl Default for ReboxMaster {
+impl Default for ReboxStat {
     fn default() -> Self {
         Self {
             table_name: TableName::new("master"),

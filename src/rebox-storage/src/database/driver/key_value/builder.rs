@@ -112,15 +112,15 @@ impl KeyValueDriverBuilderS2 {
             .get_or_create(root.as_path(), Rkv::new::<SafeMode>)
             .map_err(|err| format_err!("Create Arc error: {err}"))?;
 
-        let Self {
-            db_name,
-            base_path,
-            create_mode,
-        } = self;
+        // let Self {
+        //     db_name,
+        //     base_path,
+        //     create_mode,
+        // } = self;
         let kv_driver = KeyValueDriver {
-            db_name,
-            base_path,
-            create_mode,
+            // db_name,
+            // base_path,
+            // create_mode,
             connection,
         };
 
