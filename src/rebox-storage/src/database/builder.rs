@@ -2,56 +2,43 @@ use std::marker::PhantomData;
 
 use rebox_types::{helpers::check_valid_entity_name, ReboxResult};
 
-use crate::drivers::Driver;
+use crate::{database::DatabaseMetadata, drivers::Driver};
 
-use super::{fields::name::DatabaseName, Database, DatabaseConnection};
+use super::{fields::name::DatabaseName, Database};
 
-impl<D: Driver> Database<D> {
-    pub fn new() -> DatabaseBuilder<D> {
-        DatabaseBuilder(PhantomData)
+impl Database {
+    pub fn new() -> DatabaseBuilder {
+        DatabaseBuilder
     }
 }
 
 #[derive(Debug)]
-pub struct DatabaseBuilder<D: Driver>(PhantomData<D>);
+pub struct DatabaseBuilder;
 
-impl<D: Driver> DatabaseBuilder<D> {
-    pub fn set_name<S: AsRef<str>>(self, name: S) -> ReboxResult<DatabaseBuilderS1<D>> {
+impl DatabaseBuilder {
+    pub fn set_name<S: AsRef<str>>(self, name: S) -> ReboxResult<DatabaseBuilderS1> {
         check_valid_entity_name(&name)?;
 
         Ok(DatabaseBuilderS1 {
-            driver: PhantomData,
-            name: DatabaseName::new(name),
+            name: DatabaseName::new(name)?,
         })
     }
 }
+
 #[derive(Debug, Default)]
-pub struct DatabaseBuilderS1<D: Driver> {
-    driver: PhantomData<D>,
+pub struct DatabaseBuilderS1 {
     name: DatabaseName,
 }
-impl<D: Driver> DatabaseBuilderS1<D> {
-    pub fn set_driver(self, driver: D) -> DatabaseBuilderS2<D> {
+impl DatabaseBuilderS1 {
+    pub fn build(self) -> ReboxResult<Database> {
+        use crate::drivers::key_value::KeyValueDriver;
+        let mut driver = KeyValueDriver::new().set_name(self.name.to_owned())?.build()?.connect()?;
+        
         let Self { name, .. } = self;
-
-        DatabaseBuilderS2 { name, driver }
-    }
-}
-
-#[derive(Debug, Default)]
-pub struct DatabaseBuilderS2<D: Driver> {
-    name: DatabaseName,
-    driver: D,
-}
-impl<D: Driver> DatabaseBuilderS2<D> {
-    pub fn build(self) -> ReboxResult<Database<D>> {
-        let Self { name, driver } = self;
-        // TODO
-        let connection = DatabaseConnection::new()
-            .set_driver(driver)
-            .set_name(name.clone())?
-            .build()
-            .connect()?;
-        Ok(Database { name, connection })
+        Ok(Database {
+            name,
+            driver,
+            metadata: DatabaseMetadata::default(),
+        })
     }
 }

@@ -1,18 +1,20 @@
 use std::fmt::Debug;
 
-use crate::drivers::Driver;
-
-use anyhow::bail;
-use connection::DatabaseConnection;
+use crate::drivers::key_value::KeyValueDriver;
 use rebox_types::{
     schema::{name::TableName, CurrentRowId, Table},
     ReboxResult,
 };
 
-use self::{fields::name::DatabaseName, row::TableRow};
+use self::{
+    fields::{
+        name::DatabaseName, rebox_master::ReboxMaster, rebox_schema::ReboxSchema,
+        rebox_sequence::ReboxSequence,
+    },
+    row::TableRow,
+};
 
 pub mod builder;
-pub mod connection;
 pub mod fields;
 pub mod row;
 
@@ -20,26 +22,39 @@ pub mod row;
 mod tests;
 
 #[derive(Debug)]
-pub struct Database<D: Driver> {
+pub struct Database {
     name: DatabaseName,
-    connection: DatabaseConnection<D>,
+    driver: KeyValueDriver,
+    metadata: DatabaseMetadata,
 }
 
-impl<D: Driver> Database<D> {
+impl Database {
     pub fn name(&self) -> &str {
         self.name.as_ref()
     }
     pub fn list_tables(&self) -> ReboxResult<Vec<&TableName>> {
-        self.connection.list_tables()
+        // self.driver.list_tables()
+        todo!();
+        Ok(vec![])
     }
     pub fn create_table(&mut self, table: Table) -> ReboxResult<TableName> {
-        self.connection.create_table(table)
+        // self.driver.open_table(&table, true)?;
+        todo!();
+        Ok(table.name().to_owned())
     }
     pub fn insert_into_table(
         &mut self,
         table_name: TableName,
         table_row: TableRow,
     ) -> ReboxResult<CurrentRowId> {
-        self.connection.insert_into_table(table_name, table_row)
+        todo!();
+        Ok(CurrentRowId::default())
     }
+}
+
+#[derive(Debug, Default)]
+pub struct DatabaseMetadata {
+    rebox_sequence: ReboxSequence,
+    rebox_schema: ReboxSchema,
+    rebox_master: ReboxMaster,
 }

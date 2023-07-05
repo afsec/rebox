@@ -1,7 +1,15 @@
-use std::fmt::Display;
+use std::{fmt::Display, ops::Deref};
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct TableName(String);
+
+impl Deref for TableName {
+    type Target = str;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl From<TableName> for String {
     fn from(value: TableName) -> Self {
