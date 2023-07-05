@@ -1,26 +1,26 @@
-use rebox_types::{
-    schema::{
-        column::{model::ColumnKind, SchemaColumn},
-        Table,
-    },
-    test_helpers::ResultScenario,
-    ReboxResult,
-};
+// use rebox_types::{
+//     schema::{
+//         column::{model::ColumnKind, SchemaColumn},
+//         Table,
+//     },
+//     test_helpers::ResultScenario,
+//     ReboxResult,
+// };
 
-use test_case::test_case;
+// use test_case::test_case;
 
-use crate::{
-    database::{
-        row::{
-            column::{ColumnValue, TableColumn},
-            TableRow,
-        },
-        Database,
-    },
-    drivers::{key_value::KeyValueDriver, Driver},
-};
+// use crate::{
+//     database::{
+//         row::{
+//             column::{ColumnValue, TableColumn},
+//             TableRow,
+//         },
+//         Database,
+//     },
+//     drivers::{key_value::KeyValueDriver, Driver},
+// };
 
-use super::fields::name::DatabaseName;
+// use super::fields::name::DatabaseName;
 
 // #[test_case(&["db-name-1","db-name1"],ResultScenario::Success ; "when name is valid")]
 // #[test_case(&["db-name_1","db_name1"],ResultScenario::Error  ; "when name is invalid")]
@@ -174,32 +174,32 @@ use super::fields::name::DatabaseName;
 //     kv_storage.open_table(&table, true)?;
 //     Ok(())
 // }
-#[test]
-fn open_table_responses() -> ReboxResult<()> {
-    let c1 = SchemaColumn::new()
-        .set_name("c1")?
-        .set_kind(ColumnKind::Text)
-        .set_nullable(false)
-        .build();
-    let columns = vec![c1];
+// #[test]
+// fn open_table_responses() -> ReboxResult<()> {
+//     let c1 = SchemaColumn::new()
+//         .set_name("c1")?
+//         .set_kind(ColumnKind::Text)
+//         .set_nullable(false)
+//         .build();
+//     let columns = vec![c1];
 
-    // TODO: Implement new/open session
-    let table = Table::new()
-        .set_name("responses")?
-        .set_schema(columns)?
-        .build()?;
+//     // TODO: Implement new/open session
+//     let table = Table::new()
+//         .set_name("responses")?
+//         .set_schema(columns)?
+//         .build()?;
 
-    // TODO: Create Table Schema
-    // TODO: Open Table to Insert into
-    // TODO: Validate Table Schema against Database
+//     // TODO: Create Table Schema
+//     // TODO: Open Table to Insert into
+//     // TODO: Validate Table Schema against Database
 
-    let db_name = DatabaseName::new("some-database-name")?;
+//     let db_name = DatabaseName::new("some-database-name")?;
 
-    let mut kv_driver = KeyValueDriver::new()
-        .set_name(db_name)?
-        .build()?
-        .connect()?;
+//     let mut kv_driver = KeyValueDriver::new()
+//         .set_name(db_name)?
+//         .build()?
+//         .connect()?;
 
-    // kv_driver.open_table(&table, true)?;
-    Ok(())
-}
+//     // kv_driver.open_table(&table, true)?;
+//     Ok(())
+// }

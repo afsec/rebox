@@ -6,10 +6,8 @@ use rebox_types::{
     ReboxResult,
 };
 
-use rebox_storage::database::{fields::name::DatabaseName, Database};
+use rebox_storage::Database;
 fn main() -> ReboxResult<()> {
-    use rebox_storage::drivers::key_value::KeyValueDriver;
-
     let db_name = "example-database";
 
     let c1 = SchemaColumn::new()
@@ -29,8 +27,8 @@ fn main() -> ReboxResult<()> {
     let table = Table::new().set_name("tbl2")?.set_schema(schema)?.build()?;
     dbg!(&table);
 
-    let mut db = Database::new().set_name(db_name)?.build()?;
-    
+    let db = Database::new().set_name(db_name)?.build()?;
+
     dbg!(&db);
 
     let table_name = db.create_table(table)?;

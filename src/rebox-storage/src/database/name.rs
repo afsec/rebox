@@ -3,7 +3,7 @@ use std::ops::Deref;
 use rebox_types::{helpers::check_valid_entity_name, ReboxResult};
 
 #[derive(Debug, Default, Clone)]
-pub struct DatabaseName(String);
+pub(crate) struct DatabaseName(String);
 
 impl Deref for DatabaseName {
     type Target = str;
@@ -20,7 +20,7 @@ impl AsRef<str> for DatabaseName {
 }
 
 impl DatabaseName {
-    pub fn new<T: AsRef<str>>(name: T) -> ReboxResult<Self> {
+    pub(crate) fn new<T: AsRef<str>>(name: T) -> ReboxResult<Self> {
         check_valid_entity_name(&name)?;
         Ok(Self(name.as_ref().to_owned()))
     }
