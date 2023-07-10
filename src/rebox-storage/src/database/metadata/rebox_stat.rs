@@ -48,7 +48,7 @@ impl ReboxStat {
 impl Default for ReboxStat {
     fn default() -> Self {
         Self {
-            table_name: TableName::new("master"),
+            table_name: TableName::new("stat"),
             inner_data: Default::default(),
         }
     }
