@@ -48,6 +48,10 @@ impl Table {
         let Self { name, schema } = self;
         (name, schema)
     }
+
+    pub fn schema(&self) -> &TableSchema {
+        &self.schema
+    }
 }
 
 impl Table {
