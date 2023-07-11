@@ -23,4 +23,7 @@ impl TableSchema {
     pub fn count_columns(&self) -> usize {
         self.0.len()
     }
+    pub fn get_columns(&self) -> &BTreeMap<ColumnName, SchemaColumn> {
+        &self.0
+    }
 }

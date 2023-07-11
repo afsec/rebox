@@ -13,7 +13,7 @@ use rebox_types::{
 };
 
 use self::metadata::{
-    rebox_schema::ReboxSchema, rebox_sequence::ReboxSequence, rebox_stat::ReboxStat,
+    rebox_schema::ReboxMaster, rebox_sequence::ReboxSequence, rebox_stat::ReboxStat,
 };
 use self::name::DatabaseName;
 use self::{driver::key_value::KeyValueDriver, row::TableRow};
@@ -38,8 +38,8 @@ impl Database {
         Ok(vec![])
     }
     pub fn create_table(&self, table: Table) -> ReboxResult<TableName> {
-        // self.driver.open_table(&table, true)?;
-        todo!();
+        self.driver.create_table(&table)?;
+
         Ok(table.name().to_owned())
     }
     pub fn insert_into_table(
@@ -86,7 +86,7 @@ impl Database {
 #[derive(Debug)]
 pub(super) struct DatabaseMetadata {
     prefix: &'static str,
-    rebox_schema: ReboxSchema,
+    rebox_schema: ReboxMaster,
     rebox_sequence: ReboxSequence,
     rebox_stat: ReboxStat,
 }
