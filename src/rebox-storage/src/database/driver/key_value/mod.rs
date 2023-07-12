@@ -75,7 +75,7 @@ impl<'a> CreateTable<'a> {
         // TODO
         Self::update_master(&self, table)?;
         Self::update_sequence(&self, table)?;
-        Self::health_check(&self, table)?;
+        Self::check_integrity(&self, table)?;
         Ok(())
     }
     fn create_store<T: AsRef<str>>(&self, store_name: T) -> ReboxResult<()> {
@@ -128,7 +128,7 @@ impl<'a> CreateTable<'a> {
         writer.commit().map_err(|err| format_err!("{err}"))?;
         Ok(())
     }
-    fn health_check(&self, table: &Table) -> ReboxResult<()> {
+    fn check_integrity(&self, table: &Table) -> ReboxResult<()> {
         use bincode::config::Configuration;
 
         let created_arc = self.0.connection();
@@ -167,10 +167,7 @@ impl<'a> CreateTable<'a> {
 
             let current_row_id = match maybe_value {
                 Some(Value::U64(id)) => CurrentRowId::try_from(id)?,
-                other => bail!(
-                    "Health check alert: Table [{table_name_str}] type mismatch in [{rebox_sequence}]. Reason: {other:?}"
-    
-            ),
+                other => bail!(                    "Health check alert: Table [{table_name_str}] type mismatch in [{rebox_sequence}]. Reason: {other:?}"            ),
             };
 
             if *current_row_id != 0 {
