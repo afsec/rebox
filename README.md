@@ -5,9 +5,9 @@ Simple table-based storage for remora-investigator
 ## Getting Started
 
 ```sh
-$ nix develop
-
 $ cd rebox
+
+$ nix develop
 
 $ cargo run --example departments
 ```
