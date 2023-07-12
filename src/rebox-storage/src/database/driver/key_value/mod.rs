@@ -75,7 +75,7 @@ impl<'a> CreateTable<'a> {
         // TODO
         Self::update_master(&self, table)?;
         Self::update_sequence(&self, table)?;
-        Self::health_check(&self, table)?;
+        Self::check_integrity(&self, table)?;
         Ok(())
     }
     fn create_store<T: AsRef<str>>(&self, store_name: T) -> ReboxResult<()> {
@@ -128,7 +128,7 @@ impl<'a> CreateTable<'a> {
         writer.commit().map_err(|err| format_err!("{err}"))?;
         Ok(())
     }
-    fn health_check(&self, table: &Table) -> ReboxResult<()> {
+    fn check_integrity(&self, table: &Table) -> ReboxResult<()> {
         use bincode::config::Configuration;
 
         let created_arc = self.0.connection();
@@ -154,7 +154,7 @@ impl<'a> CreateTable<'a> {
                 TableSchema,
                 Configuration,
             >(blob, bincode::config::standard())?;
-
+            
             if &retrieved_table_schema != table.schema() {
                 bail!("Health check alert:  Table [{table_name_str}] is corrupted in [{rebox_master}]")
             }
