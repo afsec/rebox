@@ -1,10 +1,11 @@
 use std::fmt::Display;
 
+use bincode::{Decode, Encode};
 use bytes::BytesMut;
 
 // const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 50; // 50 MBytes
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Decode, Encode)]
 pub struct ColumnName(String);
 
 impl<T: AsRef<str>> From<T> for ColumnName {
@@ -19,7 +20,7 @@ impl Display for ColumnName {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Decode, Encode)]
 pub enum ColumnKind {
     Bool,
     Integer,

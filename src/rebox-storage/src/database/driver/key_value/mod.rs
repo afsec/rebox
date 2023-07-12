@@ -4,12 +4,18 @@ pub(super) mod builder;
 use std::sync::Arc;
 use std::sync::RwLock;
 
+use anyhow::bail;
 use anyhow::format_err;
-use rkv::{backend::SafeModeEnvironment, Rkv};
+use rebox_types::schema::table::TableSchema;
+use rebox_types::schema::CurrentRowId;
+use rkv::Value;
+use rkv::{backend::SafeModeEnvironment, Rkv, StoreOptions};
 
 use rebox_types::schema::name::TableName;
 use rebox_types::schema::Table;
 use rebox_types::ReboxResult;
+
+use crate::database::DatabaseMetadata;
 
 use super::DataStorage;
 use super::Driver;
@@ -20,9 +26,7 @@ pub(crate) type KvConnection = Arc<RwLock<Rkv<SafeModeEnvironment>>>;
 
 #[derive(Debug)]
 pub(crate) struct KeyValueDriver {
-    // db_name: DatabaseName,
-    // base_path: PathBuf,
-    // create_mode: bool,
+    metadata: DatabaseMetadata,
     connection: KvConnection,
 }
 impl KeyValueDriver {
@@ -34,8 +38,12 @@ impl KeyValueDriver {
         &self.connection
     }
     pub(crate) fn create_table(&self, table: &Table) -> ReboxResult<()> {
-        CreateTable::connect(self.connection())?.create(table)?;
+        CreateTable::connect(&self)?.create(table)?;
         Ok(())
+    }
+
+    pub(crate) fn metadata(&self) -> &DatabaseMetadata {
+        &self.metadata
     }
 }
 
@@ -48,10 +56,10 @@ impl DataStorage for KeyValueDriver {
     }
 }
 
-struct CreateTable<'a>(&'a KvConnection);
+struct CreateTable<'a>(&'a KeyValueDriver);
 impl<'a> CreateTable<'a> {
-    fn connect(conn: &'a KvConnection) -> ReboxResult<Self> {
-        Ok(Self(conn))
+    fn connect(driver: &'a KeyValueDriver) -> ReboxResult<Self> {
+        Ok(Self(driver))
     }
     fn create(self, table: &Table) -> ReboxResult<()> {
         let tbl_name = table.name();
@@ -67,36 +75,109 @@ impl<'a> CreateTable<'a> {
         // TODO
         Self::update_master(&self, table)?;
         Self::update_sequence(&self, table)?;
-        Self::health_check(&self, table.name())?;
+        Self::health_check(&self, table)?;
         Ok(())
     }
     fn create_store<T: AsRef<str>>(&self, store_name: T) -> ReboxResult<()> {
-        use rkv::{StoreOptions, Value};
-        let created_arc = self.0;
+        let created_arc = self.0.connection();
         let k = created_arc
             .read()
             .map_err(|err| format_err!("Read error: {err}"))?;
+        let store_name_str = store_name.as_ref();
+        if k.open_single(store_name_str, StoreOptions::default())
+            .is_ok()
+        {
+            bail!("Table {store_name_str} already exists!");
+        } else {
+            let created_store = k.open_single(store_name_str, StoreOptions::create());
 
-        let created_store = k.open_single(store_name.as_ref(), StoreOptions::create());
-
-        let mut writer = k.write()?;
-        // created_store?.put(&mut writer, "some_key", &Value::Str("some_value"))?;
-        writer.commit().map_err(|err| format_err!("{err}"))?;
+            let mut writer = k.write()?;
+            // created_store?.put(&mut writer, "some_key", &Value::Str("some_value"))?;
+            writer.commit().map_err(|err| format_err!("{err}"))?;
+        }
 
         Ok(())
     }
     fn update_master(&self, table: &Table) -> ReboxResult<()> {
+        let created_arc = self.0.connection();
+        let rebox_master = self.0.metadata().rebox_master().table_name().as_ref();
+
+        let k = created_arc
+            .read()
+            .map_err(|err| format_err!("Read error: {err}"))?;
+        let store_name_str = table.name().as_ref();
+        let master_store = k.open_single(rebox_master, StoreOptions::default())?;
+        let mut writer = k.write()?;
+        let schema_blob = bincode::encode_to_vec(&table.schema(), bincode::config::standard())?;
+        master_store.put(&mut writer, store_name_str, &Value::Blob(&schema_blob))?;
+        writer.commit().map_err(|err| format_err!("{err}"))?;
+
         Ok(())
     }
     fn update_sequence(&self, table: &Table) -> ReboxResult<()> {
+        let created_arc = self.0.connection();
+        let rebox_sequence = self.0.metadata().rebox_sequence().table_name().as_ref();
+
+        let k: std::sync::RwLockReadGuard<'_, Rkv<SafeModeEnvironment>> = created_arc
+            .read()
+            .map_err(|err| format_err!("Read error: {err}"))?;
+        let store_name_str = table.name().as_ref();
+        let master_store = k.open_single(rebox_sequence, StoreOptions::default())?;
+        let mut writer = k.write()?;
+        master_store.put(&mut writer, store_name_str, &Value::U64(0))?;
+        writer.commit().map_err(|err| format_err!("{err}"))?;
         Ok(())
     }
-    fn health_check(&self, table: &TableName) -> ReboxResult<()> {
+    fn health_check(&self, table: &Table) -> ReboxResult<()> {
+        use bincode::config::Configuration;
+
+        let created_arc = self.0.connection();
+
+        let k = created_arc
+            .read()
+            .map_err(|err| format_err!("Read error: {err}"))?;
+        let table_name_str = table.name().as_ref();
+
+        {
+            let rebox_master = self.0.metadata().rebox_master().table_name().as_ref();
+            let master_store = k.open_single(rebox_master, StoreOptions::default())?;
+            let mut reader = k.read()?;
+            let maybe_value: Option<Value> = master_store.get(&mut reader, table_name_str)?;
+
+            let blob = match maybe_value {
+                Some(Value::Blob(inner_blob)) => inner_blob,
+                other => bail!(
+                "Health check alert: Table [{table_name_str}] type mismatch in [{rebox_master}]. Reason: {other:?}"
+            ),
+            };
+            let (retrieved_table_schema, _) = bincode::decode_from_slice::<
+                TableSchema,
+                Configuration,
+            >(blob, bincode::config::standard())?;
+
+            if &retrieved_table_schema != table.schema() {
+                bail!("Health check alert:  Table [{table_name_str}] is corrupted in [{rebox_master}]")
+            }
+        }
+        {
+            let rebox_sequence = self.0.metadata().rebox_sequence().table_name().as_ref();
+            let master_store = k.open_single(rebox_sequence, StoreOptions::default())?;
+            let mut reader = k.read()?;
+            let maybe_value: Option<Value> = master_store.get(&mut reader, table_name_str)?;
+
+            let current_row_id = match maybe_value {
+                Some(Value::U64(id)) => CurrentRowId::try_from(id)?,
+                other => bail!(
+                    "Health check alert: Table [{table_name_str}] type mismatch in [{rebox_sequence}]. Reason: {other:?}"
+    
+            ),
+            };
+
+            if *current_row_id != 0 {
+                bail!("Health check alert:  Table [{table_name_str}] is corrupted in [{rebox_sequence}]")
+            }
+        }
+
         Ok(())
     }
 }
-// fn step_1(table: &Table) -> ReboxResult<()> {
-// TODO: Implement rebox_schema
-// TODO: Implement rebox_sequence
-// Ok(())
-// }

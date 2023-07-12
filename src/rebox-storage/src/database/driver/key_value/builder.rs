@@ -4,7 +4,7 @@ use anyhow::format_err;
 
 use rebox_types::{helpers::project_root, ReboxResult};
 
-use crate::database::name::DatabaseName;
+use crate::database::{name::DatabaseName, DatabaseMetadata};
 
 use super::KeyValueDriver;
 
@@ -123,6 +123,7 @@ impl KeyValueDriverBuilderS2 {
             // base_path,
             // create_mode,
             connection,
+            metadata: DatabaseMetadata::default(),
         };
 
         Ok(kv_driver)

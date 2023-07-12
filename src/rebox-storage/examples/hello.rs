@@ -1,4 +1,3 @@
-
 use rebox_types::{
     schema::{
         column::{model::ColumnKind, SchemaColumn},
@@ -10,9 +9,8 @@ use rebox_types::{
 use rebox_storage::Database;
 fn main() -> ReboxResult<()> {
     let db_name = "example-database";
-    
-    let db = Database::new().set_name(db_name)?.build()?;
 
+    let db = Database::new().set_name(db_name)?.build()?;
 
     let c1 = SchemaColumn::new()
         .set_name("c1")?
@@ -31,7 +29,7 @@ fn main() -> ReboxResult<()> {
     let table = Table::new().set_name("tbl2")?.set_schema(schema)?.build()?;
     dbg!(&table);
 
-       // dbg!(&db);
+    // dbg!(&db);
 
     let table_name = db.create_table(table)?;
 

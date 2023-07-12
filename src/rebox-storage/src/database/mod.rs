@@ -3,9 +3,11 @@ mod driver;
 mod metadata;
 mod name;
 mod row;
-use std::{fmt::Debug, marker::PhantomData, pin::Pin};
+use std::fmt::Debug;
 
 use anyhow::format_err;
+
+use rkv::StoreOptions;
 
 use rebox_types::{
     schema::{name::TableName, CurrentRowId, Table},
@@ -13,7 +15,7 @@ use rebox_types::{
 };
 
 use self::metadata::{
-    rebox_schema::ReboxMaster, rebox_sequence::ReboxSequence, rebox_stat::ReboxStat,
+    rebox_master::ReboxMaster, rebox_sequence::ReboxSequence, rebox_stat::ReboxStat,
 };
 use self::name::DatabaseName;
 use self::{driver::key_value::KeyValueDriver, row::TableRow};
@@ -62,16 +64,13 @@ impl Database {
         &self,
         metadata_table: Box<&T>,
     ) -> ReboxResult<()> {
-        use rkv::{StoreOptions, Value};
         let created_arc = self.driver.connection();
         let k = created_arc
             .read()
             .map_err(|err| format_err!("Read error: {err}"))?;
-        let store_name = format!("{}-{}", self.metadata.prefix, metadata_table.table_name());
+        let store_name = metadata_table.table_name().as_ref();
 
-        if k.open_single(&*store_name, StoreOptions::default())
-            .is_err()
-        {
+        if k.open_single(store_name, StoreOptions::default()).is_err() {
             let created_store = k.open_single(&*store_name, StoreOptions::create());
 
             let mut writer = k.write()?;
@@ -85,10 +84,23 @@ impl Database {
 
 #[derive(Debug)]
 pub(super) struct DatabaseMetadata {
-    prefix: &'static str,
-    rebox_schema: ReboxMaster,
+    rebox_master: ReboxMaster,
     rebox_sequence: ReboxSequence,
     rebox_stat: ReboxStat,
+}
+
+impl DatabaseMetadata {
+    pub(super) fn rebox_master(&self) -> &ReboxMaster {
+        &self.rebox_master
+    }
+
+    pub(super) fn rebox_sequence(&self) -> &ReboxSequence {
+        &self.rebox_sequence
+    }
+
+    pub(super) fn rebox_stat(&self) -> &ReboxStat {
+        &self.rebox_stat
+    }
 }
 
 impl<'a> IntoIterator for &'a DatabaseMetadata {
@@ -113,7 +125,7 @@ impl<'a> Iterator for DatabaseMetadataIntoIterator<'a> {
     type Item = Box<&'a dyn MetadataTable>;
     fn next(&mut self) -> Option<Box<&'a dyn MetadataTable>> {
         let outcome = match self.index {
-            0 => Box::new(&self.inner.rebox_schema as &dyn MetadataTable),
+            0 => Box::new(&self.inner.rebox_master as &dyn MetadataTable),
             1 => Box::new(&self.inner.rebox_sequence as &dyn MetadataTable),
             2 => Box::new(&self.inner.rebox_stat as &dyn MetadataTable),
             _ => return None,
@@ -126,12 +138,9 @@ impl<'a> Iterator for DatabaseMetadataIntoIterator<'a> {
 impl Default for DatabaseMetadata {
     fn default() -> Self {
         Self {
-            prefix: "rebox",
             rebox_stat: Default::default(),
-            rebox_schema: Default::default(),
+            rebox_master: Default::default(),
             rebox_sequence: Default::default(),
-            // iter_idx: 0,
-            // iter_cur: None
         }
     }
 }

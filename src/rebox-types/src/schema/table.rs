@@ -1,12 +1,13 @@
 use std::collections::BTreeMap;
 
 use anyhow::bail;
+use bincode::{config, Decode, Encode};
 
 use crate::ReboxResult;
 
 use super::column::{model::ColumnName, SchemaColumn};
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Decode, Encode, PartialEq, Eq)]
 pub struct TableSchema(BTreeMap<ColumnName, SchemaColumn>);
 
 impl TableSchema {
