@@ -1,10 +1,12 @@
+use bincode::{Decode, Encode};
+
 use crate::{helpers::check_valid_entity_name, ReboxResult};
 
 use self::model::{ColumnKind, ColumnName};
 
 pub mod model;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Decode, Encode)]
 pub struct SchemaColumn {
     name: ColumnName,
     kind: ColumnKind,

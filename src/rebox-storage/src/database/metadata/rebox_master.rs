@@ -48,7 +48,7 @@ impl ReboxMaster {
 impl Default for ReboxMaster {
     fn default() -> Self {
         Self {
-            table_name: TableName::new("master"),
+            table_name: TableName::new("rebox-master"),
             inner_data: Default::default(),
         }
     }

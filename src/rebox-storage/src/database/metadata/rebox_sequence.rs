@@ -48,7 +48,7 @@ impl ReboxSequence {
 impl Default for ReboxSequence {
     fn default() -> Self {
         Self {
-            table_name: TableName::new("sequence"),
+            table_name: TableName::new("rebox-sequence"),
             inner_data: Default::default(),
         }
     }

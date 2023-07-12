@@ -1,5 +1,5 @@
 use anyhow::bail;
-use std::fmt::Debug;
+use std::{fmt::Debug, ops::Deref};
 
 use crate::{helpers::check_valid_entity_name, ReboxResult};
 
@@ -14,9 +14,29 @@ pub mod table;
 #[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CurrentRowId(u32);
 
+impl Deref for CurrentRowId {
+    type Target = u32;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 impl From<u32> for CurrentRowId {
     fn from(value: u32) -> Self {
         Self(value)
+    }
+}
+
+impl TryFrom<u64> for CurrentRowId {
+    type Error = anyhow::Error;
+
+    fn try_from(value: u64) -> Result<Self, Self::Error> {
+        if value < (u32::MAX as u64) {
+            Ok(Self(value as u32))
+        } else {
+            bail!("Value is out of bounds. Reason: (value > u32::MAX).");
+        }
     }
 }
 
