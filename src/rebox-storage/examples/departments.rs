@@ -26,7 +26,10 @@ fn main() -> ReboxResult<()> {
     let schema: Vec<SchemaColumn> = vec![c1, c2];
     dbg!(&schema);
 
-    let table = Table::new().set_name("departments")?.set_schema(schema)?.build()?;
+    let table = Table::new()
+        .set_name("departments")?
+        .set_schema(schema)?
+        .build()?;
     dbg!(&table);
 
     // dbg!(&db);

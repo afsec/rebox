@@ -154,7 +154,7 @@ impl<'a> CreateTable<'a> {
                 TableSchema,
                 Configuration,
             >(blob, bincode::config::standard())?;
-            
+
             if &retrieved_table_schema != table.schema() {
                 bail!("Health check alert:  Table [{table_name_str}] is corrupted in [{rebox_master}]")
             }
@@ -167,10 +167,7 @@ impl<'a> CreateTable<'a> {
 
             let current_row_id = match maybe_value {
                 Some(Value::U64(id)) => CurrentRowId::try_from(id)?,
-                other => bail!(
-                    "Health check alert: Table [{table_name_str}] type mismatch in [{rebox_sequence}]. Reason: {other:?}"
-    
-            ),
+                other => bail!(                    "Health check alert: Table [{table_name_str}] type mismatch in [{rebox_sequence}]. Reason: {other:?}"            ),
             };
 
             if *current_row_id != 0 {
