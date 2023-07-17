@@ -34,8 +34,8 @@ impl TableColumn {
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ColumnValue {
     Bool(bool),
-    Integer(i32),
-    Natural(u32),
+    Integer(i64),
+    Natural(u64),
     Text(String),
 }
 

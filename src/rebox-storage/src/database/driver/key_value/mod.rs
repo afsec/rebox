@@ -1,10 +1,14 @@
 pub(super) mod builder;
 mod create_table;
+mod list_tables;
 
-use self::{builder::KeyValueDriverBuilder, create_table::CreateTable};
+use self::{builder::KeyValueDriverBuilder, create_table::CreateTable, list_tables::ListTables};
 use super::{DataStorage, Driver};
 use crate::database::DatabaseMetadata;
-use rebox_types::{schema::Table, ReboxResult};
+use rebox_types::{
+    schema::{name::TableName, Table},
+    ReboxResult,
+};
 use rkv::{backend::SafeModeEnvironment, Rkv};
 use std::sync::{Arc, RwLock};
 
@@ -23,11 +27,14 @@ impl KeyValueDriver {
     pub(crate) fn connection(&self) -> &KvConnection {
         &self.connection
     }
+
     pub(crate) fn create_table(&self, table: &Table) -> ReboxResult<()> {
-        CreateTable::connect(self)?.create(table)?;
-        Ok(())
+        CreateTable::connect(self)?.create(table)
     }
 
+    pub(crate) fn list_tables(&self) -> ReboxResult<Vec<TableName>> {
+        ListTables::connect(self)?.list()
+    }
     pub(crate) fn metadata(&self) -> &DatabaseMetadata {
         &self.metadata
     }
