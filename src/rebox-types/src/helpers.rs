@@ -13,7 +13,7 @@ pub fn check_valid_entity_name<T: AsRef<str>>(name: T) -> ReboxResult<()> {
     }
 
     input_str.chars().try_for_each(|ch| {
-        if ch.is_ascii_alphanumeric() || ch == '-' {
+        if ch.is_ascii_alphanumeric() || ch == '_' {
             Ok(())
         } else {
             bail!("Entity name has invalid char [`{ch}`]")

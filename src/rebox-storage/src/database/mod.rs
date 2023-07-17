@@ -34,14 +34,11 @@ impl Database {
     pub fn name(&self) -> &str {
         self.name.as_ref()
     }
-    pub fn list_tables(&self) -> ReboxResult<Vec<&TableName>> {
-        // self.driver.list_tables()
-        todo!();
-        Ok(vec![])
+    pub fn list_tables(&self) -> ReboxResult<Vec<TableName>> {
+        self.driver.list_tables()
     }
     pub fn create_table(&self, table: Table) -> ReboxResult<TableName> {
         self.driver.create_table(&table)?;
-
         Ok(table.name().to_owned())
     }
     pub fn insert_into_table(

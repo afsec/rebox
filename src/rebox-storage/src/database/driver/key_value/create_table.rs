@@ -15,7 +15,7 @@ impl<'a> CreateTable<'a> {
     pub(super) fn create(self, table: &Table) -> ReboxResult<()> {
         let tbl_name = table.name();
         let tbl_schema = table.schema();
-        let store_name_prefix = format!("{}_{}", "rebox", table.name());
+        let store_name_prefix = format!("{}-{}", "rebox", table.name());
         // TODO
         tbl_schema
             .get_columns()
@@ -112,9 +112,9 @@ impl<'a> CreateTable<'a> {
         }
         {
             let rebox_sequence = self.0.metadata().rebox_sequence().table_name().as_ref();
-            let master_store = k.open_single(rebox_sequence, StoreOptions::default())?;
+            let sequence_store = k.open_single(rebox_sequence, StoreOptions::default())?;
             let reader = k.read()?;
-            let maybe_value: Option<Value> = master_store.get(&reader, table_name_str)?;
+            let maybe_value: Option<Value> = sequence_store.get(&reader, table_name_str)?;
 
             let current_row_id = match maybe_value {
                 Some(Value::U64(id)) => CurrentRowId::try_from(id)?,

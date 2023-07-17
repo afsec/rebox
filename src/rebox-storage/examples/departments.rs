@@ -8,7 +8,7 @@ use rebox_types::{
 
 use rebox_storage::Database;
 fn main() -> ReboxResult<()> {
-    let db_name = "example-database";
+    let db_name = "example_departments";
 
     let db = Database::new().set_name(db_name)?.build()?;
 
