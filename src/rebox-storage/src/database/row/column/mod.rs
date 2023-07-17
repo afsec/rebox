@@ -13,17 +13,11 @@ pub struct TableColumn {
     is_nullable: bool,
     value: Option<ColumnValue>,
 }
-
 impl TableColumn {
     pub fn new() -> TableColumnBuilder {
         TableColumnBuilder
     }
-}
 
-/*
-TableColumn
- */
-impl TableColumn {
     pub fn name(&self) -> &ColumnName {
         &self.name
     }
@@ -45,6 +39,7 @@ pub enum ColumnValue {
     Text(String),
 }
 
+#[derive(Debug)]
 pub struct TableColumnBuilder;
 impl TableColumnBuilder {
     pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<TableColumnBuilderS1> {
@@ -53,6 +48,7 @@ impl TableColumnBuilder {
     }
 }
 
+#[derive(Debug)]
 pub struct TableColumnBuilderS1 {
     name: ColumnName,
 }
@@ -62,11 +58,12 @@ impl TableColumnBuilderS1 {
         TableColumnBuilderS2 { name, kind }
     }
 }
+
+#[derive(Debug)]
 pub struct TableColumnBuilderS2 {
     name: ColumnName,
     kind: ColumnKind,
 }
-
 impl TableColumnBuilderS2 {
     pub fn set_nullable(self, is_nullable: bool) -> TableColumnBuilderS3 {
         let Self { name, kind } = self;
@@ -79,13 +76,13 @@ impl TableColumnBuilderS2 {
     }
 }
 
+#[derive(Debug)]
 pub struct TableColumnBuilderS3 {
     name: ColumnName,
     kind: ColumnKind,
     is_nullable: bool,
     value: Option<ColumnValue>,
 }
-
 impl TableColumnBuilderS3 {
     pub fn set_value(self, column_value: ColumnValue) -> ReboxResult<Self> {
         let Self {

@@ -1,14 +1,15 @@
-use std::{env, path::PathBuf, str::FromStr};
-
-use anyhow::format_err;
-
-use rebox_types::{helpers::project_root, ReboxResult};
-
-use crate::database::{name::DatabaseName, DatabaseMetadata};
-
 use super::KeyValueDriver;
+use crate::database::{name::DatabaseName, DatabaseMetadata};
+use anyhow::format_err;
+use rebox_types::{helpers::project_root, ReboxResult};
+use rkv::{
+    backend::{SafeMode, SafeModeEnvironment},
+    Manager, Rkv,
+};
+use std::{env, path::PathBuf, str::FromStr};
+use std::{fs, ops::Not};
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub(crate) struct KeyValueDriverBuilder;
 
 impl KeyValueDriverBuilder {
@@ -81,6 +82,8 @@ impl KeyValueDriverBuilderS1 {
         })
     }
 }
+
+#[derive(Debug)]
 pub(crate) struct KeyValueDriverBuilderS2 {
     db_name: DatabaseName,
     base_path: PathBuf,
@@ -88,13 +91,6 @@ pub(crate) struct KeyValueDriverBuilderS2 {
 }
 impl KeyValueDriverBuilderS2 {
     pub(crate) fn connect(self) -> ReboxResult<KeyValueDriver> {
-        use rkv::StoreOptions;
-        use rkv::{
-            backend::{SafeMode, SafeModeEnvironment},
-            Manager, Rkv,
-        };
-        use std::{fs, ops::Not};
-
         let root = self.base_path.clone();
 
         if root.is_dir().not() {

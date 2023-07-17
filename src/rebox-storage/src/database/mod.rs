@@ -71,7 +71,7 @@ impl Database {
         let store_name = metadata_table.table_name().as_ref();
 
         if k.open_single(store_name, StoreOptions::default()).is_err() {
-            let created_store = k.open_single(&*store_name, StoreOptions::create());
+            let created_store = k.open_single(store_name, StoreOptions::create());
 
             let mut writer = k.write()?;
             // created_store?.put(&mut writer, "some_key", &Value::Str("some_value"))?;
@@ -82,7 +82,7 @@ impl Database {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub(super) struct DatabaseMetadata {
     rebox_master: ReboxMaster,
     rebox_sequence: ReboxSequence,
@@ -132,16 +132,6 @@ impl<'a> Iterator for DatabaseMetadataIntoIterator<'a> {
         };
         self.index += 1;
         Some(outcome)
-    }
-}
-
-impl Default for DatabaseMetadata {
-    fn default() -> Self {
-        Self {
-            rebox_stat: Default::default(),
-            rebox_master: Default::default(),
-            rebox_sequence: Default::default(),
-        }
     }
 }
 
