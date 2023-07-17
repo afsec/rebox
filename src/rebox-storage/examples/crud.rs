@@ -8,7 +8,7 @@ use rebox_types::{
 
 use rebox_storage::Database;
 fn main() -> ReboxResult<()> {
-    let db_name = "example-crud";
+    let db_name = "example_crud";
 
     let db = Database::new().set_name(db_name)?.build()?;
     create_table_departments(&db)?;
@@ -68,19 +68,19 @@ fn create_table_users(db: &Database) -> ReboxResult<()> {
         .build();
 
     let full_name = SchemaColumn::new()
-        .set_name("full-name")?
+        .set_name("full_name")?
         .set_kind(ColumnKind::Text)
         .set_nullable(false)
         .build();
 
     let is_active = SchemaColumn::new()
-        .set_name("is-active")?
+        .set_name("is_active")?
         .set_kind(ColumnKind::Bool)
         .set_nullable(false)
         .build();
 
     let created_at = SchemaColumn::new()
-        .set_name("created-at")?
+        .set_name("created_at")?
         .set_kind(ColumnKind::Integer)
         .set_nullable(false)
         .build();

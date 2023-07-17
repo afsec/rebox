@@ -15,7 +15,7 @@ impl<'a> CreateTable<'a> {
     pub(super) fn create(self, table: &Table) -> ReboxResult<()> {
         let tbl_name = table.name();
         let tbl_schema = table.schema();
-        let store_name_prefix = format!("{}_{}", "rebox", table.name());
+        let store_name_prefix = format!("{}-{}", "rebox", table.name());
         // TODO
         tbl_schema
             .get_columns()
