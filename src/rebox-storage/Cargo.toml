@@ -1,12 +1,18 @@
 [package]
-edition = "2021"
 name = "rebox-storage"
 version = "0.0.1"
+publish.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+
 
 [dependencies]
 anyhow = { workspace = true }
 bytes = { workspace = true }
 rebox-types = { path = "../rebox-types" }
+rebox_derive = { path = "../rebox_derive" }
 rkv = "0.18.4"
 tempfile = "3.6.0"
 bincode = { workspace = true }

@@ -18,6 +18,7 @@ fn main() -> ReboxResult<()> {
 }
 
 fn show_tables(db: &Database) -> ReboxResult<()> {
+    println!("\n\n");
     println!("Tables");
     println!("======\n");
     db.list_tables()?
@@ -41,17 +42,17 @@ fn create_table_departments(db: &Database) -> ReboxResult<()> {
         .build();
 
     let schema: Vec<SchemaColumn> = vec![c1, c2];
-    dbg!(&schema);
+    // dbg!(&schema);
     let table = Table::new()
         .set_name("departments")?
         .set_schema(schema)?
         .build()?;
-    dbg!(&table);
+    // dbg!(&table);
 
     // dbg!(&db);
 
     let table_name = db.create_table(table)?;
-    println!("Table [{table_name}] created.\n\n");
+    println!("Table [{table_name}] created.");
     Ok(())
 }
 
@@ -85,18 +86,17 @@ fn create_table_users(db: &Database) -> ReboxResult<()> {
         .set_nullable(false)
         .build();
 
-
     let schema: Vec<SchemaColumn> = vec![id, login, full_name, is_active, created_at];
-    dbg!(&schema);
+    // dbg!(&schema);
     let table = Table::new()
         .set_name("users")?
         .set_schema(schema)?
         .build()?;
-    dbg!(&table);
+    // dbg!(&table);
 
     // dbg!(&db);
 
     let table_name = db.create_table(table)?;
-    println!("Table [{table_name}] created.\n\n");
+    println!("Table [{table_name}] created.");
     Ok(())
 }
