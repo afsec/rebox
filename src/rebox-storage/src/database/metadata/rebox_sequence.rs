@@ -1,14 +1,13 @@
+use crate::database::MetadataTable;
 use anyhow::bail;
-use std::collections::BTreeMap;
-
+use rebox_derive::DbEntity;
 use rebox_types::{
     schema::{name::TableName, CurrentRowId},
-    ReboxResult,
+    DbPrefix, ReboxResult,
 };
+use std::collections::BTreeMap;
 
-use crate::database::MetadataTable;
-
-#[derive(Debug)]
+#[derive(Debug, DbEntity)]
 pub(crate) struct ReboxSequence {
     table_name: TableName,
     inner_data: BTreeMap<TableName, CurrentRowId>,
@@ -45,10 +44,11 @@ impl ReboxSequence {
         &self.table_name
     }
 }
+
 impl Default for ReboxSequence {
     fn default() -> Self {
         Self {
-            table_name: TableName::new("rebox_sequence"),
+            table_name: TableName::new(format!("{}_sequence", Self::prefix())),
             inner_data: Default::default(),
         }
     }

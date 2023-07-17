@@ -12,10 +12,10 @@ impl<'a> CreateTable<'a> {
     pub(super) fn connect(driver: &'a KeyValueDriver) -> ReboxResult<Self> {
         Ok(Self(driver))
     }
-    pub(super) fn create(self, table: &Table) -> ReboxResult<()> {
+    pub(super) fn drop(self, table: &Table) -> ReboxResult<()> {
         let tbl_name = table.name();
         let tbl_schema = table.schema();
-        let store_name_prefix = format!("{}-{}", Table::prefix(), tbl_name);
+        let store_name_prefix = format!("{}-{}", Table::prefix(), table.name());
         // TODO
         tbl_schema
             .get_columns()

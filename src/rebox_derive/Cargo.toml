@@ -1,0 +1,18 @@
+[package]
+name = "rebox_derive"
+version = "0.1.0"
+publish.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+
+
+[lib]
+name = "rebox_derive"
+proc-macro = true
+
+
+[dependencies]
+syn = "2.0"
+quote = "1.0"

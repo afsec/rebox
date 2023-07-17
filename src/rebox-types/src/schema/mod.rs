@@ -1,11 +1,8 @@
-use anyhow::bail;
-use std::{fmt::Debug, ops::Deref};
-
-use crate::{helpers::check_valid_entity_name, ReboxResult};
-
 use self::{column::SchemaColumn, name::TableName, table::TableSchema};
-
-// pub use self::{column::SchemaColumn, name::TableName};
+use crate::{helpers::check_valid_entity_name, DbPrefix, ReboxResult};
+use anyhow::bail;
+use rebox_derive::DbEntity;
+use std::{fmt::Debug, ops::Deref};
 
 pub mod column;
 pub mod name;
@@ -54,13 +51,16 @@ impl CurrentRowId {
     }
 }
 
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, DbEntity)]
 pub struct Table {
     name: TableName,
     schema: TableSchema,
 }
 
 impl Table {
+    pub fn new() -> TableBuilder {
+        TableBuilder
+    }
     pub fn name(&self) -> &TableName {
         &self.name
     }
@@ -74,11 +74,6 @@ impl Table {
     }
 }
 
-impl Table {
-    pub fn new() -> TableBuilder {
-        TableBuilder
-    }
-}
 #[derive(Debug)]
 pub struct TableBuilder;
 

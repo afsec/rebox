@@ -1,5 +1,6 @@
 pub(super) mod builder;
 mod create_table;
+mod drop_table;
 mod list_tables;
 
 use self::{builder::KeyValueDriverBuilder, create_table::CreateTable, list_tables::ListTables};

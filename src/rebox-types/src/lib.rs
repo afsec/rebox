@@ -45,7 +45,11 @@
 #![cfg_attr(test, allow(clippy::float_cmp))]
 
 pub type ReboxResult<T> = anyhow::Result<T>;
-
+pub trait DbPrefix {
+    fn prefix() -> &'static str {
+        "rebox"
+    }
+}
 pub mod helpers;
 pub mod schema;
 pub mod test_helpers;
