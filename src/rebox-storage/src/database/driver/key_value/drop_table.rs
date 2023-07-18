@@ -38,7 +38,7 @@ impl<'a> CreateTable<'a> {
         if k.open_single(store_name_str, StoreOptions::default())
             .is_ok()
         {
-            bail!("Table {store_name_str} already exists!");
+            bail!("KvStore {store_name_str} already exists!");
         } else {
             let created_store = k.open_single(store_name_str, StoreOptions::create());
 

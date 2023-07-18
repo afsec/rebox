@@ -1,11 +1,17 @@
 pub(super) mod builder;
 mod create_table;
-mod drop_table;
 mod list_tables;
+mod table_exists;
+//TODO
+mod drop_table;
 
-use self::{builder::KeyValueDriverBuilder, create_table::CreateTable, list_tables::ListTables};
+use self::{
+    builder::KeyValueDriverBuilder, create_table::CreateTable, list_tables::ListTables,
+    table_exists::TableExists,
+};
 use super::{DataStorage, Driver};
 use crate::database::DatabaseMetadata;
+use anyhow::bail;
 use rebox_types::{
     schema::{name::TableName, Table},
     ReboxResult,
@@ -28,9 +34,15 @@ impl KeyValueDriver {
     pub(crate) fn connection(&self) -> &KvConnection {
         &self.connection
     }
-
+    pub(crate) fn table_exists(&self, table: &Table) -> ReboxResult<bool> {
+        TableExists::connect(self)?.exists(table)
+    }
     pub(crate) fn create_table(&self, table: &Table) -> ReboxResult<()> {
-        CreateTable::connect(self)?.create(table)
+        if self.table_exists(table)? {
+            bail!("Table [{}] already exists", table.name());
+        } else {
+            CreateTable::connect(self)?.create(table)
+        }
     }
 
     pub(crate) fn list_tables(&self) -> ReboxResult<Vec<TableName>> {
