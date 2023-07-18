@@ -106,7 +106,7 @@ impl KeyValueDriverBuilderS2 {
             .map_err(|err| format_err!("Manager error: {err}"))?;
 
         let connection = manager
-            .get_or_create(root.as_path(), Rkv::new::<SafeMode>)
+            .get_or_create(root.as_path(), |p| Rkv::with_capacity::<SafeMode>(p, 255))
             .map_err(|err| format_err!("Create Arc error: {err}"))?;
 
         // let Self {

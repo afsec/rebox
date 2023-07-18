@@ -58,9 +58,11 @@ pub struct Table {
 }
 
 impl Table {
+    pub const MAX_TABLE_INPUT_COLS: u16 = 255;
     pub fn new() -> TableBuilder {
         TableBuilder
     }
+
     pub fn name(&self) -> &TableName {
         &self.name
     }
@@ -96,6 +98,12 @@ impl TableBuilderS1 {
         if columns.is_empty() {
             bail!("Sorry, you must to define at least one SchemaColumn")
         }
+
+        let max_tbl_columns = Table::MAX_TABLE_INPUT_COLS.into();
+        if columns.len() > max_tbl_columns {
+            bail!("Sorry, a table cannot have more than `{max_tbl_columns}` columns")
+        }
+
         let mut schema = TableSchema::default();
         let Self { name } = self;
         columns

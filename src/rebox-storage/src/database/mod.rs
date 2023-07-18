@@ -31,14 +31,19 @@ pub struct Database {
 }
 
 impl Database {
+    pub const MAX_DB_INPUT_COLS: u16 = 10_000 - Table::MAX_TABLE_INPUT_COLS;
     pub fn name(&self) -> &str {
         self.name.as_ref()
     }
+
     pub fn list_tables(&self) -> ReboxResult<Vec<TableName>> {
         self.driver.list_tables()
     }
     pub fn create_table(&self, table: Table) -> ReboxResult<TableName> {
-        self.driver.create_table(&table)?;
+        if self.driver.number_of_stores()? <= Self::MAX_DB_INPUT_COLS {
+            self.driver.create_table(&table)?;
+        }
+
         Ok(table.name().to_owned())
     }
     pub fn insert_into_table(
