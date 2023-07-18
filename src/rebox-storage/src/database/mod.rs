@@ -39,14 +39,21 @@ impl Database {
     pub fn list_tables(&self) -> ReboxResult<Vec<TableName>> {
         self.driver.list_tables()
     }
+
     pub fn create_table(&self, table: Table) -> ReboxResult<TableName> {
         if self.driver.number_of_stores()? <= Self::MAX_DB_INPUT_COLS {
             self.driver.create_table(&table)?;
             Ok(table.name().to_owned())
         } else {
-            bail!("Sorry, you can't create the table [{}]. Reason: The Database is reaching the MAX_DB_INPUT_COLS limit and add that table would cause overflow.",table.name())
+            bail!("Can't create the table [{}]. Reason: The Database is reaching the MAX_DB_INPUT_COLS limit and add that table would cause overflow.",table.name());
         }
     }
+
+    pub fn drop_table(&self, table: Table) -> ReboxResult<TableName> {
+        self.driver.drop(&table)?;
+        Ok(table.name().to_owned())
+    }
+
     pub fn insert_into_table(
         &self,
         table_name: TableName,
@@ -55,6 +62,7 @@ impl Database {
         todo!();
         Ok(CurrentRowId::default())
     }
+
     fn bootstrap_metadata(&self) -> ReboxResult<()> {
         // TODO: Implement new/open session
         self.metadata
@@ -63,6 +71,7 @@ impl Database {
 
         Ok(())
     }
+
     fn create_metadata_table<T: MetadataTable + ?Sized>(
         &self,
         metadata_table: Box<&T>,
@@ -74,13 +83,8 @@ impl Database {
         let store_name = metadata_table.table_name().as_ref();
 
         if k.open_single(store_name, StoreOptions::default()).is_err() {
-            let created_store = k.open_single(store_name, StoreOptions::create());
-
-            let mut writer = k.write()?;
-            // created_store?.put(&mut writer, "some_key", &Value::Str("some_value"))?;
-            writer.commit().map_err(|err| format_err!("{err}"))?;
+            let _ = k.open_single(store_name, StoreOptions::create())?;
         }
-
         Ok(())
     }
 }

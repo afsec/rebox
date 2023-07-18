@@ -58,7 +58,7 @@ impl<'a> CreateTable<'a> {
         let mut writer = rkv_env.write()?;
         let schema_blob = bincode::encode_to_vec(table.schema(), bincode::config::standard())?;
         master_store.put(&mut writer, store_name_str, &Value::Blob(&schema_blob))?;
-        writer.commit().map_err(|err| format_err!("{err}"))?;
+        writer.commit()?;
 
         Ok(())
     }
@@ -74,7 +74,7 @@ impl<'a> CreateTable<'a> {
         let master_store = rkv_env.open_single(rebox_sequence, StoreOptions::default())?;
         let mut writer = rkv_env.write()?;
         master_store.put(&mut writer, store_name_str, &Value::U64(0))?;
-        writer.commit().map_err(|err| format_err!("{err}"))?;
+        writer.commit()?;
         Ok(())
     }
 
