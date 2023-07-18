@@ -5,7 +5,7 @@ mod name;
 mod row;
 use std::fmt::Debug;
 
-use anyhow::format_err;
+use anyhow::{bail, format_err};
 
 use rkv::StoreOptions;
 
@@ -42,9 +42,10 @@ impl Database {
     pub fn create_table(&self, table: Table) -> ReboxResult<TableName> {
         if self.driver.number_of_stores()? <= Self::MAX_DB_INPUT_COLS {
             self.driver.create_table(&table)?;
+            Ok(table.name().to_owned())
+        } else {
+            bail!("Sorry, you can't create the table [{}]. Reason: The Database is reaching the MAX_DB_INPUT_COLS limit and add that table would cause overflow.",table.name())
         }
-
-        Ok(table.name().to_owned())
     }
     pub fn insert_into_table(
         &self,
