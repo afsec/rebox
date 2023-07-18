@@ -96,12 +96,12 @@ pub struct TableBuilderS1 {
 impl TableBuilderS1 {
     pub fn set_schema(self, columns: Vec<SchemaColumn>) -> ReboxResult<TableBuilderS2> {
         if columns.is_empty() {
-            bail!("Sorry, you must to define at least one SchemaColumn")
+            bail!("A table must have at least one SchemaColumn")
         }
 
         let max_tbl_columns = Table::MAX_TABLE_INPUT_COLS.into();
         if columns.len() > max_tbl_columns {
-            bail!("Sorry, a table cannot have more than `{max_tbl_columns}` columns")
+            bail!("A table cannot have more than `{max_tbl_columns}` columns")
         }
 
         let mut schema = TableSchema::default();

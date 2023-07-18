@@ -1,14 +1,15 @@
 pub(super) mod builder;
 mod create_table;
+mod drop_table;
 mod list_tables;
 mod number_of_stores;
 mod table_exists;
-//TODO
-mod drop_table;
+
+// TODO: Implement another modude to perform (Defrag / Compact) Database
 
 use self::{
-    builder::KeyValueDriverBuilder, create_table::CreateTable, list_tables::ListTables,
-    number_of_stores::NumberOfStores, table_exists::TableExists,
+    builder::KeyValueDriverBuilder, create_table::CreateTable, drop_table::DropTable,
+    list_tables::ListTables, number_of_stores::NumberOfStores, table_exists::TableExists,
 };
 use super::DataStorage;
 use crate::database::{driver::Driver, DatabaseMetadata};
@@ -48,6 +49,13 @@ impl KeyValueDriver {
             bail!("Table [{}] already exists", table.name());
         } else {
             CreateTable::connect(self)?.create(table)
+        }
+    }
+    pub(crate) fn drop(&self, table: &Table) -> ReboxResult<()> {
+        if self.table_exists(table)? {
+            DropTable::connect(self)?.delete(table)
+        } else {
+            bail!("Table [{}] not exists", table.name());
         }
     }
 

@@ -11,25 +11,25 @@ fn main() -> ReboxResult<()> {
     let db_name = "example_crud";
 
     let db = Database::new().set_name(db_name)?.build()?;
-    create_table_departments(&db)?;
-    create_table_users(&db)?;
+    crud_departments(&db)?;
+    crud_users(&db)?;
     show_tables(&db)?;
     Ok(())
 }
 
 fn show_tables(db: &Database) -> ReboxResult<()> {
-    println!("\n\n");
+    println!("\n");
     println!("Tables");
     println!("======\n");
     db.list_tables()?
         .iter()
         .for_each(|tbl_name| println!(" - {tbl_name}"));
-    println!("\n\n");
+    println!("\n");
 
     Ok(())
 }
 
-fn create_table_departments(db: &Database) -> ReboxResult<()> {
+fn crud_departments(db: &Database) -> ReboxResult<()> {
     let c1 = SchemaColumn::new()
         .set_name("id")?
         .set_kind(ColumnKind::Natural)
@@ -51,12 +51,15 @@ fn create_table_departments(db: &Database) -> ReboxResult<()> {
 
     // dbg!(&db);
 
-    let table_name = db.create_table(table)?;
+    let table_name = db.create_table(table.clone())?;
     println!("Table [{table_name}] created.");
+    show_tables(&db)?;
+    let table_name = db.drop_table(table)?;
+    println!("Table [{table_name}] deleted.");
     Ok(())
 }
 
-fn create_table_users(db: &Database) -> ReboxResult<()> {
+fn crud_users(db: &Database) -> ReboxResult<()> {
     let id = SchemaColumn::new()
         .set_name("id")?
         .set_kind(ColumnKind::Natural)
@@ -96,7 +99,10 @@ fn create_table_users(db: &Database) -> ReboxResult<()> {
 
     // dbg!(&db);
 
-    let table_name = db.create_table(table)?;
+    let table_name = db.create_table(table.clone())?;
     println!("Table [{table_name}] created.");
+    show_tables(&db)?;
+    let table_name = db.drop_table(table)?;
+    println!("Table [{table_name}] deleted.");
     Ok(())
 }
