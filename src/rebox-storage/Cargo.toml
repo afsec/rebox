@@ -13,10 +13,10 @@ anyhow = { workspace = true }
 bytes = { workspace = true }
 rebox-types = { path = "../rebox-types" }
 rebox_derive = { path = "../rebox_derive" }
+bincode = { workspace = true }
 rkv = "0.18.4"
 tempfile = "3.6.0"
-bincode = { workspace = true }
-
 
 [dev-dependencies]
+chrono = { workspace = true, features = ["clock"] }
 test-case = { workspace = true }

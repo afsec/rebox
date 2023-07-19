@@ -1,3 +1,4 @@
+use rebox_storage::database::Database;
 use rebox_types::{
     schema::{
         column::{model::ColumnKind, SchemaColumn},
@@ -6,7 +7,6 @@ use rebox_types::{
     ReboxResult,
 };
 
-use rebox_storage::Database;
 fn main() -> ReboxResult<()> {
     let db_name = "example_hello";
 

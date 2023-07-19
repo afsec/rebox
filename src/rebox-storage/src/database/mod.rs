@@ -2,23 +2,21 @@ pub(crate) mod builder;
 mod driver;
 mod metadata;
 mod name;
-mod row;
-use std::fmt::Debug;
+pub mod row;
 
+use self::{
+    driver::key_value::KeyValueDriver,
+    metadata::{rebox_master::ReboxMaster, rebox_sequence::ReboxSequence, rebox_stat::ReboxStat},
+    name::DatabaseName,
+    row::TableRow,
+};
 use anyhow::{bail, format_err};
-
-use rkv::StoreOptions;
-
 use rebox_types::{
     schema::{name::TableName, CurrentRowId, Table},
     ReboxResult,
 };
-
-use self::metadata::{
-    rebox_master::ReboxMaster, rebox_sequence::ReboxSequence, rebox_stat::ReboxStat,
-};
-use self::name::DatabaseName;
-use self::{driver::key_value::KeyValueDriver, row::TableRow};
+use rkv::StoreOptions;
+use std::fmt::Debug;
 
 #[cfg(test)]
 mod tests;

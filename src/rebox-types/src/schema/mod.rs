@@ -1,4 +1,4 @@
-use self::{column::SchemaColumn, name::TableName, table::TableSchema};
+use self::{column::SchemaColumn, name::TableName, schema::TableSchema};
 use crate::{helpers::check_valid_entity_name, DbPrefix, ReboxResult};
 use anyhow::bail;
 use rebox_derive::DbEntity;
@@ -6,7 +6,7 @@ use std::{fmt::Debug, ops::Deref};
 
 pub mod column;
 pub mod name;
-pub mod table;
+pub mod schema;
 
 #[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CurrentRowId(u32);

@@ -44,9 +44,7 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![cfg_attr(test, allow(clippy::float_cmp))]
 
-mod database;
+pub mod database;
 
 #[cfg(test)]
 mod tests;
-
-pub use self::database::Database;

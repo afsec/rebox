@@ -2,7 +2,6 @@ use super::KeyValueDriver;
 use anyhow::format_err;
 use rebox_types::ReboxResult;
 
-
 pub(super) struct NumberOfStores<'a>(&'a KeyValueDriver);
 impl<'a> NumberOfStores<'a> {
     pub(super) fn connect(driver: &'a KeyValueDriver) -> ReboxResult<Self> {
