@@ -1,8 +1,11 @@
 use anyhow::{bail, format_err};
-use rebox_types::{schema::Table, DbPrefix, ReboxResult};
+use rebox_types::{
+    schema::{name::TableName, Table},
+    DbPrefix, ReboxResult,
+};
 use rkv::{backend::SafeModeEnvironment, Rkv, StoreOptions};
 
-use super::KeyValueDriver;
+use super::{helpers::retrieve_schema, KeyValueDriver};
 
 pub(super) struct DropTable<'a>(&'a KeyValueDriver);
 impl<'a> DropTable<'a> {
@@ -10,18 +13,18 @@ impl<'a> DropTable<'a> {
         Ok(Self(driver))
     }
 
-    pub(super) fn delete(self, table: &Table) -> ReboxResult<()> {
-        let tbl_schema = table.schema();
-        let store_name_prefix = format!("{}-{}", Table::prefix(), table.name());
+    pub(super) fn delete(self, table_name: &TableName) -> ReboxResult<()> {
+        let tbl_schema = retrieve_schema(&self.0.connection(), self.0.metadata(), table_name)?;
+        let store_name_prefix = format!("{}-{}", Table::prefix(), table_name);
         tbl_schema
             .get_columns()
             .iter()
             .try_for_each(|(col_name, _)| {
                 Self::delete_store(&self, format!("{store_name_prefix}_{col_name}"))
             })?;
-        Self::update_master(&self, table)?;
-        Self::update_sequence(&self, table)?;
-        Self::check_integrity(&self, table)?;
+        Self::update_master(&self, table_name)?;
+        Self::update_sequence(&self, table_name)?;
+        Self::check_integrity(&self, table_name)?;
         Ok(())
     }
 
@@ -44,14 +47,14 @@ impl<'a> DropTable<'a> {
         }
     }
 
-    fn update_master(&self, table: &Table) -> ReboxResult<()> {
+    fn update_master(&self, table_name: &TableName) -> ReboxResult<()> {
         let created_arc = self.0.connection();
         let rebox_master = self.0.metadata().rebox_master().table_name().as_ref();
 
         let rkv_env = created_arc
             .read()
             .map_err(|err| format_err!("Read error: {err}"))?;
-        let store_name_str = table.name().as_ref();
+        let store_name_str = table_name.as_ref();
         let master_store = rkv_env.open_single(rebox_master, StoreOptions::default())?;
         let mut writer = rkv_env.write()?;
         master_store.delete(&mut writer, store_name_str)?;
@@ -60,14 +63,14 @@ impl<'a> DropTable<'a> {
         Ok(())
     }
 
-    fn update_sequence(&self, table: &Table) -> ReboxResult<()> {
+    fn update_sequence(&self, table_name: &TableName) -> ReboxResult<()> {
         let created_arc = self.0.connection();
         let rebox_sequence = self.0.metadata().rebox_sequence().table_name().as_ref();
 
         let rkv_env: std::sync::RwLockReadGuard<'_, Rkv<SafeModeEnvironment>> = created_arc
             .read()
             .map_err(|err| format_err!("Read error: {err}"))?;
-        let store_name_str = table.name().as_ref();
+        let store_name_str = table_name.as_ref();
         let master_store = rkv_env.open_single(rebox_sequence, StoreOptions::default())?;
         let mut writer = rkv_env.write()?;
         master_store.delete(&mut writer, store_name_str)?;
@@ -75,13 +78,13 @@ impl<'a> DropTable<'a> {
         Ok(())
     }
 
-    fn check_integrity(&self, table: &Table) -> ReboxResult<()> {
+    fn check_integrity(&self, table_name: &TableName) -> ReboxResult<()> {
         let created_arc = self.0.connection();
 
         let rkv_env = created_arc
             .read()
             .map_err(|err| format_err!("Read error: {err}"))?;
-        let table_name_str = table.name().as_ref();
+        let table_name_str = table_name.as_ref();
 
         {
             let rebox_master = self.0.metadata().rebox_master().table_name().as_ref();

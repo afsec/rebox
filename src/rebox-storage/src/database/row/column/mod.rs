@@ -9,12 +9,20 @@ use rebox_types::{
     ReboxResult,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TableColumn {
     name: ColumnName,
     kind: ColumnKind,
     is_nullable: bool,
     value: Option<ColumnValue>,
+}
+
+impl PartialEq<SchemaColumn> for TableColumn {
+    fn eq(&self, other: &SchemaColumn) -> bool {
+        self.name() == other.name()
+            && self.kind() == other.kind()
+            && self.is_nullable() == other.is_nullable()
+    }
 }
 
 impl From<&SchemaColumn> for TableColumn {

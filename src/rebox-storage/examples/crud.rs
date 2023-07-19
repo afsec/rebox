@@ -49,8 +49,8 @@ impl CrudDepartments {
         dbg!(&table_row);
         db.insert_into_table(table_name, table_row)?;
 
-        let table_name = db.drop_table(table)?;
-        println!("Table [{table_name}] deleted.");
+        // let table_name = db.drop_table(table.name())?;
+        // println!("Table [{table_name}] deleted.");
 
         Ok(())
     }
@@ -84,7 +84,7 @@ impl CrudDepartments {
             .map(|column| column.set_value(ColumnValue::Text("Marketing".into())));
 
         row.verify()?;
-        row.finish()?;
+        row.check_verified()?;
         Ok(row)
     }
 }
@@ -102,8 +102,8 @@ impl CrudUsers {
         let table_row = Self::generate_data(&table)?;
         dbg!(&table_row);
 
-        let table_name = db.drop_table(table)?;
-        println!("Table [{table_name}] deleted.");
+        // let table_name = db.drop_table(table.name())?;
+        // println!("Table [{table_name}] deleted.");
         Ok(())
     }
     fn generate_table() -> ReboxResult<Table> {
@@ -146,7 +146,6 @@ impl CrudUsers {
         Ok(table)
     }
     fn generate_data(table: &Table) -> ReboxResult<TableRow> {
-        // TODO: TableRow::from -> row.build()?;
         let mut row = TableRow::from(table);
         let btree = row.get_mut();
         let _ = btree
@@ -168,7 +167,7 @@ impl CrudUsers {
             .get_mut("created_at")
             .map(|column| column.set_value(ColumnValue::Integer(Utc::now().timestamp())));
         row.verify()?;
-        row.finish()?;
+        row.check_verified()?;
         Ok(row)
     }
 }

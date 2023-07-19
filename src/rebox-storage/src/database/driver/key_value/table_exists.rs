@@ -2,7 +2,7 @@ use super::KeyValueDriver;
 use anyhow::{bail, format_err};
 use bincode::config::Configuration;
 use rebox_types::{
-    schema::{schema::TableSchema, Table},
+    schema::{name::TableName, schema::TableSchema},
     ReboxResult,
 };
 use rkv::{StoreOptions, Value};
@@ -12,12 +12,12 @@ impl<'a> TableExists<'a> {
     pub(super) fn connect(driver: &'a KeyValueDriver) -> ReboxResult<Self> {
         Ok(Self(driver))
     }
-    pub(super) fn exists(self, table: &Table) -> ReboxResult<bool> {
+    pub(super) fn exists(self, table_name: &TableName) -> ReboxResult<bool> {
         let created_arc = self.0.connection();
         let rkv_env = created_arc
             .read()
             .map_err(|err| format_err!("Read error: {err}"))?;
-        let table_name_str = table.name().as_ref();
+        let table_name_str = table_name.as_ref();
         let rebox_master = self.0.metadata().rebox_master().table_name().as_ref();
         let master_store = rkv_env.open_single(rebox_master, StoreOptions::default())?;
         let reader = rkv_env.read()?;
@@ -36,10 +36,6 @@ impl<'a> TableExists<'a> {
             blob,
             bincode::config::standard(),
         )?;
-        if &retrieved_table_schema == table.schema() {
-            Ok(true)
-        } else {
-            bail!("Health check alert:  Table [{table_name_str}] is corrupted in [{rebox_master}]")
-        }
+        Ok(retrieved_table_schema.get_columns().len() > 0)
     }
 }

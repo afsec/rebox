@@ -12,6 +12,7 @@ rebox_derive = { path = "../rebox_derive" }
 anyhow = { workspace = true }
 bincode = { workspace = true }
 bytes = { workspace = true }
+rkv = { workspace = true }
 
 [dev-dependencies]
 test-case = { workspace = true }
