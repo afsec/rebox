@@ -1,18 +1,23 @@
+use chrono::Utc;
 use rebox_types::{
     schema::{
-        column::{model::ColumnKind, SchemaColumn},
+        column::{
+            model::{ColumnKind, ColumnValue},
+            SchemaColumn,
+        },
         Table,
     },
     ReboxResult,
 };
 
-use rebox_storage::Database;
+use rebox_storage::database::{row::TableRow, Database};
 fn main() -> ReboxResult<()> {
     let db_name = "example_crud";
 
     let db = Database::new().set_name(db_name)?.build()?;
-    crud_departments(&db)?;
-    crud_users(&db)?;
+    CrudDepartments::run(&db)?;
+    CrudUsers::run(&db)?;
+
     show_tables(&db)?;
     Ok(())
 }
@@ -29,80 +34,141 @@ fn show_tables(db: &Database) -> ReboxResult<()> {
     Ok(())
 }
 
-fn crud_departments(db: &Database) -> ReboxResult<()> {
-    let c1 = SchemaColumn::new()
-        .set_name("id")?
-        .set_kind(ColumnKind::Natural)
-        .set_nullable(false)
-        .build();
-    let c2 = SchemaColumn::new()
-        .set_name("name")?
-        .set_kind(ColumnKind::Text)
-        .set_nullable(false)
-        .build();
+struct CrudDepartments;
 
-    let schema: Vec<SchemaColumn> = vec![c1, c2];
-    // dbg!(&schema);
-    let table = Table::new()
-        .set_name("departments")?
-        .set_schema(schema)?
-        .build()?;
-    // dbg!(&table);
+impl CrudDepartments {
+    pub fn run(db: &Database) -> ReboxResult<()> {
+        let table = Self::generate_table()?;
 
-    // dbg!(&db);
+        let table_name = db.create_table(table.clone())?;
+        println!("Table [{table_name}] created.");
 
-    let table_name = db.create_table(table.clone())?;
-    println!("Table [{table_name}] created.");
-    show_tables(&db)?;
-    let table_name = db.drop_table(table)?;
-    println!("Table [{table_name}] deleted.");
-    Ok(())
+        show_tables(&db)?;
+
+        let table_row = Self::generate_data(&table)?;
+        dbg!(&table_row);
+        db.insert_into_table(table_name, table_row)?;
+
+        let table_name = db.drop_table(table)?;
+        println!("Table [{table_name}] deleted.");
+
+        Ok(())
+    }
+    fn generate_table() -> ReboxResult<Table> {
+        let id = SchemaColumn::new()
+            .set_name("id")?
+            .set_kind(ColumnKind::Natural)
+            .set_nullable(false)
+            .build();
+        let name = SchemaColumn::new()
+            .set_name("name")?
+            .set_kind(ColumnKind::Text)
+            .set_nullable(false)
+            .build();
+        let columns = vec![id, name];
+        let table = Table::new()
+            .set_name("departments")?
+            .set_schema(columns)?
+            .build()?;
+
+        Ok(table)
+    }
+    fn generate_data(table: &Table) -> ReboxResult<TableRow> {
+        let mut row = TableRow::from(table);
+        let btree = row.get_mut();
+        let _ = btree
+            .get_mut("id")
+            .map(|column| column.set_value(ColumnValue::Natural(1)));
+        let _ = btree
+            .get_mut("name")
+            .map(|column| column.set_value(ColumnValue::Text("Marketing".into())));
+
+        row.verify()?;
+        row.finish()?;
+        Ok(row)
+    }
 }
 
-fn crud_users(db: &Database) -> ReboxResult<()> {
-    let id = SchemaColumn::new()
-        .set_name("id")?
-        .set_kind(ColumnKind::Natural)
-        .set_nullable(false)
-        .build();
-    let login = SchemaColumn::new()
-        .set_name("name")?
-        .set_kind(ColumnKind::Text)
-        .set_nullable(false)
-        .build();
+struct CrudUsers;
+impl CrudUsers {
+    pub fn run(db: &Database) -> ReboxResult<()> {
+        let table = Self::generate_table()?;
 
-    let full_name = SchemaColumn::new()
-        .set_name("full_name")?
-        .set_kind(ColumnKind::Text)
-        .set_nullable(false)
-        .build();
+        let table_name = db.create_table(table.clone())?;
+        println!("Table [{table_name}] created.");
 
-    let is_active = SchemaColumn::new()
-        .set_name("is_active")?
-        .set_kind(ColumnKind::Bool)
-        .set_nullable(false)
-        .build();
+        show_tables(&db)?;
 
-    let created_at = SchemaColumn::new()
-        .set_name("created_at")?
-        .set_kind(ColumnKind::Integer)
-        .set_nullable(false)
-        .build();
+        let table_row = Self::generate_data(&table)?;
+        dbg!(&table_row);
 
-    let schema: Vec<SchemaColumn> = vec![id, login, full_name, is_active, created_at];
-    // dbg!(&schema);
-    let table = Table::new()
-        .set_name("users")?
-        .set_schema(schema)?
-        .build()?;
-    // dbg!(&table);
+        let table_name = db.drop_table(table)?;
+        println!("Table [{table_name}] deleted.");
+        Ok(())
+    }
+    fn generate_table() -> ReboxResult<Table> {
+        let id = SchemaColumn::new()
+            .set_name("id")?
+            .set_kind(ColumnKind::Natural)
+            .set_nullable(false)
+            .build();
+        let login = SchemaColumn::new()
+            .set_name("login")?
+            .set_kind(ColumnKind::Text)
+            .set_nullable(false)
+            .build();
 
-    // dbg!(&db);
+        let full_name = SchemaColumn::new()
+            .set_name("full_name")?
+            .set_kind(ColumnKind::Text)
+            .set_nullable(false)
+            .build();
 
-    let table_name = db.create_table(table.clone())?;
-    println!("Table [{table_name}] created.");
-    show_tables(&db)?;
-    let table_name = db.drop_table(table)?;
-    println!("Table [{table_name}] deleted.");
-    Ok(())
+        let is_active = SchemaColumn::new()
+            .set_name("is_active")?
+            .set_kind(ColumnKind::Bool)
+            .set_nullable(false)
+            .build();
+
+        let created_at = SchemaColumn::new()
+            .set_name("created_at")?
+            .set_kind(ColumnKind::Integer)
+            .set_nullable(false)
+            .build();
+
+        let columns = vec![id, login, full_name, is_active, created_at];
+
+        let table = Table::new()
+            .set_name("users")?
+            .set_schema(columns)?
+            .build()?;
+
+        Ok(table)
+    }
+    fn generate_data(table: &Table) -> ReboxResult<TableRow> {
+        // TODO: TableRow::from -> row.build()?;
+        let mut row = TableRow::from(table);
+        let btree = row.get_mut();
+        let _ = btree
+            .get_mut("id")
+            .map(|column| column.set_value(ColumnValue::Natural(1)));
+        let _ = btree
+            .get_mut("login")
+            .map(|column| column.set_value(ColumnValue::Text("root".into())));
+
+        let _ = btree
+            .get_mut("full_name")
+            .map(|column| column.set_value(ColumnValue::Text("Charlie Root".into())));
+
+        let _ = btree
+            .get_mut("is_active")
+            .map(|column| column.set_value(ColumnValue::Bool(true)));
+
+        let _ = btree
+            .get_mut("created_at")
+            .map(|column| column.set_value(ColumnValue::Integer(Utc::now().timestamp())));
+        row.verify()?;
+        row.finish()?;
+        Ok(row)
+    }
 }

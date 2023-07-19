@@ -2,7 +2,7 @@ use super::KeyValueDriver;
 use anyhow::{bail, format_err};
 use bincode::config::Configuration;
 use rebox_types::{
-    schema::{table::TableSchema, CurrentRowId, Table},
+    schema::{schema::TableSchema, CurrentRowId, Table},
     DbPrefix, ReboxResult,
 };
 use rkv::{backend::SafeModeEnvironment, Rkv, StoreOptions, Value};

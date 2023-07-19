@@ -1,12 +1,18 @@
-use std::fmt::Display;
-
 use bincode::{Decode, Encode};
-use bytes::BytesMut;
+use std::{fmt::Display, ops::Deref};
 
 // const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 50; // 50 MBytes
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Decode, Encode)]
 pub struct ColumnName(String);
+
+impl Deref for ColumnName {
+    type Target = String;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl<T: AsRef<str>> From<T> for ColumnName {
     fn from(value: T) -> Self {
@@ -28,8 +34,16 @@ pub enum ColumnKind {
     Text,
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub struct ColumnData(BytesMut);
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum ColumnValue {
+    Bool(bool),
+    Integer(i64),
+    Natural(u64),
+    Text(String),
+}
+
+// #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
+// pub struct ColumnData(BytesMut);
 
 // impl ColumnData {
 //     pub fn store(mut self, payload: Box<dyn Buf>) -> ReboxResult<()> {

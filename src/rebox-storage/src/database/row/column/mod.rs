@@ -2,7 +2,10 @@ use anyhow::bail;
 
 use rebox_types::{
     helpers::check_valid_entity_name,
-    schema::column::model::{ColumnKind, ColumnName},
+    schema::column::{
+        model::{ColumnKind, ColumnName, ColumnValue},
+        SchemaColumn,
+    },
     ReboxResult,
 };
 
@@ -13,6 +16,17 @@ pub struct TableColumn {
     is_nullable: bool,
     value: Option<ColumnValue>,
 }
+
+impl From<&SchemaColumn> for TableColumn {
+    fn from(schema_column: &SchemaColumn) -> Self {
+        Self {
+            name: schema_column.name().clone(),
+            kind: schema_column.kind().clone(),
+            is_nullable: schema_column.is_nullable().clone(),
+            value: None,
+        }
+    }
+}
 impl TableColumn {
     pub fn new() -> TableColumnBuilder {
         TableColumnBuilder
@@ -22,21 +36,25 @@ impl TableColumn {
         &self.name
     }
 
-    pub fn set_value(mut self, value: ColumnValue) -> Self {
-        self.value = Some(value);
-        self
+    pub fn kind(&self) -> &ColumnKind {
+        &self.kind
     }
+
+    pub fn is_nullable(&self) -> bool {
+        self.is_nullable
+    }
+
+    pub fn value(&self) -> Option<&ColumnValue> {
+        self.value.as_ref()
+    }
+
+    pub fn set_value(&mut self, value: ColumnValue) {
+        self.value = Some(value);
+    }
+
     pub fn build(self) -> Self {
         self
     }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub enum ColumnValue {
-    Bool(bool),
-    Integer(i64),
-    Natural(u64),
-    Text(String),
 }
 
 #[derive(Debug)]

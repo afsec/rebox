@@ -21,6 +21,15 @@ impl SchemaColumn {
     pub fn name(&self) -> &ColumnName {
         &self.name
     }
+
+    pub fn kind(&self) -> &ColumnKind {
+        &self.kind
+    }
+
+    pub fn is_nullable(&self) -> bool {
+        self.is_nullable
+    }
+
     pub fn take(self) -> (ColumnName, ColumnKind, bool) {
         let Self {
             name,
