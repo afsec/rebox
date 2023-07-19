@@ -22,6 +22,13 @@ impl<'a> InsertIntoTable<'a> {
             &table_name,
             &table_row,
         )?;
+
+        let current_row_id = {
+            let mut inner_row_id =
+                retrieve_last_row_id(self.0.connection(), self.0.metadata(), &table_name)?;
+            inner_row_id.inc()?;
+            inner_row_id
+        };
         table_row
             .get()
             .iter()
@@ -33,22 +40,20 @@ impl<'a> InsertIntoTable<'a> {
                 ))?;
                 let value = column_value.to_owned().into();
                 let store_name_str = format!("{store_name_prefix}_{col_name}");
-                self.put_into_store(store_name_str, value)
+                self.put_into_store(store_name_str, value, &current_row_id)
             })?;
-
-        let current_row_id = {
-            let mut last_row_id =
-                retrieve_last_row_id(self.0.connection(), self.0.metadata(), &table_name)?;
-            last_row_id.inc()?;
-            last_row_id
-        };
 
         self.update_sequence(&table_name, &current_row_id)?;
         // self.check_row_integrity(&self, &table_name, &table_row, &current_row_id)?;
         Ok(current_row_id)
     }
 
-    fn put_into_store<T: AsRef<str>>(&self, store_name: T, value: OwnedValue) -> ReboxResult<()> {
+    fn put_into_store<T: AsRef<str>>(
+        &self,
+        store_name: T,
+        value: OwnedValue,
+        current_row_id: &RowId,
+    ) -> ReboxResult<()> {
         let created_arc = self.0.connection();
         let rkv_env = created_arc
             .read()
@@ -59,8 +64,10 @@ impl<'a> InsertIntoTable<'a> {
             Ok(inner) => inner,
             Err(err) => bail!("KvStore {store_name_str} not found. Reason:{err}"),
         };
+
         let mut writer = rkv_env.write()?;
-        store.put(&mut writer, store_name_str, &Value::from(&value))?;
+        let key = current_row_id.to_be_bytes();
+        store.put(&mut writer, &key, &Value::from(&value))?;
         Ok(())
     }
 

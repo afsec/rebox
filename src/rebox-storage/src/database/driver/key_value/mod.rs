@@ -7,11 +7,12 @@ mod list_tables;
 mod number_of_stores;
 mod table_exists;
 
-// TODO: Implement another modude to perform (Defrag / Compact) Database
+// TODO: Implement another module to perform (Defrag / Compact) Database
 
 use self::{
     builder::KeyValueDriverBuilder, create_table::CreateTable, drop_table::DropTable,
-    list_tables::ListTables, number_of_stores::NumberOfStores, table_exists::TableExists, insert_into_table::InsertIntoTable,
+    insert_into_table::InsertIntoTable, list_tables::ListTables, number_of_stores::NumberOfStores,
+    table_exists::TableExists,
 };
 use super::DataStorage;
 use crate::database::{driver::Driver, row::TableRow, DatabaseMetadata};
