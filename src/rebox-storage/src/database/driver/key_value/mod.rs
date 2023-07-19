@@ -1,6 +1,8 @@
 pub(super) mod builder;
 mod create_table;
 mod drop_table;
+mod helpers;
+mod insert_into_table;
 mod list_tables;
 mod number_of_stores;
 mod table_exists;
@@ -9,14 +11,14 @@ mod table_exists;
 
 use self::{
     builder::KeyValueDriverBuilder, create_table::CreateTable, drop_table::DropTable,
-    list_tables::ListTables, number_of_stores::NumberOfStores, table_exists::TableExists,
+    list_tables::ListTables, number_of_stores::NumberOfStores, table_exists::TableExists, insert_into_table::InsertIntoTable,
 };
 use super::DataStorage;
-use crate::database::{driver::Driver, DatabaseMetadata};
+use crate::database::{driver::Driver, row::TableRow, DatabaseMetadata};
 use anyhow::bail;
 use rebox_derive::DbDriver;
 use rebox_types::{
-    schema::{name::TableName, Table},
+    schema::{name::TableName, RowId, Table},
     ReboxResult,
 };
 
@@ -38,24 +40,35 @@ impl KeyValueDriver {
     pub(crate) fn connection(&self) -> &KvConnection {
         &self.connection
     }
-    pub(crate) fn table_exists(&self, table: &Table) -> ReboxResult<bool> {
-        TableExists::connect(self)?.exists(table)
+    pub(crate) fn table_exists(&self, table_name: &TableName) -> ReboxResult<bool> {
+        TableExists::connect(self)?.exists(table_name)
     }
     pub(crate) fn number_of_stores(&self) -> ReboxResult<u16> {
         NumberOfStores::connect(self)?.len()
     }
     pub(crate) fn create_table(&self, table: &Table) -> ReboxResult<()> {
-        if self.table_exists(table)? {
+        if self.table_exists(table.name())? {
             bail!("Table [{}] already exists", table.name());
         } else {
             CreateTable::connect(self)?.create(table)
         }
     }
-    pub(crate) fn drop(&self, table: &Table) -> ReboxResult<()> {
-        if self.table_exists(table)? {
-            DropTable::connect(self)?.delete(table)
+    pub(crate) fn insert_into_table(
+        &self,
+        table_name: TableName,
+        table_row: TableRow,
+    ) -> ReboxResult<RowId> {
+        if self.table_exists(&table_name)? {
+            InsertIntoTable::connect(self)?.insert(table_name, table_row)
         } else {
-            bail!("Table [{}] not exists", table.name());
+            bail!("Table [{}] already exists", &table_name);
+        }
+    }
+    pub(crate) fn drop(&self, table_name: &TableName) -> ReboxResult<()> {
+        if self.table_exists(table_name)? {
+            DropTable::connect(self)?.delete(table_name)
+        } else {
+            bail!("Table [{}] not exists", table_name);
         }
     }
 

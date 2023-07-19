@@ -1,6 +1,6 @@
 use bincode::{Decode, Encode};
+use rkv::OwnedValue as RkvOwnedValue;
 use std::{fmt::Display, ops::Deref};
-
 // const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 50; // 50 MBytes
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Decode, Encode)]
@@ -42,15 +42,13 @@ pub enum ColumnValue {
     Text(String),
 }
 
-// #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
-// pub struct ColumnData(BytesMut);
-
-// impl ColumnData {
-//     pub fn store(mut self, payload: Box<dyn Buf>) -> ReboxResult<()> {
-//         if self.0.capacity() >= COLUMN_MAX_CAPACITY {
-//             bail!("Out ot space inside a column")
-//         }
-//         self.0.put(payload);
-//         Ok(())
-//     }
-// }
+impl From<ColumnValue> for RkvOwnedValue {
+    fn from(column_value: ColumnValue) -> Self {
+        match column_value {
+            ColumnValue::Bool(b) => Self::Bool(b),
+            ColumnValue::Integer(i) => Self::I64(i),
+            ColumnValue::Natural(u) => Self::U64(u),
+            ColumnValue::Text(s) => Self::Str(s),
+        }
+    }
+}

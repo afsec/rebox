@@ -2,7 +2,7 @@ use super::KeyValueDriver;
 use anyhow::{bail, format_err};
 use bincode::config::Configuration;
 use rebox_types::{
-    schema::{schema::TableSchema, CurrentRowId, Table},
+    schema::{schema::TableSchema, RowId, Table},
     DbPrefix, ReboxResult,
 };
 use rkv::{backend::SafeModeEnvironment, Rkv, StoreOptions, Value};
@@ -21,11 +21,11 @@ impl<'a> CreateTable<'a> {
             .get_columns()
             .iter()
             .try_for_each(|(col_name, _)| {
-                Self::create_store(&self, format!("{store_name_prefix}_{col_name}"))
+                self.create_store(format!("{store_name_prefix}_{col_name}"))
             })?;
-        Self::update_master(&self, table)?;
-        Self::update_sequence(&self, table)?;
-        Self::check_integrity(&self, table)?;
+        self.update_master(table)?;
+        self.update_sequence(table)?;
+        self.check_integrity(table)?;
         Ok(())
     }
 
@@ -114,7 +114,7 @@ impl<'a> CreateTable<'a> {
             let maybe_value: Option<Value> = sequence_store.get(&reader, table_name_str)?;
 
             let current_row_id = match maybe_value {
-                Some(Value::U64(id)) => CurrentRowId::try_from(id)?,
+                Some(Value::U64(id)) => RowId::try_from(id)?,
                 other => bail!(                    "Health check alert: Table [{table_name_str}] type mismatch in [{rebox_sequence}]. Reason: {other:?}"            ),
             };
 

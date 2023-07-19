@@ -9,9 +9,9 @@ pub mod name;
 pub mod schema;
 
 #[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
-pub struct CurrentRowId(u32);
+pub struct RowId(u32);
 
-impl Deref for CurrentRowId {
+impl Deref for RowId {
     type Target = u32;
 
     fn deref(&self) -> &Self::Target {
@@ -19,13 +19,19 @@ impl Deref for CurrentRowId {
     }
 }
 
-impl From<u32> for CurrentRowId {
+impl From<u32> for RowId {
     fn from(value: u32) -> Self {
         Self(value)
     }
 }
 
-impl TryFrom<u64> for CurrentRowId {
+impl From<RowId> for u64 {
+    fn from(row_id: RowId) -> u64 {
+        u64::from(row_id.0)
+    }
+}
+
+impl TryFrom<u64> for RowId {
     type Error = anyhow::Error;
 
     fn try_from(value: u64) -> Result<Self, Self::Error> {
@@ -37,10 +43,10 @@ impl TryFrom<u64> for CurrentRowId {
     }
 }
 
-impl CurrentRowId {
+impl RowId {
     pub fn inc(&mut self) -> ReboxResult<()> {
         if self.is_full() {
-            bail!("Max limit reached for CurrentRowId");
+            bail!("Max limit reached for RowId");
         } else {
             self.0 += 1;
             Ok(())

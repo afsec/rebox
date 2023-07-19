@@ -12,7 +12,7 @@ use self::{
 };
 use anyhow::{bail, format_err};
 use rebox_types::{
-    schema::{name::TableName, CurrentRowId, Table},
+    schema::{name::TableName, RowId, Table},
     ReboxResult,
 };
 use rkv::StoreOptions;
@@ -41,24 +41,26 @@ impl Database {
     pub fn create_table(&self, table: Table) -> ReboxResult<TableName> {
         if self.driver.number_of_stores()? <= Self::MAX_DB_INPUT_COLS {
             self.driver.create_table(&table)?;
-            Ok(table.name().to_owned())
+            Ok(table.name().clone())
         } else {
             bail!("Can't create the table [{}]. Reason: The Database is reaching the MAX_DB_INPUT_COLS limit and add that table would cause overflow.",table.name());
         }
     }
 
-    pub fn drop_table(&self, table: Table) -> ReboxResult<TableName> {
-        self.driver.drop(&table)?;
-        Ok(table.name().to_owned())
+    pub fn drop_table(&self, table_name: &TableName) -> ReboxResult<TableName> {
+        self.driver.drop(&table_name)?;
+        Ok(table_name.clone())
     }
 
     pub fn insert_into_table(
         &self,
         table_name: TableName,
         table_row: TableRow,
-    ) -> ReboxResult<CurrentRowId> {
-        todo!();
-        Ok(CurrentRowId::default())
+    ) -> ReboxResult<RowId> {
+        table_row.check_verified()?;
+        let cur_id = self.driver.insert_into_table(table_name, table_row)?;
+
+        Ok(cur_id)
     }
 
     fn bootstrap_metadata(&self) -> ReboxResult<()> {

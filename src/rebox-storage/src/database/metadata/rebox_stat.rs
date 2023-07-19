@@ -2,7 +2,7 @@ use crate::database::MetadataTable;
 use anyhow::bail;
 use rebox_derive::DbEntity;
 use rebox_types::{
-    schema::{name::TableName, CurrentRowId},
+    schema::{name::TableName, RowId},
     DbPrefix, ReboxResult,
 };
 use std::collections::BTreeMap;
@@ -10,7 +10,7 @@ use std::collections::BTreeMap;
 #[derive(Debug, DbEntity)]
 pub(crate) struct ReboxStat {
     table_name: TableName,
-    inner_data: BTreeMap<TableName, CurrentRowId>,
+    inner_data: BTreeMap<TableName, RowId>,
 }
 
 impl MetadataTable for ReboxStat {
@@ -25,7 +25,7 @@ impl ReboxStat {
         let cur_row_id = self
             .inner_data
             .entry(table_name.to_owned())
-            .or_insert(CurrentRowId::default());
+            .or_insert(RowId::default());
 
         cur_row_id.inc()?;
 

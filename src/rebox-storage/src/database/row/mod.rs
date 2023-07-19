@@ -8,7 +8,7 @@ pub mod column;
 #[derive(Debug, Default, Clone)]
 pub struct TableRow {
     row: BTreeMap<String, TableColumn>,
-    verified: bool,
+    is_verified: bool,
 }
 impl From<&Table> for TableRow {
     fn from(table: &Table) -> Self {
@@ -53,6 +53,11 @@ impl TableRow {
             ..Default::default()
         })
     }
+
+    pub fn is_verified(&self) -> bool {
+        self.is_verified
+    }
+
     pub fn verify(&mut self) -> ReboxResult<()> {
         self.get().iter().try_for_each(|(key, column)| {
             match (column.is_nullable(), column.value().is_some()) {
@@ -63,11 +68,11 @@ impl TableRow {
                 ),
             }
         })?;
-        self.verified = true;
+        self.is_verified = true;
         Ok(())
     }
-    pub fn finish(&self) -> ReboxResult<()> {
-        if self.verified {
+    pub fn check_verified(&self) -> ReboxResult<()> {
+        if self.is_verified {
             Ok(())
         } else {
             bail!("TableRow is not vefified try `.verify()?;`")

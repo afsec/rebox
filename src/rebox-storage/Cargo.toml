@@ -14,7 +14,7 @@ bytes = { workspace = true }
 rebox-types = { path = "../rebox-types" }
 rebox_derive = { path = "../rebox_derive" }
 bincode = { workspace = true }
-rkv = "0.18.4"
+rkv = { workspace = true }
 tempfile = "3.6.0"
 
 [dev-dependencies]

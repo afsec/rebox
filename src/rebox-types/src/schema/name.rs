@@ -4,16 +4,10 @@ use std::{fmt::Display, ops::Deref};
 pub struct TableName(String);
 
 impl Deref for TableName {
-    type Target = str;
+    type Target = String;
 
     fn deref(&self) -> &Self::Target {
         &self.0
-    }
-}
-
-impl From<TableName> for String {
-    fn from(value: TableName) -> Self {
-        value.0
     }
 }
 
