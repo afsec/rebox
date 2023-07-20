@@ -1,5 +1,6 @@
-use anyhow::bail;
+pub mod data;
 
+use anyhow::bail;
 use rebox_types::{
     helpers::check_valid_entity_name,
     schema::column::{

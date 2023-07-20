@@ -1,6 +1,9 @@
 use crate::database::{driver::key_value::helpers::retrieve_last_row_id, row::TableRow};
 
-use super::{helpers::check_row_against_schema, KeyValueDriver};
+use super::{
+    helpers::{check_row_against_schema, retrieve_schema},
+    KeyValueDriver,
+};
 use anyhow::{bail, format_err};
 use rebox_types::{
     schema::{name::TableName, RowId, Table},
@@ -22,7 +25,7 @@ impl<'a> InsertIntoTable<'a> {
             &table_name,
             &table_row,
         )?;
-
+        let schema = retrieve_schema(self.0.connection(), self.0.metadata(), &table_name)?;
         let current_row_id = {
             let mut inner_row_id =
                 retrieve_last_row_id(self.0.connection(), self.0.metadata(), &table_name)?;
@@ -38,7 +41,7 @@ impl<'a> InsertIntoTable<'a> {
                     file!(),
                     line!()
                 ))?;
-                let value = column_value.to_owned().into();
+                let value: OwnedValue = column_value.to_owned().into();
                 let store_name_str = format!("{store_name_prefix}_{col_name}");
                 self.put_into_store(store_name_str, value, &current_row_id)
             })?;
@@ -68,6 +71,7 @@ impl<'a> InsertIntoTable<'a> {
         let mut writer = rkv_env.write()?;
         let key = current_row_id.to_be_bytes();
         store.put(&mut writer, &key, &Value::from(&value))?;
+        writer.commit()?;
         Ok(())
     }
 

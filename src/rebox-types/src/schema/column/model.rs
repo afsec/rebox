@@ -1,3 +1,4 @@
+use anyhow::bail;
 use bincode::{Decode, Encode};
 use rkv::OwnedValue as RkvOwnedValue;
 use std::{fmt::Display, ops::Deref};
@@ -34,12 +35,39 @@ pub enum ColumnKind {
     Text,
 }
 
+impl PartialEq<ColumnValue> for ColumnKind {
+    fn eq(&self, other: &ColumnValue) -> bool {
+        other == self
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum ColumnValue {
     Bool(bool),
     Integer(i64),
     Natural(u64),
     Text(String),
+}
+impl Display for ColumnValue {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ColumnValue::Bool(v) => write!(f, "{v}"),
+            ColumnValue::Integer(v) => write!(f, "{v}"),
+            ColumnValue::Natural(v) => write!(f, "{v}"),
+            ColumnValue::Text(v) => write!(f, "{v}"),
+        }
+    }
+}
+impl PartialEq<ColumnKind> for ColumnValue {
+    fn eq(&self, other: &ColumnKind) -> bool {
+        match (self, other) {
+            (ColumnValue::Bool(_), ColumnKind::Bool) => true,
+            (ColumnValue::Integer(_), ColumnKind::Integer) => true,
+            (ColumnValue::Natural(_), ColumnKind::Natural) => true,
+            (ColumnValue::Text(_), ColumnKind::Text) => true,
+            _ => false,
+        }
+    }
 }
 
 impl From<ColumnValue> for RkvOwnedValue {
@@ -50,5 +78,20 @@ impl From<ColumnValue> for RkvOwnedValue {
             ColumnValue::Natural(u) => Self::U64(u),
             ColumnValue::Text(s) => Self::Str(s),
         }
+    }
+}
+
+impl TryFrom<RkvOwnedValue> for ColumnValue {
+    type Error = anyhow::Error;
+
+    fn try_from(rkv_owned_value: RkvOwnedValue) -> Result<Self, Self::Error> {
+        let converted = match rkv_owned_value {
+            RkvOwnedValue::Bool(b) => ColumnValue::Bool(b),
+            RkvOwnedValue::I64(i) => ColumnValue::Integer(i),
+            RkvOwnedValue::U64(u) => ColumnValue::Natural(u),
+            RkvOwnedValue::Str(s) => ColumnValue::Text(s),
+            _ => bail!("OwnedValue not implemented for ColumnValue"),
+        };
+        Ok(converted)
     }
 }

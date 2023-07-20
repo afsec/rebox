@@ -1,6 +1,7 @@
 pub(super) mod builder;
 mod create_table;
 mod drop_table;
+mod get_table_row;
 mod helpers;
 mod insert_into_table;
 mod list_tables;
@@ -11,11 +12,11 @@ mod table_exists;
 
 use self::{
     builder::KeyValueDriverBuilder, create_table::CreateTable, drop_table::DropTable,
-    insert_into_table::InsertIntoTable, list_tables::ListTables, number_of_stores::NumberOfStores,
-    table_exists::TableExists,
+    get_table_row::GetTableRow, insert_into_table::InsertIntoTable, list_tables::ListTables,
+    number_of_stores::NumberOfStores, table_exists::TableExists,
 };
 use super::DataStorage;
-use crate::database::{driver::Driver, row::TableRow, DatabaseMetadata};
+use crate::database::{driver::Driver, row::{TableRow, column::data::RowData}, DatabaseMetadata};
 use anyhow::bail;
 use rebox_derive::DbDriver;
 use rebox_types::{
@@ -65,6 +66,18 @@ impl KeyValueDriver {
             bail!("Table [{}] already exists", &table_name);
         }
     }
+    pub(crate) fn get_table_row(
+        &self,
+        table_name: &TableName,
+        table_row: &RowId,
+    ) -> ReboxResult<Option<RowData>> {
+        if self.table_exists(&table_name)? {
+            GetTableRow::connect(self)?.get(table_name, table_row)
+        } else {
+            bail!("Table [{}] already exists", &table_name);
+        }
+    }
+
     pub(crate) fn drop(&self, table_name: &TableName) -> ReboxResult<()> {
         if self.table_exists(table_name)? {
             DropTable::connect(self)?.delete(table_name)
