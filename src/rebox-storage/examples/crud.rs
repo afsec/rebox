@@ -41,13 +41,18 @@ impl CrudDepartments {
         let table = Self::generate_table()?;
 
         let table_name = db.create_table(table.clone())?;
-        println!("Table [{table_name}] created.");
-
-        show_tables(&db)?;
+        println!("\nTable [{table_name}] created.\n");
 
         let table_row = Self::generate_data(&table)?;
-        dbg!(&table_row);
-        db.insert_into_table(table_name, table_row)?;
+        // dbg!(&table_row);
+        let row_id = db.insert_into_table(table_name.clone(), table_row)?;
+
+        let maybe_table_row = db.get_table_row(&table_name, &row_id)?;
+        // dbg!(&maybe_table_row);
+        match maybe_table_row {
+            Some(row_data) => println!("{row_data}"),
+            None => println!("Row id [{row_id}] not exists"),
+        };
 
         // let table_name = db.drop_table(table.name())?;
         // println!("Table [{table_name}] deleted.");
@@ -95,12 +100,18 @@ impl CrudUsers {
         let table = Self::generate_table()?;
 
         let table_name = db.create_table(table.clone())?;
-        println!("Table [{table_name}] created.");
-
-        show_tables(&db)?;
+        println!("\nTable [{table_name}] created.\n");
 
         let table_row = Self::generate_data(&table)?;
-        dbg!(&table_row);
+        // dbg!(&table_row);
+        let row_id = db.insert_into_table(table_name.clone(), table_row)?;
+
+        let maybe_table_row = db.get_table_row(&table_name, &row_id)?;
+        // dbg!(&maybe_table_row);
+        match maybe_table_row {
+            Some(row_data) => println!("{row_data}"),
+            None => println!("Row id [{row_id}] not exists"),
+        };
 
         // let table_name = db.drop_table(table.name())?;
         // println!("Table [{table_name}] deleted.");

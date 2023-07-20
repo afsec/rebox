@@ -2,13 +2,16 @@ use self::{column::SchemaColumn, name::TableName, schema::TableSchema};
 use crate::{helpers::check_valid_entity_name, DbPrefix, ReboxResult};
 use anyhow::bail;
 use rebox_derive::DbEntity;
-use std::{fmt::Debug, ops::Deref};
+use std::{
+    fmt::{Debug, Display},
+    ops::Deref,
+};
 
 pub mod column;
 pub mod name;
 pub mod schema;
 
-#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RowId(u32);
 
 impl Deref for RowId {
@@ -40,6 +43,12 @@ impl TryFrom<u64> for RowId {
         } else {
             bail!("Value is out of bounds. Reason: (value > u32::MAX).");
         }
+    }
+}
+
+impl Display for RowId {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 
