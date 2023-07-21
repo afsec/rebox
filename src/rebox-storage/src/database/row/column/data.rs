@@ -10,6 +10,7 @@ use serde::Serialize;
 #[derive(Debug, Serialize)]
 pub struct RowData {
     row_id: RowId,
+    #[serde(flatten)]
     data: BTreeMap<ColumnName, ColumnValue>,
 }
 

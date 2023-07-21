@@ -5,12 +5,15 @@ use rebox_types::{
             model::{ColumnKind, ColumnValue},
             SchemaColumn,
         },
-        Table,
+        RowId, Table,
     },
     ReboxResult,
 };
 
-use rebox_storage::database::{row::TableRow, Database};
+use rebox_storage::database::{
+    row::{column::data::RowData, TableRow},
+    Database,
+};
 fn main() -> ReboxResult<()> {
     let db_name = "example_crud";
 
@@ -30,50 +33,17 @@ impl CrudDepartments {
         let table_name = db.create_table(table.clone())?;
         println!("\nTable [{table_name}] created.\n");
 
-        let table_row = Self::generate_data(&table)?;
+        let rows = Self::generate_data(&table)?;
+        let _ = rows
+            .into_iter()
+            .map(|row| db.insert_into_table(table_name.clone(), row))
+            .collect::<ReboxResult<Vec<RowId>>>()?;
         // dbg!(&table_row);
-        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
-        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
-        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
-        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
-        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
+
         // let rows = db.get_table_rows(&table_name, Some(&row_id))?;
         let rows = db.get_table_rows(&table_name, None)?;
-        {
-            // let json = serde_json::to_string(&rows)?;
-            // println!("{}", json);
-        }
-        {
-            use tabled::{builder::Builder, settings::Style};
-            let mut headers: Vec<String> = vec!["row_id".into()];
-            let mut col_names: Vec<String> = rows
-                .first()
-                .map(|item| {
-                    item.col_names()
-                        .iter()
-                        .map(|col_name| col_name.to_string())
-                        .collect()
-                })
-                .unwrap();
-            let mut builder = Builder::default();
-            headers.append(&mut col_names);
-            builder.set_header(headers);
-            rows.iter().for_each(|item| {
-                let mut output = vec![item.row_id().to_string()];
-                let mut columns: Vec<String> = item
-                    .col_values()
-                    .iter()
-                    .map(|col_value| col_value.to_string())
-                    .collect();
-                output.append(&mut columns);
-                builder.push_record(output);
-            });
-
-            let mut table = builder.build();
-            table.with(Style::rounded());
-
-            println!("{}", table);
-        }
+        print_rows_as_json(&rows)?;
+        print_row_as_table(&rows)?;
 
         // let table_name = db.drop_table(table.name())?;
         // println!("Table [{table_name}] deleted.");
@@ -99,19 +69,52 @@ impl CrudDepartments {
 
         Ok(table)
     }
-    fn generate_data(table: &Table) -> ReboxResult<TableRow> {
-        let mut row = TableRow::from(table);
-        let btree = row.get_mut();
-        let _ = btree
-            .get_mut("id")
-            .map(|column| column.set_value(ColumnValue::Natural(1)));
-        let _ = btree
-            .get_mut("name")
-            .map(|column| column.set_value(ColumnValue::Text("Marketing".into())));
+    fn generate_data(table: &Table) -> ReboxResult<Vec<TableRow>> {
+        let mut rows = vec![];
+        {
+            let mut row = TableRow::from(table);
+            let btree = row.get_mut();
+            let _ = btree
+                .get_mut("id")
+                .map(|column| column.set_value(ColumnValue::Natural(1)));
+            let _ = btree
+                .get_mut("name")
+                .map(|column| column.set_value(ColumnValue::Text("IT".into())));
 
-        row.verify()?;
-        row.check_verified()?;
-        Ok(row)
+            row.verify()?;
+            row.check_verified()?;
+            rows.push(row);
+        }
+        {
+            let mut row = TableRow::from(table);
+            let btree = row.get_mut();
+            let _ = btree
+                .get_mut("id")
+                .map(|column| column.set_value(ColumnValue::Natural(2)));
+            let _ = btree
+                .get_mut("name")
+                .map(|column| column.set_value(ColumnValue::Text("Accounting".into())));
+
+            row.verify()?;
+            row.check_verified()?;
+            rows.push(row);
+        }
+        {
+            let mut row = TableRow::from(table);
+            let btree = row.get_mut();
+            let _ = btree
+                .get_mut("id")
+                .map(|column| column.set_value(ColumnValue::Natural(3)));
+            let _ = btree
+                .get_mut("name")
+                .map(|column| column.set_value(ColumnValue::Text("Marketing".into())));
+
+            row.verify()?;
+            row.check_verified()?;
+            rows.push(row);
+        }
+
+        Ok(rows)
     }
 }
 
@@ -125,49 +128,12 @@ impl CrudUsers {
 
         let table_row = Self::generate_data(&table)?;
         // dbg!(&table_row);
-        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
-        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
-        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
-        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
-        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
+        let row_id = db.insert_into_table(table_name.clone(), table_row)?;
 
         // let rows = db.get_table_rows(&table_name, Some(&row_id))?;
         let rows = db.get_table_rows(&table_name, None)?;
-        {
-            // let json = serde_json::to_string(&rows)?;
-            // println!("{}", json);
-        }
-        {
-            use tabled::{builder::Builder, settings::Style};
-            let mut headers: Vec<String> = vec!["row_id".into()];
-            let mut col_names: Vec<String> = rows
-                .first()
-                .map(|item| {
-                    item.col_names()
-                        .iter()
-                        .map(|col_name| col_name.to_string())
-                        .collect()
-                })
-                .unwrap();
-            let mut builder = Builder::default();
-            headers.append(&mut col_names);
-            builder.set_header(headers);
-            rows.iter().for_each(|item| {
-                let mut output = vec![item.row_id().to_string()];
-                let mut columns: Vec<String> = item
-                    .col_values()
-                    .iter()
-                    .map(|col_value| col_value.to_string())
-                    .collect();
-                output.append(&mut columns);
-                builder.push_record(output);
-            });
-
-            let mut table = builder.build();
-            table.with(Style::rounded());
-
-            println!("{}", table);
-        }
+        print_rows_as_json(&rows)?;
+        print_row_as_table(&rows)?;
 
         // let table_name = db.drop_table(table.name())?;
         // println!("Table [{table_name}] deleted.");
@@ -237,4 +203,45 @@ impl CrudUsers {
         row.check_verified()?;
         Ok(row)
     }
+}
+
+fn print_rows_as_json(rows: &Vec<RowData>) -> ReboxResult<()> {
+    let maybe_first = rows.first();
+    dbg!(maybe_first);
+    let json = serde_json::to_string_pretty(&rows)?;
+    println!("{}", json);
+    Ok(())
+}
+
+fn print_row_as_table(rows: &Vec<RowData>) -> ReboxResult<()> {
+    use tabled::{builder::Builder, settings::Style};
+    let mut headers: Vec<String> = vec!["row_id".into()];
+    let mut col_names: Vec<String> = rows
+        .first()
+        .map(|item| {
+            item.col_names()
+                .iter()
+                .map(|col_name| col_name.to_string())
+                .collect()
+        })
+        .unwrap();
+    let mut builder = Builder::default();
+    headers.append(&mut col_names);
+    builder.set_header(headers);
+    rows.iter().for_each(|item| {
+        let mut output = vec![item.row_id().to_string()];
+        let mut columns: Vec<String> = item
+            .col_values()
+            .iter()
+            .map(|col_value| col_value.to_string())
+            .collect();
+        output.append(&mut columns);
+        builder.push_record(output);
+    });
+
+    let mut table = builder.build();
+    table.with(Style::rounded());
+
+    println!("{}", table);
+    Ok(())
 }
