@@ -1,10 +1,12 @@
 use anyhow::bail;
 use bincode::{Decode, Encode};
 use rkv::OwnedValue as RkvOwnedValue;
+use serde::Serialize;
 use std::{fmt::Display, ops::Deref};
+
 // const COLUMN_MAX_CAPACITY: usize = 1024 * 1024 * 50; // 50 MBytes
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Decode, Encode)]
+#[derive(Debug, Clone, Serialize, PartialEq, Eq, PartialOrd, Ord, Decode, Encode)]
 pub struct ColumnName(String);
 
 impl Deref for ColumnName {
@@ -41,7 +43,8 @@ impl PartialEq<ColumnValue> for ColumnKind {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Serialize, PartialEq, Eq, PartialOrd, Ord)]
+#[serde(untagged)]
 pub enum ColumnValue {
     Bool(bool),
     Integer(i64),

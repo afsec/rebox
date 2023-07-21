@@ -18,19 +18,6 @@ fn main() -> ReboxResult<()> {
     CrudDepartments::run(&db)?;
     CrudUsers::run(&db)?;
 
-    show_tables(&db)?;
-    Ok(())
-}
-
-fn show_tables(db: &Database) -> ReboxResult<()> {
-    println!("\n");
-    println!("Tables");
-    println!("======\n");
-    db.list_tables()?
-        .iter()
-        .for_each(|tbl_name| println!(" - {tbl_name}"));
-    println!("\n");
-
     Ok(())
 }
 
@@ -45,14 +32,48 @@ impl CrudDepartments {
 
         let table_row = Self::generate_data(&table)?;
         // dbg!(&table_row);
-        let row_id = db.insert_into_table(table_name.clone(), table_row)?;
+        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
+        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
+        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
+        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
+        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
+        // let rows = db.get_table_rows(&table_name, Some(&row_id))?;
+        let rows = db.get_table_rows(&table_name, None)?;
+        {
+            // let json = serde_json::to_string(&rows)?;
+            // println!("{}", json);
+        }
+        {
+            use tabled::{builder::Builder, settings::Style};
+            let mut headers: Vec<String> = vec!["row_id".into()];
+            let mut col_names: Vec<String> = rows
+                .first()
+                .map(|item| {
+                    item.col_names()
+                        .iter()
+                        .map(|col_name| col_name.to_string())
+                        .collect()
+                })
+                .unwrap();
+            let mut builder = Builder::default();
+            headers.append(&mut col_names);
+            builder.set_header(headers);
+            rows.iter().for_each(|item| {
+                let mut output = vec![item.row_id().to_string()];
+                let mut columns: Vec<String> = item
+                    .col_values()
+                    .iter()
+                    .map(|col_value| col_value.to_string())
+                    .collect();
+                output.append(&mut columns);
+                builder.push_record(output);
+            });
 
-        let maybe_table_row = db.get_table_row(&table_name, &row_id)?;
-        // dbg!(&maybe_table_row);
-        match maybe_table_row {
-            Some(row_data) => println!("{row_data}"),
-            None => println!("Row id [{row_id}] not exists"),
-        };
+            let mut table = builder.build();
+            table.with(Style::rounded());
+
+            println!("{}", table);
+        }
 
         // let table_name = db.drop_table(table.name())?;
         // println!("Table [{table_name}] deleted.");
@@ -104,14 +125,49 @@ impl CrudUsers {
 
         let table_row = Self::generate_data(&table)?;
         // dbg!(&table_row);
-        let row_id = db.insert_into_table(table_name.clone(), table_row)?;
+        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
+        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
+        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
+        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
+        let row_id = db.insert_into_table(table_name.clone(), table_row.clone())?;
 
-        let maybe_table_row = db.get_table_row(&table_name, &row_id)?;
-        // dbg!(&maybe_table_row);
-        match maybe_table_row {
-            Some(row_data) => println!("{row_data}"),
-            None => println!("Row id [{row_id}] not exists"),
-        };
+        // let rows = db.get_table_rows(&table_name, Some(&row_id))?;
+        let rows = db.get_table_rows(&table_name, None)?;
+        {
+            // let json = serde_json::to_string(&rows)?;
+            // println!("{}", json);
+        }
+        {
+            use tabled::{builder::Builder, settings::Style};
+            let mut headers: Vec<String> = vec!["row_id".into()];
+            let mut col_names: Vec<String> = rows
+                .first()
+                .map(|item| {
+                    item.col_names()
+                        .iter()
+                        .map(|col_name| col_name.to_string())
+                        .collect()
+                })
+                .unwrap();
+            let mut builder = Builder::default();
+            headers.append(&mut col_names);
+            builder.set_header(headers);
+            rows.iter().for_each(|item| {
+                let mut output = vec![item.row_id().to_string()];
+                let mut columns: Vec<String> = item
+                    .col_values()
+                    .iter()
+                    .map(|col_value| col_value.to_string())
+                    .collect();
+                output.append(&mut columns);
+                builder.push_record(output);
+            });
+
+            let mut table = builder.build();
+            table.with(Style::rounded());
+
+            println!("{}", table);
+        }
 
         // let table_name = db.drop_table(table.name())?;
         // println!("Table [{table_name}] deleted.");
