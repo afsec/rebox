@@ -24,3 +24,6 @@ chrono = { workspace = true, features = ["clock"] }
 json_to_table = { workspace = true }
 serde_json = { workspace = true }
 tabled = { workspace = true }
+ulid = { workspace = true }
+hex = { workspace = true }
+md-5 = { workspace = true }

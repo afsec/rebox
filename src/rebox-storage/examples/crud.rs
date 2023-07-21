@@ -1,4 +1,8 @@
 use chrono::Utc;
+use rebox_storage::database::{
+    row::{column::data::RowData, TableRow},
+    Database,
+};
 use rebox_types::{
     schema::{
         column::{
@@ -10,13 +14,8 @@ use rebox_types::{
     ReboxResult,
 };
 
-use rebox_storage::database::{
-    row::{column::data::RowData, TableRow},
-    Database,
-};
 fn main() -> ReboxResult<()> {
     let db_name = "example_crud";
-
     let db = Database::new().set_name(db_name)?.build()?;
     CrudDepartments::run(&db)?;
     CrudUsers::run(&db)?;
@@ -42,7 +41,7 @@ impl CrudDepartments {
 
         // let rows = db.get_table_rows(&table_name, Some(&row_id))?;
         let rows = db.get_table_rows(&table_name, None)?;
-        print_rows_as_json(&rows)?;
+        // print_rows_as_json(&rows)?;
         print_row_as_table(&rows)?;
 
         // let table_name = db.drop_table(table.name())?;
@@ -52,8 +51,8 @@ impl CrudDepartments {
     }
     fn generate_table() -> ReboxResult<Table> {
         let id = SchemaColumn::new()
-            .set_name("id")?
-            .set_kind(ColumnKind::Natural)
+            .set_name("oid")?
+            .set_kind(ColumnKind::Text)
             .set_nullable(false)
             .build();
         let name = SchemaColumn::new()
@@ -75,8 +74,8 @@ impl CrudDepartments {
             let mut row = TableRow::from(table);
             let btree = row.get_mut();
             let _ = btree
-                .get_mut("id")
-                .map(|column| column.set_value(ColumnValue::Natural(1)));
+                .get_mut("oid")
+                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
             let _ = btree
                 .get_mut("name")
                 .map(|column| column.set_value(ColumnValue::Text("IT".into())));
@@ -89,8 +88,8 @@ impl CrudDepartments {
             let mut row = TableRow::from(table);
             let btree = row.get_mut();
             let _ = btree
-                .get_mut("id")
-                .map(|column| column.set_value(ColumnValue::Natural(2)));
+                .get_mut("oid")
+                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
             let _ = btree
                 .get_mut("name")
                 .map(|column| column.set_value(ColumnValue::Text("Accounting".into())));
@@ -103,8 +102,8 @@ impl CrudDepartments {
             let mut row = TableRow::from(table);
             let btree = row.get_mut();
             let _ = btree
-                .get_mut("id")
-                .map(|column| column.set_value(ColumnValue::Natural(3)));
+                .get_mut("oid")
+                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
             let _ = btree
                 .get_mut("name")
                 .map(|column| column.set_value(ColumnValue::Text("Marketing".into())));
@@ -126,13 +125,16 @@ impl CrudUsers {
         let table_name = db.create_table(table.clone())?;
         println!("\nTable [{table_name}] created.\n");
 
-        let table_row = Self::generate_data(&table)?;
+        let rows = Self::generate_data(&table)?;
         // dbg!(&table_row);
-        let row_id = db.insert_into_table(table_name.clone(), table_row)?;
+        let _ = rows
+            .into_iter()
+            .map(|row| db.insert_into_table(table_name.clone(), row))
+            .collect::<ReboxResult<Vec<RowId>>>()?;
 
         // let rows = db.get_table_rows(&table_name, Some(&row_id))?;
         let rows = db.get_table_rows(&table_name, None)?;
-        print_rows_as_json(&rows)?;
+        // print_rows_as_json(&rows)?;
         print_row_as_table(&rows)?;
 
         // let table_name = db.drop_table(table.name())?;
@@ -141,8 +143,8 @@ impl CrudUsers {
     }
     fn generate_table() -> ReboxResult<Table> {
         let id = SchemaColumn::new()
-            .set_name("id")?
-            .set_kind(ColumnKind::Natural)
+            .set_name("oid")?
+            .set_kind(ColumnKind::Text)
             .set_nullable(false)
             .build();
         let login = SchemaColumn::new()
@@ -178,30 +180,85 @@ impl CrudUsers {
 
         Ok(table)
     }
-    fn generate_data(table: &Table) -> ReboxResult<TableRow> {
-        let mut row = TableRow::from(table);
-        let btree = row.get_mut();
-        let _ = btree
-            .get_mut("id")
-            .map(|column| column.set_value(ColumnValue::Natural(1)));
-        let _ = btree
-            .get_mut("login")
-            .map(|column| column.set_value(ColumnValue::Text("root".into())));
+    fn generate_data(table: &Table) -> ReboxResult<Vec<TableRow>> {
+        let mut rows = vec![];
+        {
+            let mut row = TableRow::from(table);
+            let btree = row.get_mut();
+            let _ = btree
+                .get_mut("oid")
+                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
+            let _ = btree
+                .get_mut("login")
+                .map(|column| column.set_value(ColumnValue::Text("root".into())));
 
-        let _ = btree
-            .get_mut("full_name")
-            .map(|column| column.set_value(ColumnValue::Text("Charlie Root".into())));
+            let _ = btree
+                .get_mut("full_name")
+                .map(|column| column.set_value(ColumnValue::Text("Charlie Root".into())));
 
-        let _ = btree
-            .get_mut("is_active")
-            .map(|column| column.set_value(ColumnValue::Bool(true)));
+            let _ = btree
+                .get_mut("is_active")
+                .map(|column| column.set_value(ColumnValue::Bool(true)));
 
-        let _ = btree
-            .get_mut("created_at")
-            .map(|column| column.set_value(ColumnValue::Integer(Utc::now().timestamp())));
-        row.verify()?;
-        row.check_verified()?;
-        Ok(row)
+            let _ = btree
+                .get_mut("created_at")
+                .map(|column| column.set_value(ColumnValue::Integer(Utc::now().timestamp())));
+            row.verify()?;
+            row.check_verified()?;
+            rows.push(row);
+        }
+        {
+            let mut row = TableRow::from(table);
+            let btree = row.get_mut();
+            let _ = btree
+                .get_mut("oid")
+                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
+            let _ = btree
+                .get_mut("login")
+                .map(|column| column.set_value(ColumnValue::Text("admin".into())));
+
+            let _ = btree
+                .get_mut("full_name")
+                .map(|column| column.set_value(ColumnValue::Text("Administrator".into())));
+
+            let _ = btree
+                .get_mut("is_active")
+                .map(|column| column.set_value(ColumnValue::Bool(true)));
+
+            let _ = btree
+                .get_mut("created_at")
+                .map(|column| column.set_value(ColumnValue::Integer(Utc::now().timestamp())));
+            row.verify()?;
+            row.check_verified()?;
+            rows.push(row);
+        }
+        {
+            let mut row = TableRow::from(table);
+            let btree = row.get_mut();
+            let _ = btree
+                .get_mut("oid")
+                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
+            let _ = btree
+                .get_mut("login")
+                .map(|column| column.set_value(ColumnValue::Text("staff".into())));
+
+            let _ = btree
+                .get_mut("full_name")
+                .map(|column| column.set_value(ColumnValue::Text("Staff".into())));
+
+            let _ = btree
+                .get_mut("is_active")
+                .map(|column| column.set_value(ColumnValue::Bool(true)));
+
+            let _ = btree
+                .get_mut("created_at")
+                .map(|column| column.set_value(ColumnValue::Integer(Utc::now().timestamp())));
+            row.verify()?;
+            row.check_verified()?;
+            rows.push(row);
+        }
+
+        Ok(rows)
     }
 }
 
@@ -244,4 +301,17 @@ fn print_row_as_table(rows: &Vec<RowData>) -> ReboxResult<()> {
 
     println!("{}", table);
     Ok(())
+}
+
+fn gen_new_oid() -> String {
+    use std::collections::hash_map::DefaultHasher;
+    use std::hash::Hash;
+    use std::hash::Hasher;
+    use ulid::Ulid;
+    let t = Ulid::new();
+    let mut s = DefaultHasher::new();
+    t.hash(&mut s);
+    let hash = s.finish().to_be_bytes();
+
+    hex::encode(hash)
 }

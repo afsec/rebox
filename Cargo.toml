@@ -47,6 +47,9 @@ test-case = "3.1.0"
 serde = { version = "1.0.173", features = ["derive"] }
 serde_json = { version = "1.0.103" }
 tabled = "0.12.2"
+ulid = "1.0.0"
+hex = "0.4.3"
+md-5 = "0.10.5"
 # serde = { version = "1.0.164", features = ["derive"] }
 # chrono = { version = "0.4.26", default-features = false, features = [
 #     "serde",
