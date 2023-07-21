@@ -1,33 +1,53 @@
-use std::fmt::Display;
+use std::collections::BTreeMap;
 
+use anyhow::{bail, Ok};
 use rebox_types::schema::{
     column::model::{ColumnName, ColumnValue},
     RowId,
 };
+use serde::Serialize;
 
-#[derive(Debug)]
-pub struct RowData(Vec<ColumnData>);
-impl From<Vec<ColumnData>> for RowData {
-    fn from(value: Vec<ColumnData>) -> Self {
-        Self(value)
-    }
+#[derive(Debug, Serialize)]
+pub struct RowData {
+    row_id: RowId,
+    data: BTreeMap<ColumnName, ColumnValue>,
 }
 
-impl Display for RowData {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let maybe_rowid = self.0.first().map(|data| data.row_id());
-        match maybe_rowid {
-            Some(row_id) => {
-                let mut header_str = format!("| row_id |");
-                let mut data_str = format!("| {:a$} |", **row_id, a = 6);
-                self.0.iter().for_each(|data| {
-                    header_str.push_str(format!(" {} |", data.col_name()).as_str());
-                    data_str.push_str(format!(" {} |", data.value()).as_str());
-                });
+impl RowData {
+    pub fn row_id(&self) -> &RowId {
+        &self.row_id
+    }
+    pub fn col_names(&self) -> Vec<&ColumnName> {
+        self.data.keys().collect()
+    }
+    pub fn col_values(&self) -> Vec<&ColumnValue> {
+        self.data.values().collect()
+    }
+}
+impl TryFrom<Vec<ColumnData>> for RowData {
+    type Error = anyhow::Error;
 
-                write!(f, "{header_str}\n{data_str}")
+    fn try_from(vec: Vec<ColumnData>) -> Result<Self, Self::Error> {
+        if vec.is_empty() {
+            bail!("Empty Vec.")
+        } else {
+            let mut data = BTreeMap::new();
+            let mut maybe_first_row_id: Option<RowId> = None;
+            vec.into_iter().enumerate().for_each(|(idx, column_data)| {
+                let ColumnData {
+                    row_id,
+                    col_name,
+                    value,
+                } = column_data;
+                if idx == 0 {
+                    maybe_first_row_id = Some(row_id)
+                }
+                data.insert(col_name, value);
+            });
+            match maybe_first_row_id {
+                Some(row_id) => Ok(Self { row_id, data }),
+                None => bail!("Empty Vec."),
             }
-            None => write!(f, ""),
         }
     }
 }

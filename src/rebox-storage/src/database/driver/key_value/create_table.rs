@@ -23,6 +23,7 @@ impl<'a> CreateTable<'a> {
             .try_for_each(|(col_name, _)| {
                 self.create_store(format!("{store_name_prefix}_{col_name}"))
             })?;
+        self.create_store(format!("{store_name_prefix}_rowid"))?;
         self.update_master(table)?;
         self.update_sequence(table)?;
         self.check_integrity(table)?;
@@ -115,7 +116,7 @@ impl<'a> CreateTable<'a> {
 
             let current_row_id = match maybe_value {
                 Some(Value::U64(id)) => RowId::try_from(id)?,
-                other => bail!(                    "Health check alert: Table [{table_name_str}] type mismatch in [{rebox_sequence}]. Reason: {other:?}"            ),
+                other => bail!("Health check alert: Table [{table_name_str}] type mismatch in [{rebox_sequence}]. Reason: {other:?}"            ),
             };
 
             if *current_row_id != 0 {

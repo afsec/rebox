@@ -2,6 +2,7 @@ use self::{column::SchemaColumn, name::TableName, schema::TableSchema};
 use crate::{helpers::check_valid_entity_name, DbPrefix, ReboxResult};
 use anyhow::bail;
 use rebox_derive::DbEntity;
+use serde::Serialize;
 use std::{
     fmt::{Debug, Display},
     ops::Deref,
@@ -11,7 +12,7 @@ pub mod column;
 pub mod name;
 pub mod schema;
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Default, Clone, Serialize, PartialEq, Eq, PartialOrd, Ord)]
 pub struct RowId(u32);
 
 impl Deref for RowId {

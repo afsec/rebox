@@ -1,9 +1,6 @@
 use crate::database::{driver::key_value::helpers::retrieve_last_row_id, row::TableRow};
 
-use super::{
-    helpers::{check_row_against_schema, retrieve_schema},
-    KeyValueDriver,
-};
+use super::{helpers::check_row_against_schema, KeyValueDriver};
 use anyhow::{bail, format_err};
 use rebox_types::{
     schema::{name::TableName, RowId, Table},
@@ -25,7 +22,6 @@ impl<'a> InsertIntoTable<'a> {
             &table_name,
             &table_row,
         )?;
-        let schema = retrieve_schema(self.0.connection(), self.0.metadata(), &table_name)?;
         let current_row_id = {
             let mut inner_row_id =
                 retrieve_last_row_id(self.0.connection(), self.0.metadata(), &table_name)?;
@@ -46,8 +42,8 @@ impl<'a> InsertIntoTable<'a> {
                 self.put_into_store(store_name_str, value, &current_row_id)
             })?;
 
+        self.update_rowid_index(&table_name, &current_row_id)?;
         self.update_sequence(&table_name, &current_row_id)?;
-        // self.check_row_integrity(&self, &table_name, &table_row, &current_row_id)?;
         Ok(current_row_id)
     }
 
@@ -75,6 +71,24 @@ impl<'a> InsertIntoTable<'a> {
         Ok(())
     }
 
+    fn update_rowid_index(
+        &self,
+        table_name: &TableName,
+        current_row_id: &RowId,
+    ) -> ReboxResult<()> {
+        let created_arc = self.0.connection();
+        let table_rowid_store_str = format!("rebox-{table_name}_rowid");
+        let rkv_env: std::sync::RwLockReadGuard<'_, Rkv<SafeModeEnvironment>> = created_arc
+            .read()
+            .map_err(|err| format_err!("Read error: {err}"))?;
+        let key = current_row_id.to_be_bytes();
+        let sequence_store =
+            rkv_env.open_single(table_rowid_store_str.as_ref(), StoreOptions::default())?;
+        let mut writer = rkv_env.write()?;
+        sequence_store.put(&mut writer, key, &Value::Bool(true))?;
+        writer.commit()?;
+        Ok(())
+    }
     fn update_sequence(&self, table_name: &TableName, current_row_id: &RowId) -> ReboxResult<()> {
         let created_arc = self.0.connection();
         let rebox_sequence = self.0.metadata().rebox_sequence().table_name().as_ref();
@@ -93,42 +107,4 @@ impl<'a> InsertIntoTable<'a> {
         writer.commit()?;
         Ok(())
     }
-
-    // fn check_row_integrity(
-    //     &self,
-    //     table_name: &TableName,
-    //     table_row: &TableRow,
-    //     current_row_id: &RowId,
-    // ) -> ReboxResult<()> {
-    //     let tbl_schema = retrieve_schema(self.0.connection(), self.0.metadata(), &table_name)?;
-    //     let store_name_prefix = format!("{}-{}", Table::prefix(), table_name);
-
-    //     tbl_schema
-    //         .get_columns()
-    //         .iter()
-    //         .try_for_each(|(col_name, schema_column)| {
-    //             // TODO: Check Store: &SchemaColumn against &TableRow
-    //             // TODO:
-    //             self.get_store(&self, format!("{store_name_prefix}_{col_name}"))
-    //         })?;
-
-    //     Ok(())
-    // }
-
-    // fn get_store<T: AsRef<str>>(&self, store_name: T) -> ReboxResult<()> {
-    //     let created_arc = self.0.connection();
-    //     let rkv_env = created_arc
-    //         .read()
-    //         .map_err(|err| format_err!("Read error: {err}"))?;
-    //     let store_name_str = store_name.as_ref();
-    //     if rkv_env
-    //         .open_single(store_name_str, StoreOptions::default())
-    //         .is_ok()
-    //     {
-    //         bail!("KvStore {store_name_str} already exists!");
-    //     } else {
-    //         let _ = rkv_env.open_single(store_name_str, StoreOptions::create())?;
-    //         Ok(())
-    //     }
-    // }
 }

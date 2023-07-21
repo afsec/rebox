@@ -7,8 +7,8 @@ use rebox_types::{
 };
 use rkv::{OwnedValue, StoreOptions};
 
-pub(super) struct GetTableRow<'a>(&'a KeyValueDriver);
-impl<'a> GetTableRow<'a> {
+pub(super) struct GetTableSingleRow<'a>(&'a KeyValueDriver);
+impl<'a> GetTableSingleRow<'a> {
     pub(super) fn connect(driver: &'a KeyValueDriver) -> ReboxResult<Self> {
         Ok(Self(driver))
     }

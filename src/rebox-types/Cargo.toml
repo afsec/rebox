@@ -13,6 +13,7 @@ anyhow = { workspace = true }
 bincode = { workspace = true }
 bytes = { workspace = true }
 rkv = { workspace = true }
+serde = { workspace = true }
 
 [dev-dependencies]
 test-case = { workspace = true }

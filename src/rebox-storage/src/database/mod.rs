@@ -8,7 +8,7 @@ use self::{
     driver::key_value::KeyValueDriver,
     metadata::{rebox_master::ReboxMaster, rebox_sequence::ReboxSequence, rebox_stat::ReboxStat},
     name::DatabaseName,
-    row::{TableRow, column::data::RowData},
+    row::{column::data::RowData, TableRow},
 };
 use anyhow::{bail, format_err};
 use rebox_types::{
@@ -63,12 +63,12 @@ impl Database {
         Ok(cur_id)
     }
 
-    pub fn get_table_row(
+    pub fn get_table_rows(
         &self,
         table_name: &TableName,
-        table_row: &RowId,
-    ) -> ReboxResult<Option<RowData>> {
-        self.driver.get_table_row(table_name, table_row)
+        table_row: Option<&RowId>,
+    ) -> ReboxResult<Vec<RowData>> {
+        self.driver.get_table_rows(table_name, table_row)
     }
 
     fn bootstrap_metadata(&self) -> ReboxResult<()> {

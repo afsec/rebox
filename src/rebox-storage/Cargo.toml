@@ -15,8 +15,12 @@ rebox-types = { path = "../rebox-types" }
 rebox_derive = { path = "../rebox_derive" }
 bincode = { workspace = true }
 rkv = { workspace = true }
+serde = { workspace = true }
 tempfile = "3.6.0"
 
 [dev-dependencies]
-chrono = { workspace = true, features = ["clock"] }
 test-case = { workspace = true }
+chrono = { workspace = true, features = ["clock"] }
+json_to_table = { workspace = true }
+serde_json = { workspace = true }
+tabled = { workspace = true }
