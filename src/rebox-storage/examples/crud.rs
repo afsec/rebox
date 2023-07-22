@@ -75,7 +75,7 @@ impl CrudDepartments {
             let btree = row.get_mut();
             let _ = btree
                 .get_mut("oid")
-                .map(|column| column.set_value(gen_new_oid()));
+                .map(|column| column.set_value("bfbc43216c956571".to_string()));
             let _ = btree
                 .get_mut("name")
                 .map(|column| column.set_value("IT".to_string()));
@@ -89,7 +89,7 @@ impl CrudDepartments {
             let btree = row.get_mut();
             let _ = btree
                 .get_mut("oid")
-                .map(|column| column.set_value(gen_new_oid()));
+                .map(|column| column.set_value("d608b2b2d42ed554".to_string()));
             let _ = btree
                 .get_mut("name")
                 .map(|column| column.set_value("Accounting".to_string()));
@@ -103,7 +103,7 @@ impl CrudDepartments {
             let btree = row.get_mut();
             let _ = btree
                 .get_mut("oid")
-                .map(|column| column.set_value(gen_new_oid().to_string()));
+                .map(|column| column.set_value("41ba2b37ddca8117".to_string()));
             let _ = btree
                 .get_mut("name")
                 .map(|column| column.set_value("Marketing".to_string()));
@@ -159,6 +159,12 @@ impl CrudUsers {
             .set_nullable(false)
             .build();
 
+        let department_id = SchemaColumn::new()
+            .set_name("department_id")?
+            .set_kind(ColumnKind::Text)
+            .set_nullable(false)
+            .build();
+
         let is_active = SchemaColumn::new()
             .set_name("is_active")?
             .set_kind(ColumnKind::Bool)
@@ -171,7 +177,7 @@ impl CrudUsers {
             .set_nullable(false)
             .build();
 
-        let columns = vec![id, login, full_name, is_active, created_at];
+        let columns = vec![id, login, full_name, department_id, is_active, created_at];
 
         let table = Table::new()
             .set_name("users")?
@@ -195,6 +201,9 @@ impl CrudUsers {
             let _ = btree
                 .get_mut("full_name")
                 .map(|column| column.set_value("Charlie Root".to_string()));
+            let _ = btree
+                .get_mut("department_id")
+                .map(|column| column.set_value("bfbc43216c956571".to_string()));
 
             let _ = btree
                 .get_mut("is_active")
@@ -215,11 +224,15 @@ impl CrudUsers {
                 .map(|column| column.set_value(gen_new_oid().to_string()));
             let _ = btree
                 .get_mut("login")
-                .map(|column| column.set_value("admin".to_string()));
+                .map(|column| column.set_value("bob".to_string()));
 
             let _ = btree
                 .get_mut("full_name")
-                .map(|column| column.set_value("Administrator".to_string()));
+                .map(|column| column.set_value("Bob Cooper".to_string()));
+
+            let _ = btree
+                .get_mut("department_id")
+                .map(|column| column.set_value("d608b2b2d42ed554".to_string()));
 
             let _ = btree
                 .get_mut("is_active")
@@ -240,11 +253,14 @@ impl CrudUsers {
                 .map(|column| column.set_value(gen_new_oid().to_string()));
             let _ = btree
                 .get_mut("login")
-                .map(|column| column.set_value("staff".to_string()));
+                .map(|column| column.set_value("alice".to_string()));
 
             let _ = btree
                 .get_mut("full_name")
-                .map(|column| column.set_value("Staff".to_string()));
+                .map(|column| column.set_value("Alice Cooper".to_string()));
+            let _ = btree
+                .get_mut("department_id")
+                .map(|column| column.set_value("41ba2b37ddca8117".to_string()));
 
             let _ = btree
                 .get_mut("is_active")
