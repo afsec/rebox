@@ -57,8 +57,8 @@ impl TableColumn {
         self.value.as_ref()
     }
 
-    pub fn set_value(&mut self, value: ColumnValue) {
-        self.value = Some(value);
+    pub fn set_value<T: Into<ColumnValue>>(&mut self, value: T) {
+        self.value = Some(value.into());
     }
 
     pub fn build(self) -> Self {

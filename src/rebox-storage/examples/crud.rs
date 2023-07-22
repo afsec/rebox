@@ -75,10 +75,10 @@ impl CrudDepartments {
             let btree = row.get_mut();
             let _ = btree
                 .get_mut("oid")
-                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
+                .map(|column| column.set_value(gen_new_oid()));
             let _ = btree
                 .get_mut("name")
-                .map(|column| column.set_value(ColumnValue::Text("IT".into())));
+                .map(|column| column.set_value("IT".to_string()));
 
             row.verify()?;
             row.check_verified()?;
@@ -89,10 +89,10 @@ impl CrudDepartments {
             let btree = row.get_mut();
             let _ = btree
                 .get_mut("oid")
-                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
+                .map(|column| column.set_value(gen_new_oid()));
             let _ = btree
                 .get_mut("name")
-                .map(|column| column.set_value(ColumnValue::Text("Accounting".into())));
+                .map(|column| column.set_value("Accounting".to_string()));
 
             row.verify()?;
             row.check_verified()?;
@@ -103,10 +103,10 @@ impl CrudDepartments {
             let btree = row.get_mut();
             let _ = btree
                 .get_mut("oid")
-                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
+                .map(|column| column.set_value(gen_new_oid().to_string()));
             let _ = btree
                 .get_mut("name")
-                .map(|column| column.set_value(ColumnValue::Text("Marketing".into())));
+                .map(|column| column.set_value("Marketing".to_string()));
 
             row.verify()?;
             row.check_verified()?;
@@ -187,22 +187,22 @@ impl CrudUsers {
             let btree = row.get_mut();
             let _ = btree
                 .get_mut("oid")
-                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
+                .map(|column| column.set_value(gen_new_oid().to_string()));
             let _ = btree
                 .get_mut("login")
-                .map(|column| column.set_value(ColumnValue::Text("root".into())));
+                .map(|column| column.set_value("root".to_string()));
 
             let _ = btree
                 .get_mut("full_name")
-                .map(|column| column.set_value(ColumnValue::Text("Charlie Root".into())));
+                .map(|column| column.set_value("Charlie Root".to_string()));
 
             let _ = btree
                 .get_mut("is_active")
-                .map(|column| column.set_value(ColumnValue::Bool(true)));
+                .map(|column| column.set_value(true));
 
             let _ = btree
                 .get_mut("created_at")
-                .map(|column| column.set_value(ColumnValue::Integer(Utc::now().timestamp())));
+                .map(|column| column.set_value(Utc::now().timestamp()));
             row.verify()?;
             row.check_verified()?;
             rows.push(row);
@@ -212,22 +212,22 @@ impl CrudUsers {
             let btree = row.get_mut();
             let _ = btree
                 .get_mut("oid")
-                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
+                .map(|column| column.set_value(gen_new_oid().to_string()));
             let _ = btree
                 .get_mut("login")
-                .map(|column| column.set_value(ColumnValue::Text("admin".into())));
+                .map(|column| column.set_value("admin".to_string()));
 
             let _ = btree
                 .get_mut("full_name")
-                .map(|column| column.set_value(ColumnValue::Text("Administrator".into())));
+                .map(|column| column.set_value("Administrator".to_string()));
 
             let _ = btree
                 .get_mut("is_active")
-                .map(|column| column.set_value(ColumnValue::Bool(true)));
+                .map(|column| column.set_value(true));
 
             let _ = btree
                 .get_mut("created_at")
-                .map(|column| column.set_value(ColumnValue::Integer(Utc::now().timestamp())));
+                .map(|column| column.set_value(Utc::now().timestamp()));
             row.verify()?;
             row.check_verified()?;
             rows.push(row);
@@ -237,22 +237,22 @@ impl CrudUsers {
             let btree = row.get_mut();
             let _ = btree
                 .get_mut("oid")
-                .map(|column| column.set_value(ColumnValue::Text(gen_new_oid())));
+                .map(|column| column.set_value(gen_new_oid().to_string()));
             let _ = btree
                 .get_mut("login")
-                .map(|column| column.set_value(ColumnValue::Text("staff".into())));
+                .map(|column| column.set_value("staff".to_string()));
 
             let _ = btree
                 .get_mut("full_name")
-                .map(|column| column.set_value(ColumnValue::Text("Staff".into())));
+                .map(|column| column.set_value("Staff".to_string()));
 
             let _ = btree
                 .get_mut("is_active")
-                .map(|column| column.set_value(ColumnValue::Bool(true)));
+                .map(|column| column.set_value(true));
 
             let _ = btree
                 .get_mut("created_at")
-                .map(|column| column.set_value(ColumnValue::Integer(Utc::now().timestamp())));
+                .map(|column| column.set_value(Utc::now().timestamp()));
             row.verify()?;
             row.check_verified()?;
             rows.push(row);
