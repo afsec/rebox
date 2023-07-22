@@ -11,6 +11,7 @@ pub struct SchemaColumn {
     name: ColumnName,
     kind: ColumnKind,
     is_nullable: bool,
+    is_unique: bool,
 }
 
 impl SchemaColumn {
@@ -30,14 +31,15 @@ impl SchemaColumn {
         self.is_nullable
     }
 
-    pub fn take(self) -> (ColumnName, ColumnKind, bool) {
-        let Self {
-            name,
-            kind,
-            is_nullable,
-        } = self;
-        (name, kind, is_nullable)
-    }
+    // pub fn take(self) -> (ColumnName, ColumnKind, bool) {
+    //     let Self {
+    //         name,
+    //         kind,
+    //         is_nullable,
+    //         is_unique,
+    //     } = self;
+    //     (name, kind, is_nullable)
+    // }
 }
 
 #[derive(Debug)]
@@ -85,16 +87,38 @@ pub struct SchemaColumnBuilderS3 {
 }
 
 impl SchemaColumnBuilderS3 {
+    pub fn set_unique(self, is_unique: bool) -> SchemaColumnBuilderS4 {
+        let Self { name, kind, is_nullable } = self;
+        SchemaColumnBuilderS4 {
+            name,
+            kind,
+            is_nullable,
+            is_unique
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct SchemaColumnBuilderS4 {
+    name: ColumnName,
+    kind: ColumnKind,
+    is_nullable: bool,
+    is_unique: bool
+}
+
+impl SchemaColumnBuilderS4 {
     pub fn build(self) -> SchemaColumn {
         let Self {
             name,
             kind,
             is_nullable,
+            is_unique
         } = self;
         SchemaColumn {
             name,
             kind,
             is_nullable,
+            is_unique,
         }
     }
 }

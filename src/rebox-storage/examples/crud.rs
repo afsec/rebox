@@ -54,11 +54,13 @@ impl CrudDepartments {
             .set_name("oid")?
             .set_kind(ColumnKind::Text)
             .set_nullable(false)
+            .set_unique(false)
             .build();
         let name = SchemaColumn::new()
             .set_name("name")?
             .set_kind(ColumnKind::Text)
             .set_nullable(false)
+            .set_unique(false)
             .build();
         let columns = vec![id, name];
         let table = Table::new()
@@ -146,35 +148,41 @@ impl CrudUsers {
             .set_name("oid")?
             .set_kind(ColumnKind::Text)
             .set_nullable(false)
+            .set_unique(false)
             .build();
         let login = SchemaColumn::new()
             .set_name("login")?
             .set_kind(ColumnKind::Text)
             .set_nullable(false)
+            .set_unique(false)
             .build();
 
         let full_name = SchemaColumn::new()
             .set_name("full_name")?
             .set_kind(ColumnKind::Text)
             .set_nullable(false)
+            .set_unique(false)
             .build();
 
         let department_id = SchemaColumn::new()
             .set_name("department_id")?
             .set_kind(ColumnKind::Text)
             .set_nullable(false)
+            .set_unique(false)
             .build();
 
         let is_active = SchemaColumn::new()
             .set_name("is_active")?
             .set_kind(ColumnKind::Bool)
             .set_nullable(false)
+            .set_unique(false)
             .build();
 
         let created_at = SchemaColumn::new()
             .set_name("created_at")?
             .set_kind(ColumnKind::Integer)
             .set_nullable(false)
+            .set_unique(false)
             .build();
 
         let columns = vec![id, login, full_name, department_id, is_active, created_at];
