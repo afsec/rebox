@@ -16,11 +16,13 @@ fn main() -> ReboxResult<()> {
         .set_name("c1")?
         .set_kind(ColumnKind::Text)
         .set_nullable(false)
+        .set_unique(false)
         .build();
     let c2 = SchemaColumn::new()
         .set_name("c2")?
         .set_kind(ColumnKind::Text)
         .set_nullable(false)
+        .set_unique(false)
         .build();
 
     let schema: Vec<SchemaColumn> = vec![c1, c2];
