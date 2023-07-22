@@ -96,7 +96,7 @@ impl Table {
 pub struct TableBuilder;
 
 impl TableBuilder {
-    pub fn set_name<T: AsRef<str>>(self, name: T) -> ReboxResult<TableBuilderS1> {
+    pub fn name<T: AsRef<str>>(self, name: T) -> ReboxResult<TableBuilderS1> {
         check_valid_entity_name(&name)?;
         Ok(TableBuilderS1 {
             name: TableName::new(name),
@@ -110,7 +110,7 @@ pub struct TableBuilderS1 {
 }
 
 impl TableBuilderS1 {
-    pub fn set_schema(self, columns: Vec<SchemaColumn>) -> ReboxResult<TableBuilderS2> {
+    pub fn schema(self, columns: Vec<SchemaColumn>) -> ReboxResult<TableBuilderS2> {
         if columns.is_empty() {
             bail!("A table must have at least one SchemaColumn")
         }
