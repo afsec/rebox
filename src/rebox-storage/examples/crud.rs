@@ -16,7 +16,7 @@ use rebox_types::{
 
 fn main() -> ReboxResult<()> {
     let db_name = "example_crud";
-    let db = Database::new().set_name(db_name)?.build()?;
+    let db = Database::new().name(db_name)?.build()?;
     CrudDepartments::run(&db)?;
     CrudUsers::run(&db)?;
 
@@ -51,22 +51,23 @@ impl CrudDepartments {
     }
     fn generate_table() -> ReboxResult<Table> {
         let id = SchemaColumn::new()
-            .set_name("oid")?
-            .set_kind(ColumnKind::Text)
-            .set_nullable(false)
-            .set_unique(false)
+            .name("oid")?
+            .kind(ColumnKind::Text)
+            .not_null(false)
+            .unique(false)
+            .primary_key(false)
+            .auto_increment(false)
             .build();
         let name = SchemaColumn::new()
-            .set_name("name")?
-            .set_kind(ColumnKind::Text)
-            .set_nullable(false)
-            .set_unique(false)
+            .name("name")?
+            .kind(ColumnKind::Text)
+            .not_null(false)
+            .unique(false)
+            .primary_key(false)
+            .auto_increment(false)
             .build();
         let columns = vec![id, name];
-        let table = Table::new()
-            .set_name("departments")?
-            .set_schema(columns)?
-            .build()?;
+        let table = Table::new().name("departments")?.schema(columns)?.build()?;
 
         Ok(table)
     }
@@ -145,52 +146,61 @@ impl CrudUsers {
     }
     fn generate_table() -> ReboxResult<Table> {
         let id = SchemaColumn::new()
-            .set_name("oid")?
-            .set_kind(ColumnKind::Text)
-            .set_nullable(false)
-            .set_unique(false)
+            .name("oid")?
+            .kind(ColumnKind::Text)
+            .not_null(false)
+            .unique(false)
+            .primary_key(false)
+            .auto_increment(false)
             .build();
         let login = SchemaColumn::new()
-            .set_name("login")?
-            .set_kind(ColumnKind::Text)
-            .set_nullable(false)
-            .set_unique(false)
+            .name("login")?
+            .kind(ColumnKind::Text)
+            .not_null(false)
+            .unique(false)
+            .primary_key(false)
+            .auto_increment(false)
             .build();
 
         let full_name = SchemaColumn::new()
-            .set_name("full_name")?
-            .set_kind(ColumnKind::Text)
-            .set_nullable(false)
-            .set_unique(false)
+            .name("full_name")?
+            .kind(ColumnKind::Text)
+            .not_null(false)
+            .unique(false)
+            .primary_key(false)
+            .auto_increment(false)
             .build();
 
         let department_id = SchemaColumn::new()
-            .set_name("department_id")?
-            .set_kind(ColumnKind::Text)
-            .set_nullable(false)
-            .set_unique(false)
+            .name("department_id")?
+            .kind(ColumnKind::Text)
+            .not_null(false)
+            .unique(false)
+            .primary_key(false)
+            .auto_increment(false)
             .build();
 
         let is_active = SchemaColumn::new()
-            .set_name("is_active")?
-            .set_kind(ColumnKind::Bool)
-            .set_nullable(false)
-            .set_unique(false)
+            .name("is_active")?
+            .kind(ColumnKind::Bool)
+            .not_null(false)
+            .unique(false)
+            .primary_key(false)
+            .auto_increment(false)
             .build();
 
         let created_at = SchemaColumn::new()
-            .set_name("created_at")?
-            .set_kind(ColumnKind::Integer)
-            .set_nullable(false)
-            .set_unique(false)
+            .name("created_at")?
+            .kind(ColumnKind::Integer)
+            .not_null(false)
+            .unique(false)
+            .primary_key(false)
+            .auto_increment(false)
             .build();
 
         let columns = vec![id, login, full_name, department_id, is_active, created_at];
 
-        let table = Table::new()
-            .set_name("users")?
-            .set_schema(columns)?
-            .build()?;
+        let table = Table::new().name("users")?.schema(columns)?.build()?;
 
         Ok(table)
     }

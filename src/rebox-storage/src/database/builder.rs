@@ -14,7 +14,7 @@ impl Database {
 pub struct DatabaseBuilder;
 
 impl DatabaseBuilder {
-    pub fn set_name<S: AsRef<str>>(self, name: S) -> ReboxResult<DatabaseBuilderS1> {
+    pub fn name<S: AsRef<str>>(self, name: S) -> ReboxResult<DatabaseBuilderS1> {
         check_valid_entity_name(&name)?;
 
         Ok(DatabaseBuilderS1 {
