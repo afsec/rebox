@@ -12,6 +12,7 @@ use self::{
 };
 use anyhow::{bail, format_err};
 use rebox_types::{
+    query::ColumnsFilter,
     schema::{name::TableName, RowId, Table},
     ReboxResult,
 };
@@ -66,9 +67,9 @@ impl Database {
     pub fn get_table_rows(
         &self,
         table_name: &TableName,
-        table_row: Option<&RowId>,
+        columns_filter: &ColumnsFilter,
     ) -> ReboxResult<Vec<RowData>> {
-        self.driver.get_table_rows(table_name, table_row)
+        self.driver.get_table_rows(table_name, columns_filter)
     }
 
     fn bootstrap_metadata(&self) -> ReboxResult<()> {

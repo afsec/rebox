@@ -4,6 +4,7 @@ use rebox_storage::database::{
     Database,
 };
 use rebox_types::{
+    query::ColumnsFilter,
     schema::{
         column::{
             model::{ColumnKind, ColumnValue},
@@ -30,7 +31,7 @@ impl CrudDepartments {
         let table = Self::generate_table()?;
 
         let table_name = db.create_table(table.clone())?;
-        println!("\nTable [{table_name}] created.\n");
+        println!("\nTable [{table_name}] created.");
 
         let rows = Self::generate_data(&table)?;
         let _ = rows
@@ -40,9 +41,24 @@ impl CrudDepartments {
         // dbg!(&table_row);
 
         // let rows = db.get_table_rows(&table_name, Some(&row_id))?;
-        let rows = db.get_table_rows(&table_name, None)?;
-        // print_rows_as_json(&rows)?;
-        print_row_as_table(&rows)?;
+        // * All columns
+        {
+            let columns_filter = ColumnsFilter::new()
+                // .column("oid")?
+                .build();
+            let rows = db.get_table_rows(&table_name, &columns_filter)?;
+            // print_rows_as_json(&rows)?;
+            println!("Table [{table_name}] filtered by {columns_filter}:");
+            print_row_as_table(&rows)?;
+        }
+        // * Filtered by column `name`
+        {
+            let columns_filter = ColumnsFilter::new().column("name")?.build();
+            let rows = db.get_table_rows(&table_name, &columns_filter)?;
+            // print_rows_as_json(&rows)?;
+            println!("Table [{table_name}] filtered by {columns_filter}:");
+            print_row_as_table(&rows)?;
+        }
 
         // let table_name = db.drop_table(table.name())?;
         // println!("Table [{table_name}] deleted.");
@@ -126,7 +142,7 @@ impl CrudUsers {
         let table = Self::generate_table()?;
 
         let table_name = db.create_table(table.clone())?;
-        println!("\nTable [{table_name}] created.\n");
+        println!("\nTable [{table_name}] created.");
 
         let rows = Self::generate_data(&table)?;
         // dbg!(&table_row);
@@ -135,10 +151,31 @@ impl CrudUsers {
             .map(|row| db.insert_into_table(table_name.clone(), row))
             .collect::<ReboxResult<Vec<RowId>>>()?;
 
-        // let rows = db.get_table_rows(&table_name, Some(&row_id))?;
-        let rows = db.get_table_rows(&table_name, None)?;
-        // print_rows_as_json(&rows)?;
-        print_row_as_table(&rows)?;
+        ///////////////////
+        // * All columns
+        {
+            let columns_filter = ColumnsFilter::new()
+                // .column("oid")?
+                .build();
+            let rows = db.get_table_rows(&table_name, &columns_filter)?;
+            // print_rows_as_json(&rows)?;
+            println!("Table [{table_name}] filtered by {columns_filter}:");
+            print_row_as_table(&rows)?;
+        }
+        // * Filtered by column `name`
+        {
+            let columns_filter = ColumnsFilter::new()
+                .column("department_id")?
+                .column("full_name")?
+                .column("is_active")?
+                .build();
+            let rows = db.get_table_rows(&table_name, &columns_filter)?;
+            // print_rows_as_json(&rows)?;
+            println!("Table [{table_name}] filtered by {columns_filter}:");
+            print_row_as_table(&rows)?;
+        }
+
+        ///////////////////
 
         // let table_name = db.drop_table(table.name())?;
         // println!("Table [{table_name}] deleted.");

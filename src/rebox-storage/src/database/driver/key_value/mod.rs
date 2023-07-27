@@ -1,7 +1,6 @@
 pub(super) mod builder;
 mod create_table;
 mod drop_table;
-// mod get_table_single_row;
 mod get_table_rows;
 mod helpers;
 mod insert_into_table;
@@ -25,6 +24,7 @@ use crate::database::{
 use anyhow::bail;
 use rebox_derive::DbDriver;
 use rebox_types::{
+    query::ColumnsFilter,
     schema::{name::TableName, RowId, Table},
     ReboxResult,
 };
@@ -74,10 +74,10 @@ impl KeyValueDriver {
     pub(crate) fn get_table_rows(
         &self,
         table_name: &TableName,
-        table_row: Option<&RowId>,
+        columns_filter: &ColumnsFilter,
     ) -> ReboxResult<Vec<RowData>> {
         if self.table_exists(&table_name)? {
-            GetTableRows::connect(self)?.get(table_name, table_row)
+            GetTableRows::connect(self)?.get_filtered(table_name, columns_filter)
         } else {
             bail!("Table [{}] already exists", &table_name);
         }
