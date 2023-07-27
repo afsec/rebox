@@ -76,7 +76,7 @@ impl SchemaColumnBuilderS2 {
         SchemaColumnBuilderS3 {
             name,
             kind,
-            is_nullable: yes
+            is_nullable: yes,
         }
     }
 }
@@ -90,12 +90,16 @@ pub struct SchemaColumnBuilderS3 {
 
 impl SchemaColumnBuilderS3 {
     pub fn unique(self, yes: bool) -> SchemaColumnBuilderS4 {
-        let Self { name, kind, is_nullable } = self;
+        let Self {
+            name,
+            kind,
+            is_nullable,
+        } = self;
         SchemaColumnBuilderS4 {
             name,
             kind,
             is_nullable,
-            is_unique: yes
+            is_unique: yes,
         }
     }
 }
@@ -110,16 +114,20 @@ pub struct SchemaColumnBuilderS4 {
 
 impl SchemaColumnBuilderS4 {
     pub fn primary_key(self, yes: bool) -> SchemaColumnBuilderS5 {
-        let Self { name, kind, is_nullable, is_unique } = self;
+        let Self {
+            name,
+            kind,
+            is_nullable,
+            is_unique,
+        } = self;
         SchemaColumnBuilderS5 {
             name,
             kind,
             is_nullable,
             is_unique,
-            is_primary_key: yes
+            is_primary_key: yes,
         }
     }
-
 }
 
 #[derive(Debug)]
@@ -128,21 +136,26 @@ pub struct SchemaColumnBuilderS5 {
     kind: ColumnKind,
     is_nullable: bool,
     is_unique: bool,
-    is_primary_key: bool
+    is_primary_key: bool,
 }
 impl SchemaColumnBuilderS5 {
     pub fn auto_increment(self, yes: bool) -> SchemaColumnBuilderS6 {
-        let Self { name, kind, is_nullable, is_unique, is_primary_key } = self;
+        let Self {
+            name,
+            kind,
+            is_nullable,
+            is_unique,
+            is_primary_key,
+        } = self;
         SchemaColumnBuilderS6 {
             name,
             kind,
             is_nullable,
             is_unique,
             is_primary_key,
-            is_auto_increment: yes
+            is_auto_increment: yes,
         }
     }
-
 }
 
 #[derive(Debug)]
@@ -152,26 +165,26 @@ pub struct SchemaColumnBuilderS6 {
     is_nullable: bool,
     is_unique: bool,
     is_primary_key: bool,
-    is_auto_increment: bool
+    is_auto_increment: bool,
 }
 
 impl SchemaColumnBuilderS6 {
-pub fn build(self) -> SchemaColumn {
-    let Self {
-        name,
-        kind,
-        is_nullable,
-        is_unique,
-        is_primary_key,
-        is_auto_increment,
-    } = self;
-    SchemaColumn {
-        name,
-        kind,
-        is_nullable,
-        is_unique,
-        is_primary_key,
-        is_auto_increment,
+    pub fn build(self) -> SchemaColumn {
+        let Self {
+            name,
+            kind,
+            is_nullable,
+            is_unique,
+            is_primary_key,
+            is_auto_increment,
+        } = self;
+        SchemaColumn {
+            name,
+            kind,
+            is_nullable,
+            is_unique,
+            is_primary_key,
+            is_auto_increment,
+        }
     }
-}
 }

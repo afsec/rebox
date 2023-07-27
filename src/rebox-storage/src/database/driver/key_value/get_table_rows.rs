@@ -2,6 +2,7 @@ use super::{helpers::retrieve_schema, KeyValueDriver};
 use crate::database::row::column::data::{ColumnData, RowData};
 use anyhow::{bail, format_err};
 use rebox_types::{
+    query::ColumnsFilter,
     schema::{column::model::ColumnValue, name::TableName, RowId, Table},
     DbPrefix, ReboxResult,
 };
@@ -11,6 +12,52 @@ pub(super) struct GetTableRows<'a>(&'a KeyValueDriver);
 impl<'a> GetTableRows<'a> {
     pub(super) fn connect(driver: &'a KeyValueDriver) -> ReboxResult<Self> {
         Ok(Self(driver))
+    }
+
+    pub(super) fn get_filtered(
+        self,
+        table_name: &TableName,
+        columns_filter: &ColumnsFilter,
+    ) -> ReboxResult<Vec<RowData>> {
+        let store_name_prefix = format!("{}-{}", Table::prefix(), table_name);
+        let tbl_schema = retrieve_schema(self.0.connection(), self.0.metadata(), &table_name)?;
+        let schema_cols = tbl_schema.get_columns();
+        // TODO: Refactor RowId implementation
+        let row_ids = self.get_keys_from_rowid_store(table_name)?;
+        let outcome: Vec<RowData> = row_ids
+            .iter()
+            .map(|row_id| {
+                let row_data = schema_cols
+                    .iter()
+                    .map(|(col_name, tbl_column)| {
+                        if columns_filter.contains(&(col_name.try_into()?)) {
+                            let store_name_str = format!("{store_name_prefix}_{col_name}");
+                            let kind = tbl_column.kind();
+                            let value: ColumnValue = self
+                                .get_value_from_store(store_name_str, row_id)?
+                                .try_into()?;
+                            if value != *kind {
+                                bail!("Incompatiple types between ColumnKind and ColumnValue");
+                            }
+                            let data = ColumnData::new()
+                                .set_row_id(row_id.clone())
+                                .set_col_name(col_name)
+                                .set_value(value)
+                                .build();
+                            Ok(Some(data))
+                        } else {
+                            Ok(None)
+                        }
+                    })
+                    .collect::<ReboxResult<Vec<Option<ColumnData>>>>()?
+                    .into_iter()
+                    .flatten()
+                    .collect::<Vec<ColumnData>>();
+
+                Ok(row_data.try_into()?)
+            })
+            .collect::<ReboxResult<Vec<RowData>>>()?;
+        Ok(outcome)
     }
 
     pub(super) fn get(

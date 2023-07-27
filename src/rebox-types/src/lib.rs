@@ -51,5 +51,6 @@ pub trait DbPrefix {
     }
 }
 pub mod helpers;
+pub mod query;
 pub mod schema;
 pub mod test_helpers;
