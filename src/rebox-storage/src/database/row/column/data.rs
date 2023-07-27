@@ -15,6 +15,13 @@ pub struct RowData {
 }
 
 impl RowData {
+    // TODO: Refactor RowId;
+    pub fn new_rowid(row_id: RowId) -> Self {
+        Self {
+            row_id,
+            data: Default::default(),
+        }
+    }
     pub fn row_id(&self) -> &RowId {
         &self.row_id
     }

@@ -18,7 +18,6 @@ pub(super) fn retrieve_schema(
     let table_name_str = &**table_name;
     let rebox_master = metadata.rebox_master().table_name().as_ref();
     let created_arc = connection.clone();
-    let rebox_master = metadata.rebox_master().table_name().as_ref();
 
     let rkv_env = created_arc
         .read()
@@ -87,3 +86,25 @@ pub(super) fn check_row_against_schema(
     }
     Ok(())
 }
+
+// pub(super) fn check_column_value_against_schema(
+//     connection: &KvConnection,
+//     metadata: &DatabaseMetadata,
+//     table_name: &TableName,
+//     column_name: &ColumnName,
+//     column_value: &ColumnValue,
+// ) -> ReboxResult<()> {
+//     let tbl_schema = retrieve_schema(connection, metadata, table_name)?;
+//     let schema_cols = tbl_schema.get_columns();
+
+//     let schema_column = schema_cols.get(&**column_name).ok_or(format_err!(
+//         "Impossible State at {} {}",
+//         file!(),
+//         line!()
+//     ))?;
+//     if column_value != schema_column.kind() {
+//         bail!("Row is not matching against {table_name} schema");
+//     }
+
+//     Ok(())
+// }

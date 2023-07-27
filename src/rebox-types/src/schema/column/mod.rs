@@ -10,9 +10,13 @@ pub mod model;
 pub struct SchemaColumn {
     name: ColumnName,
     kind: ColumnKind,
+    // TODO
     is_nullable: bool,
+    // TODO
     is_unique: bool,
+    // TODO
     is_primary_key: bool,
+    // TODO
     is_auto_increment: bool,
 }
 
@@ -32,16 +36,6 @@ impl SchemaColumn {
     pub fn is_nullable(&self) -> bool {
         self.is_nullable
     }
-
-    // pub fn take(self) -> (ColumnName, ColumnKind, bool) {
-    //     let Self {
-    //         name,
-    //         kind,
-    //         is_nullable,
-    //         is_unique,
-    //     } = self;
-    //     (name, kind, is_nullable)
-    // }
 }
 
 #[derive(Debug)]
