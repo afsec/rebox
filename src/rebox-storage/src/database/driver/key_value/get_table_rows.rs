@@ -11,7 +11,6 @@ use rebox_types::{
             SchemaColumn,
         },
         name::TableName,
-        schema::TableSchema,
         RowId, Table,
     },
     DbPrefix, ReboxResult,
