@@ -8,7 +8,7 @@ mod list_tables;
 mod number_of_stores;
 mod table_exists;
 
-// TODO: Implement another module to perform (Defrag / Compact) Database
+// TODO: Implement another module to perform (Defrag / Compact / Auto Vaccum) Database
 
 use self::{
     builder::KeyValueDriverBuilder, create_table::CreateTable, drop_table::DropTable,
@@ -24,7 +24,7 @@ use crate::database::{
 use anyhow::bail;
 use rebox_derive::DbDriver;
 use rebox_types::{
-    query::ColumnsFilter,
+    query::{columns_filter::ColumnsFilter, values_to_match::ValuesToMatch},
     schema::{name::TableName, RowId, Table},
     ReboxResult,
 };
@@ -75,9 +75,10 @@ impl KeyValueDriver {
         &self,
         table_name: &TableName,
         columns_filter: &ColumnsFilter,
+        values_to_match: &ValuesToMatch,
     ) -> ReboxResult<Vec<RowData>> {
         if self.table_exists(&table_name)? {
-            GetTableRows::connect(self)?.get_filtered(table_name, columns_filter)
+            GetTableRows::connect(self)?.get(table_name, columns_filter, values_to_match)
         } else {
             bail!("Table [{}] already exists", &table_name);
         }

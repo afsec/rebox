@@ -12,7 +12,7 @@ use self::{
 };
 use anyhow::{bail, format_err};
 use rebox_types::{
-    query::ColumnsFilter,
+    query::{columns_filter::ColumnsFilter, values_to_match::ValuesToMatch},
     schema::{name::TableName, RowId, Table},
     ReboxResult,
 };
@@ -68,8 +68,10 @@ impl Database {
         &self,
         table_name: &TableName,
         columns_filter: &ColumnsFilter,
+        values_to_match: &ValuesToMatch,
     ) -> ReboxResult<Vec<RowData>> {
-        self.driver.get_table_rows(table_name, columns_filter)
+        self.driver
+            .get_table_rows(table_name, columns_filter, values_to_match)
     }
 
     fn bootstrap_metadata(&self) -> ReboxResult<()> {

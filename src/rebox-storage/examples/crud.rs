@@ -4,7 +4,7 @@ use rebox_storage::database::{
     Database,
 };
 use rebox_types::{
-    query::ColumnsFilter,
+    query::{columns_filter::ColumnsFilter, values_to_match::ValuesToMatch},
     schema::{
         column::{
             model::{ColumnKind, ColumnValue},
@@ -46,17 +46,19 @@ impl CrudDepartments {
             let columns_filter = ColumnsFilter::new()
                 // .column("oid")?
                 .build();
-            let rows = db.get_table_rows(&table_name, &columns_filter)?;
+            let values_to_match = ValuesToMatch::default();
+            let rows = db.get_table_rows(&table_name, &columns_filter, &values_to_match)?;
             // print_rows_as_json(&rows)?;
-            println!("Table [{table_name}] filtered by {columns_filter}:");
+            println!("SELECT {columns_filter} FROM [{table_name}] {values_to_match}");
             print_row_as_table(&rows)?;
         }
         // * Filtered by column `name`
         {
             let columns_filter = ColumnsFilter::new().column("name")?.build();
-            let rows = db.get_table_rows(&table_name, &columns_filter)?;
+            let values_to_match = ValuesToMatch::default();
+            let rows = db.get_table_rows(&table_name, &columns_filter, &values_to_match)?;
             // print_rows_as_json(&rows)?;
-            println!("Table [{table_name}] filtered by {columns_filter}:");
+            println!("SELECT {columns_filter} FROM [{table_name}] {values_to_match}");
             print_row_as_table(&rows)?;
         }
 
@@ -157,9 +159,10 @@ impl CrudUsers {
             let columns_filter = ColumnsFilter::new()
                 // .column("oid")?
                 .build();
-            let rows = db.get_table_rows(&table_name, &columns_filter)?;
+            let values_to_match = ValuesToMatch::default();
+            let rows = db.get_table_rows(&table_name, &columns_filter, &values_to_match)?;
             // print_rows_as_json(&rows)?;
-            println!("Table [{table_name}] filtered by {columns_filter}:");
+            println!("SELECT {columns_filter} FROM [{table_name}] {values_to_match}");
             print_row_as_table(&rows)?;
         }
         // * Filtered by column `name`
@@ -169,9 +172,15 @@ impl CrudUsers {
                 .column("full_name")?
                 .column("is_active")?
                 .build();
-            let rows = db.get_table_rows(&table_name, &columns_filter)?;
+            let values_to_match = ValuesToMatch::new()
+                .set_where("login".try_into()?)
+                .is()
+                .value(ColumnValue::Text("root".into()))
+                .build()?;
+            let rows = db.get_table_rows(&table_name, &columns_filter, &values_to_match)?;
             // print_rows_as_json(&rows)?;
-            println!("Table [{table_name}] filtered by {columns_filter}:");
+            println!("SELECT {columns_filter} FROM [{table_name}] {values_to_match}");
+
             print_row_as_table(&rows)?;
         }
 

@@ -1,9 +1,19 @@
+use std::collections::BTreeMap;
+
 use super::{helpers::retrieve_schema, KeyValueDriver};
 use crate::database::row::column::data::{ColumnData, RowData};
 use anyhow::{bail, format_err};
 use rebox_types::{
-    query::ColumnsFilter,
-    schema::{column::model::ColumnValue, name::TableName, RowId, Table},
+    query::{columns_filter::ColumnsFilter, values_to_match::ValuesToMatch},
+    schema::{
+        column::{
+            model::{ColumnName, ColumnValue},
+            SchemaColumn,
+        },
+        name::TableName,
+        schema::TableSchema,
+        RowId, Table,
+    },
     DbPrefix, ReboxResult,
 };
 use rkv::{OwnedValue, StoreOptions};
@@ -14,35 +24,38 @@ impl<'a> GetTableRows<'a> {
         Ok(Self(driver))
     }
 
-    pub(super) fn get_filtered(
+    pub(super) fn get(
         self,
         table_name: &TableName,
         columns_filter: &ColumnsFilter,
+        values_to_match: &ValuesToMatch,
     ) -> ReboxResult<Vec<RowData>> {
         let store_name_prefix = format!("{}-{}", Table::prefix(), table_name);
         let tbl_schema = retrieve_schema(self.0.connection(), self.0.metadata(), &table_name)?;
         let schema_cols = tbl_schema.get_columns();
-        // TODO: Refactor RowId implementation
-        let row_ids = self.get_keys_from_rowid_store(table_name)?;
-        let outcome: Vec<RowData> = row_ids
+
+        let selected_rowids =
+            self.get_row_ids_from_matched_values(table_name, &schema_cols, values_to_match)?;
+
+        let outcome = selected_rowids
             .iter()
             .map(|row_id| {
                 let row_data = schema_cols
                     .iter()
                     .map(|(col_name, tbl_column)| {
-                        if columns_filter.contains(&(col_name.try_into()?)) {
-                            let store_name_str = format!("{store_name_prefix}_{col_name}");
-                            let kind = tbl_column.kind();
-                            let value: ColumnValue = self
-                                .get_value_from_store(store_name_str, row_id)?
-                                .try_into()?;
-                            if value != *kind {
-                                bail!("Incompatiple types between ColumnKind and ColumnValue");
-                            }
+                        let store_name_str = format!("{store_name_prefix}_{col_name}");
+                        let kind = tbl_column.kind();
+                        let retrieved_column_value: ColumnValue = self
+                            .get_value_from_store(store_name_str, row_id)?
+                            .try_into()?;
+                        if retrieved_column_value != *kind {
+                            bail!("Incompatiple types between ColumnKind and ColumnValue");
+                        }
+                        if columns_filter.contains(&ColumnName::try_from(col_name)?) {
                             let data = ColumnData::new()
                                 .set_row_id(row_id.clone())
                                 .set_col_name(col_name)
-                                .set_value(value)
+                                .set_value(retrieved_column_value)
                                 .build();
                             Ok(Some(data))
                         } else {
@@ -51,49 +64,8 @@ impl<'a> GetTableRows<'a> {
                     })
                     .collect::<ReboxResult<Vec<Option<ColumnData>>>>()?
                     .into_iter()
-                    .flatten()
+                    .filter_map(|some_item| some_item)
                     .collect::<Vec<ColumnData>>();
-
-                Ok(row_data.try_into()?)
-            })
-            .collect::<ReboxResult<Vec<RowData>>>()?;
-        Ok(outcome)
-    }
-
-    pub(super) fn get(
-        self,
-        table_name: &TableName,
-        maybe_row_id: Option<&RowId>,
-    ) -> ReboxResult<Vec<RowData>> {
-        let store_name_prefix = format!("{}-{}", Table::prefix(), table_name);
-        let tbl_schema = retrieve_schema(self.0.connection(), self.0.metadata(), &table_name)?;
-        let schema_cols = tbl_schema.get_columns();
-        let row_ids = match maybe_row_id {
-            Some(row_id) => vec![row_id.clone()],
-            None => self.get_keys_from_rowid_store(table_name)?,
-        };
-        let outcome = row_ids
-            .iter()
-            .map(|row_id| {
-                let row_data = schema_cols
-                    .iter()
-                    .map(|(col_name, tbl_column)| {
-                        let store_name_str = format!("{store_name_prefix}_{col_name}");
-                        let kind = tbl_column.kind();
-                        let value: ColumnValue = self
-                            .get_value_from_store(store_name_str, row_id)?
-                            .try_into()?;
-                        if value != *kind {
-                            bail!("Incompatiple types between ColumnKind and ColumnValue");
-                        }
-                        let data = ColumnData::new()
-                            .set_row_id(row_id.clone())
-                            .set_col_name(col_name)
-                            .set_value(value)
-                            .build();
-                        Ok(data)
-                    })
-                    .collect::<ReboxResult<Vec<ColumnData>>>()?;
                 Ok(row_data.try_into()?)
             })
             .collect::<ReboxResult<Vec<RowData>>>()?;
@@ -146,5 +118,33 @@ impl<'a> GetTableRows<'a> {
             })
             .collect::<ReboxResult<Vec<RowId>>>()?;
         Ok(row_ids)
+    }
+    fn get_row_ids_from_matched_values(
+        &self,
+        table_name: &TableName,
+        schema_cols: &BTreeMap<String, SchemaColumn>,
+        values_to_match: &ValuesToMatch,
+    ) -> ReboxResult<Vec<RowId>> {
+        let store_name_prefix = format!("{}-{}", Table::prefix(), table_name);
+        let all_row_ids = self.get_keys_from_rowid_store(table_name)?;
+        let mut selected_rowids: Vec<RowId> = Default::default();
+        for row_id in all_row_ids {
+            for (col_name, tbl_column) in schema_cols {
+                let store_name_str = format!("{store_name_prefix}_{col_name}");
+                let kind = tbl_column.kind();
+                let retrieved_column_value: ColumnValue = self
+                    .get_value_from_store(store_name_str, &row_id)?
+                    .try_into()?;
+                if retrieved_column_value != *kind {
+                    bail!("Incompatiple types between ColumnKind and ColumnValue");
+                }
+                if values_to_match.match_against(tbl_column.name(), &retrieved_column_value) {
+                    selected_rowids.push(row_id.clone());
+                    break;
+                }
+            }
+        }
+
+        Ok(selected_rowids)
     }
 }
